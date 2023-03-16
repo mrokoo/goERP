@@ -22,12 +22,12 @@ type Respository interface {
 
 // mongo存储库
 type MongoRespository struct {
-	customer *mongo.Collection
+	customers *mongo.Collection
 }
 
 func (mr *MongoRespository) SaveCustomer(ctx context.Context, customer Customer) error {
 	mongoCustomer := toMongoCustomer(customer)
-	_, err := mr.customer.InsertOne(ctx, mongoCustomer)
+	_, err := mr.customers.InsertOne(ctx, mongoCustomer)
 	if err != nil {
 		if mongo.IsDuplicateKeyError(err) {
 			return fmt.Errorf("fail to persist customer: %w", ErrNotUID)
@@ -40,7 +40,7 @@ func (mr *MongoRespository) SaveCustomer(ctx context.Context, customer Customer)
 
 func (mr *MongoRespository) DeleteCustomer(ctx context.Context, customerID CustomerId) error {
 	filter := bson.D{{Key: "ID", Value: customerID}}
-	_, err := mr.customer.DeleteOne(ctx, filter)
+	_, err := mr.customers.DeleteOne(ctx, filter)
 	if err != nil {
 		return fmt.Errorf("fail to delete customer: %w", err)
 	}
@@ -59,7 +59,7 @@ func (mr *MongoRespository) ChangeCustomer(ctx context.Context, customer Custome
 		{Key: "note", Value: mongoCustomer.Note},
 		{Key: "state", Value: mongoCustomer.State},
 	}}}
-	_, err := mr.customer.UpdateOne(ctx, filter, update)
+	_, err := mr.customers.UpdateOne(ctx, filter, update)
 	if err != nil {
 		return fmt.Errorf("fail to change customer: %w", err)
 	}
@@ -76,9 +76,9 @@ func NewMongoRepo(ctx context.Context, connectionString string) (*MongoResposito
 		return nil, fmt.Errorf("failed to create a mongo client: %w", err)
 	}
 
-	customer := client.Database("goERP").Collection("customers")
+	customers := client.Database("goERP").Collection("customers")
 	return &MongoRespository{
-		customer: customer,
+		customers: customers,
 	}, nil
 }
 
