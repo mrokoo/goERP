@@ -2,12 +2,15 @@ package customer
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
+
+var ErrNotUID = errors.New("the customerId is not unique")
 
 // customer 领域层存储库接口
 type Respository interface {
@@ -26,6 +29,10 @@ func (mr *MongoRespository) SaveCustomer(ctx context.Context, customer Customer)
 	mongoCustomer := toMongoCustomer(customer)
 	_, err := mr.customer.InsertOne(ctx, mongoCustomer)
 	if err != nil {
+		if mongo.IsDuplicateKeyError(err) {
+			return fmt.Errorf("fail to persist customer: %w", ErrNotUID)
+		}
+
 		return fmt.Errorf("fail to persist customer: %w", err)
 	}
 	return nil

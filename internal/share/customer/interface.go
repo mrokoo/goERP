@@ -2,7 +2,7 @@ package customer
 
 import (
 	"context"
-	"fmt"
+	"errors"
 
 	"github.com/gin-gonic/gin"
 )
@@ -25,26 +25,28 @@ func CreateCustomerRouter(e *gin.Engine) {
 			app.repo.ChangeCustomer(context.Background(), customer)
 			// to do
 		})
-		c.POST("/fetch", func(ctx *gin.Context) {
+		c.POST("/fetchAllcustomer", func(ctx *gin.Context) {
 			ctx.JSON(200, gin.H{
 				"message": "helloworld",
 			})
 		})
 
-		c.POST("/save", func(ctx *gin.Context) {
+		c.POST("/saveCustomer", func(ctx *gin.Context) {
 			var customer Customer
 			err := ctx.BindJSON(&customer)
-			fmt.Printf("%#v\n", customer)
 			if err != nil {
 				ctx.JSON(400, gin.H{
 					"message": "错误",
 				})
 			}
 
-			if err := app.SaveCustomer(context.TODO(), customer); err != nil {
-				ctx.JSON(200, gin.H{
-					"message": "添加失败",
-				})
+			if err := app.SaveCustomer(context.Background(), customer); err != nil {
+				if errors.Is(err, ErrNotUID) {
+					ctx.JSON(300, gin.H{
+						"message": "不是唯一ID",
+					})
+				}
+
 			} else {
 				ctx.JSON(200, gin.H{
 					"message": "添加OK",
