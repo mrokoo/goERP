@@ -16,11 +16,19 @@ func CreateCustomerRouter(e *gin.Engine) {
 	service := NewCustomerApplicationService(repo)
 	c := e.Group("/customer")
 	{
-
 		c.PUT("/updateCustomer", func(ctx *gin.Context) {
-			var customer Customer
-			err := ctx.BindJSON(&customer)
-			if err != nil {
+			var req struct {
+				ID          CustomerId  `json:"id"`
+				Name        Name        `json:"name"`
+				Grade       GradeType   `json:"grade"`
+				Contact     ContactName `json:"contact"`
+				PhoneNumber PhoneNumber `json:"phoneNumber"`
+				Address     Address     `json:"address"`
+				Note        string      `json:"note"`
+				State       StateType   `json:"state"`
+			}
+
+			if err := ctx.BindJSON(&req); err != nil {
 				ctx.JSON(400, gin.H{
 					"code":     -1,
 					"showMsg":  "failure",
@@ -29,7 +37,7 @@ func CreateCustomerRouter(e *gin.Engine) {
 				})
 				return
 			}
-			if err := service.repo.ChangeCustomer(context.Background(), customer); err != nil {
+			if err := service.UpdateCustomer(context.Background(), req); err != nil {
 				ctx.JSON(400, gin.H{
 					"code":     -1,
 					"showMsg":  "failure",
@@ -46,7 +54,7 @@ func CreateCustomerRouter(e *gin.Engine) {
 			})
 		})
 		c.GET("/getCustomerList", func(ctx *gin.Context) {
-			customerList, err := service.repo.FetchAllCustomers(ctx)
+			customerList, err := service.GetCustomerList(context.Background())
 			if err != nil {
 				ctx.JSON(400, gin.H{
 					"code":     -1,
@@ -110,7 +118,7 @@ func CreateCustomerRouter(e *gin.Engine) {
 				return
 			}
 
-			if err := service.repo.DeleteCustomer(ctx, CustomerId(req.CustomerId)); err != nil {
+			if err := service.DeleteCustomer(ctx, req.CustomerId); err != nil {
 				ctx.JSON(400, gin.H{
 					"code":     -1,
 					"showMsg":  "failure",

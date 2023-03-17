@@ -2,6 +2,7 @@ package supplier
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -11,12 +12,12 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var ErrNotUID = errors.New("the customerId is not unique")
+var ErrNotUID = errors.New("the supplierId is not unique")
 
 type Repositiory interface {
 	SaveSupplier(ctx context.Context, supplier Supplier) error
 	ChangeSupplier(ctx context.Context, supplier Supplier) error
-	FetchAllSuppliers(ctx context.Context) error
+	FetchAllSuppliers(ctx context.Context) ([]Supplier, error)
 	DeleteSupplier(ctx context.Context, supplierID SupplierId) error
 }
 
@@ -37,8 +38,11 @@ func (mr *MongoRespository) SaveSupplier(ctx context.Context, supplier Supplier)
 }
 
 func (mr *MongoRespository) DeleteSupplier(ctx context.Context, supplierID SupplierId) error {
-	filter := bson.D{{Key: "ID", Value: supplierID}}
-	_, err := mr.suppliers.DeleteOne(ctx, filter)
+	filter := bson.D{{Key: "id", Value: supplierID}}
+	result, err := mr.suppliers.DeleteOne(ctx, filter)
+	if result.DeletedCount == 0 {
+		return errors.New("fail to query the supplier")
+	}
 	if err != nil {
 		return fmt.Errorf("fail to delete supplier: %w", err)
 	}
@@ -47,7 +51,7 @@ func (mr *MongoRespository) DeleteSupplier(ctx context.Context, supplierID Suppl
 
 func (mr *MongoRespository) ChangeSupplier(ctx context.Context, supplier Supplier) error {
 	mongoS := toMongoSupplier(supplier)
-	filter := bson.D{{Key: "ID", Value: supplier.ID}}
+	filter := bson.D{{Key: "id", Value: supplier.ID}}
 	update := bson.D{{Key: "$set", Value: bson.D{
 		{Key: "name", Value: mongoS.Name},
 		{Key: "contact", Value: mongoS.Contact},
@@ -60,15 +64,37 @@ func (mr *MongoRespository) ChangeSupplier(ctx context.Context, supplier Supplie
 		{Key: "debt", Value: mongoS.debt},
 	}}}
 
-	_, err := mr.suppliers.UpdateOne(ctx, filter, update)
+	result, err := mr.suppliers.UpdateOne(ctx, filter, update)
+	if result.MatchedCount == 0 {
+		return errors.New("fail to query the supplier")
+	}
 	if err != nil {
 		return fmt.Errorf("fail to change supplier: %w", err)
 	}
 	return nil
 }
 
-func (mr *MongoRespository) FetchAllSuppliers(ctx context.Context) error {
-	return fmt.Errorf("this is a error")
+func (mr *MongoRespository) FetchAllSuppliers(ctx context.Context) ([]Supplier, error) {
+	cursor, err := mr.suppliers.Find(ctx, bson.D{})
+
+	if err != nil {
+		return []Supplier{}, fmt.Errorf("fail to fetch suppliers: %w", err)
+	}
+
+	var results []Supplier
+	if err = cursor.All(ctx, &results); err != nil {
+		return []Supplier{}, fmt.Errorf("fail to fetch suppliers: %w", err)
+	}
+
+	for _, result := range results {
+		cursor.Decode(&result)
+		output, err := json.MarshalIndent(result, "", "    ")
+		if err != nil {
+			panic(err)
+		}
+		fmt.Printf("%s\n", output)
+	}
+	return results, nil
 }
 
 func NewMongoRepo(ctx context.Context, connectionString string) (*MongoRespository, error) {
@@ -77,7 +103,7 @@ func NewMongoRepo(ctx context.Context, connectionString string) (*MongoResposito
 		return nil, fmt.Errorf("failed to create a mongo client: %w", err)
 	}
 
-	suppliers := client.Database("goERP").Collection("customers")
+	suppliers := client.Database("goERP").Collection("suppliers")
 	return &MongoRespository{
 		suppliers: suppliers,
 	}, nil
