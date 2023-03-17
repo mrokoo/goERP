@@ -2,6 +2,7 @@ package customer
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -17,7 +18,7 @@ type Respository interface {
 	SaveCustomer(ctx context.Context, customer Customer) error
 	DeleteCustomer(ctx context.Context, customerID CustomerId) error
 	ChangeCustomer(ctx context.Context, customer Customer) error
-	FetchAllCustomers(ctx context.Context) error
+	FetchAllCustomers(ctx context.Context) ([]Customer, error)
 }
 
 // mongo存储库
@@ -39,8 +40,11 @@ func (mr *MongoRespository) SaveCustomer(ctx context.Context, customer Customer)
 }
 
 func (mr *MongoRespository) DeleteCustomer(ctx context.Context, customerID CustomerId) error {
-	filter := bson.D{{Key: "ID", Value: customerID}}
-	_, err := mr.customers.DeleteOne(ctx, filter)
+	filter := bson.D{{Key: "id", Value: customerID}}
+	result, err := mr.customers.DeleteOne(ctx, filter)
+	if result.DeletedCount == 0 {
+		return errors.New("fail to query the customer")
+	}
 	if err != nil {
 		return fmt.Errorf("fail to delete customer: %w", err)
 	}
@@ -49,7 +53,7 @@ func (mr *MongoRespository) DeleteCustomer(ctx context.Context, customerID Custo
 
 func (mr *MongoRespository) ChangeCustomer(ctx context.Context, customer Customer) error {
 	mongoCustomer := toMongoCustomer(customer)
-	filter := bson.D{{Key: "ID", Value: customer.ID}}
+	filter := bson.D{{Key: "id", Value: customer.ID}}
 	update := bson.D{{Key: "$set", Value: bson.D{
 		{Key: "name", Value: mongoCustomer.Name},
 		{Key: "grade", Value: mongoCustomer.Grade},
@@ -59,15 +63,38 @@ func (mr *MongoRespository) ChangeCustomer(ctx context.Context, customer Custome
 		{Key: "note", Value: mongoCustomer.Note},
 		{Key: "state", Value: mongoCustomer.State},
 	}}}
-	_, err := mr.customers.UpdateOne(ctx, filter, update)
+	result, err := mr.customers.UpdateOne(ctx, filter, update)
+
+	if result.MatchedCount == 0 {
+		return errors.New("fail to query the customer")
+	}
 	if err != nil {
 		return fmt.Errorf("fail to change customer: %w", err)
 	}
 	return nil
 }
 
-func (mr *MongoRespository) FetchAllCustomers(ctx context.Context) error {
-	return fmt.Errorf("this is a error")
+func (mr *MongoRespository) FetchAllCustomers(ctx context.Context) ([]Customer, error) {
+	cursor, err := mr.customers.Find(ctx, bson.D{})
+
+	if err != nil {
+		return []Customer{}, fmt.Errorf("fail to fetch customers: %w", err)
+	}
+
+	var results []Customer
+	if err = cursor.All(ctx, &results); err != nil {
+		return []Customer{}, fmt.Errorf("fail to fetch customers: %w", err)
+	}
+
+	for _, result := range results {
+		cursor.Decode(&result)
+		output, err := json.MarshalIndent(result, "", "    ")
+		if err != nil {
+			panic(err)
+		}
+		fmt.Printf("%s\n", output)
+	}
+	return results, nil
 }
 
 func NewMongoRepo(ctx context.Context, connectionString string) (*MongoRespository, error) {
