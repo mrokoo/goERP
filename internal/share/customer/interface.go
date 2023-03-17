@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func CreateCustomerRouter(e *gin.Engine) {
+func LoadCustomerRouter(e *gin.Engine) {
 	mongoConString := "mongodb://localhost:27017/"
 	repo, err := NewMongoRepo(context.Background(), mongoConString)
 	if err != nil {
