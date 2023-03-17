@@ -3,7 +3,6 @@ package customer
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/gin-gonic/gin"
 )
@@ -49,7 +48,6 @@ func CreateCustomerRouter(e *gin.Engine) {
 		c.GET("/getCustomerList", func(ctx *gin.Context) {
 			customerList, err := service.repo.FetchAllCustomers(ctx)
 			if err != nil {
-				fmt.Println(err)
 				ctx.JSON(400, gin.H{
 					"code":     -1,
 					"showMsg":  "failure",

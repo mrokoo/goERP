@@ -15,6 +15,8 @@ type Customer struct {
 	State       StateType   `json:"state"`
 }
 
+// to do 验证结构体有效性。用于请求参数
+
 type CustomerId string
 
 type Name string
