@@ -133,6 +133,6 @@ func toMongoSupplier(s Supplier) MongoSupplier {
 		Bank:    s.Bank,
 		Note:    s.Note,
 		State:   s.State,
-		debt:    s.debt,
+		debt:    s.Debt,
 	}
 }

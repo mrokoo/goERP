@@ -12,7 +12,7 @@ type Supplier struct {
 	Bank    BankName
 	Note    string
 	State   StateType
-	debt    money.Money
+	Debt    money.Money
 }
 
 type SupplierId string
@@ -24,6 +24,7 @@ type Account string
 type BankName string
 
 type StateType int
+
 const (
 	STATE_INVAILD = iota
 	STATE_ACTIVE
