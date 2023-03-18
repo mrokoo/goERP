@@ -13,8 +13,8 @@ import (
 
 var ErrNotUID = errors.New("the customerId is not unique")
 
-// customer 领域层存储库接口
 type Respository interface {
+	LoadCustomer(ctx context.Context, customerID CustomerId) (Customer, error)
 	SaveCustomer(ctx context.Context, customer Customer) error
 	DeleteCustomer(ctx context.Context, customerID CustomerId) error
 	ChangeCustomer(ctx context.Context, customer Customer) error
@@ -24,6 +24,21 @@ type Respository interface {
 // mongo存储库
 type MongoRespository struct {
 	customers *mongo.Collection
+}
+
+func (mr *MongoRespository) LoadCustomer(ctx context.Context, customerID CustomerId) (Customer, error) {
+	filter := bson.D{{Key: "id", Value: customerID}}
+	result := mr.customers.FindOne(ctx, filter)
+	var customer Customer
+
+	if err := result.Decode(customer); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return Customer{}, mongo.ErrNoDocuments
+		} else {
+			return Customer{}, err
+		}
+	}
+	return customer, nil
 }
 
 func (mr *MongoRespository) SaveCustomer(ctx context.Context, customer Customer) error {

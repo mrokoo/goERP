@@ -2,6 +2,8 @@ package customer
 
 import (
 	"errors"
+	"fmt"
+	"regexp"
 )
 
 type Customer struct {
@@ -15,14 +17,64 @@ type Customer struct {
 	State       StateType   `json:"state"`
 }
 
-// to do 验证结构体有效性。用于请求参数
+type CustomerCMD struct {
+	ID          string
+	Name        string
+	Grade       int
+	Contact     string
+	PhoneNumber string
+	Address     string
+	Note        string
+	State       int
+}
+
+func NewCustomer(cmd CustomerCMD) (_ Customer, err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("new customer: %w", err)
+		}
+	}()
+	customer := Customer{}
+
+	// to do id 验证
+	customer.ID = CustomerId(cmd.ID)
+	customer.Name, err = NewName(cmd.Name)
+	if err != nil {
+		return Customer{}, err
+	}
+	customer.Grade, err = NewGrade(cmd.Grade)
+	if err != nil {
+		return Customer{}, err
+	}
+	customer.Contact, err = NewContact(cmd.Contact)
+	if err != nil {
+		return Customer{}, err
+	}
+	customer.PhoneNumber, err = NewPhoneNumber(cmd.PhoneNumber)
+	if err != nil {
+		return Customer{}, err
+	}
+	customer.Address, err = NewAddress(cmd.Address)
+	if err != nil {
+		return Customer{}, err
+	}
+	customer.Note = cmd.Note
+	customer.State, err = NewState(cmd.State)
+	if err != nil {
+		return Customer{}, err
+	}
+	return customer, nil
+}
 
 type CustomerId string
 
 type Name string
 
-func NewName(name string) Name {
-	return Name(name)
+func NewName(name string) (Name, error) {
+	if l := len(name); l < 0 || l > 50 {
+		return "", errors.New(" the name length does not meet the requirements")
+	}
+	return Name(name), nil
 }
 
 type GradeType int
@@ -36,17 +88,29 @@ const (
 
 func NewGrade(grade int) (GradeType, error) {
 	if grade < 1 || grade > 3 {
-		return GRADE_INVAILD, errors.New("this grade is invaild")
+		return GRADE_INVAILD, errors.New("the grade is invaild")
 	}
 	return GradeType(grade), nil
 }
 
 type ContactName string
 
+func NewContact(contactName string) (ContactName, error) {
+	if l := len(contactName); l < 0 || l > 50 {
+		return "", errors.New(" the contact name length does not meet the requirements")
+	}
+	return ContactName(contactName), nil
+}
+
 type PhoneNumber string
 
-func NewPhoneNumber(number string) PhoneNumber {
-	return PhoneNumber(number)
+func NewPhoneNumber(number string) (PhoneNumber, error) {
+	regRuler := "^1[345789]{1}\\d{9}$"
+	reg := regexp.MustCompile(regRuler)
+	if !reg.MatchString(number) {
+		return "", errors.New("not a phone number")
+	}
+	return PhoneNumber(number), nil
 }
 
 type Address string
@@ -68,7 +132,7 @@ const (
 
 func NewState(state int) (StateType, error) {
 	if state < 1 || state > 2 {
-		return GRADE_INVAILD, errors.New("this state is invaild")
+		return GRADE_INVAILD, errors.New("the state is invaild")
 	}
 	return StateType(state), nil
 }
