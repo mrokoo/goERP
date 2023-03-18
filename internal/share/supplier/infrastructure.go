@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/Rhymond/go-money"
 	"go.mongodb.org/mongo-driver/bson"
@@ -120,6 +121,7 @@ type MongoSupplier struct {
 	Note    string
 	State   StateType
 	debt    money.Money
+	time    time.Time
 }
 
 func toMongoSupplier(s Supplier) MongoSupplier {
@@ -134,5 +136,6 @@ func toMongoSupplier(s Supplier) MongoSupplier {
 		Note:    s.Note,
 		State:   s.State,
 		debt:    s.Debt,
+		time:    time.Now(),
 	}
 }

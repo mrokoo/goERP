@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -141,6 +142,7 @@ type mongoCustomer struct {
 	Address     Address
 	Note        string
 	State       StateType
+	Time        time.Time
 }
 
 func toMongoCustomer(c Customer) mongoCustomer {
@@ -153,5 +155,6 @@ func toMongoCustomer(c Customer) mongoCustomer {
 		Address:     c.Address,
 		Note:        c.Note,
 		State:       c.State,
+		Time:        time.Now(),
 	}
 }
