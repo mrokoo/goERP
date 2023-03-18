@@ -37,7 +37,10 @@ func NewCustomer(cmd CustomerCMD) (_ Customer, err error) {
 	customer := Customer{}
 
 	// to do id 验证
-	customer.ID = CustomerId(cmd.ID)
+	customer.ID, err = NewCustomerID(cmd.ID)
+	if err != nil {
+		return Customer{}, err
+	}
 	customer.Name, err = NewName(cmd.Name)
 	if err != nil {
 		return Customer{}, err
@@ -67,6 +70,23 @@ func NewCustomer(cmd CustomerCMD) (_ Customer, err error) {
 }
 
 type CustomerId string
+
+func (c *CustomerId) CheckCustomerID() error {
+	regRuler := "^C[0-9]+$"
+	reg := regexp.MustCompile(regRuler)
+	if !reg.MatchString(string(*c)) {
+		return errors.New("the customerID is wrong")
+	}
+	return nil
+}
+
+func NewCustomerID(id string) (CustomerId, error) {
+	cid := CustomerId(id)
+	if err := cid.CheckCustomerID(); err != nil {
+		return "", err
+	}
+	return cid, nil
+}
 
 type Name string
 

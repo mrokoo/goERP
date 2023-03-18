@@ -19,6 +19,8 @@ type Respository interface {
 	DeleteCustomer(ctx context.Context, customerID CustomerId) error
 	ChangeCustomer(ctx context.Context, customer Customer) error
 	FetchAllCustomers(ctx context.Context) ([]Customer, error)
+
+	CheckCustomerID(ctx context.Context, customerID CustomerId) bool
 }
 
 // mongo存储库
@@ -110,6 +112,12 @@ func (mr *MongoRespository) FetchAllCustomers(ctx context.Context) ([]Customer, 
 		fmt.Printf("%s\n", output)
 	}
 	return results, nil
+}
+
+func (mr *MongoRespository) CheckCustomerID(ctx context.Context, customerId CustomerId) bool {
+	filter := bson.D{{Key: "id", Value: customerId}}
+	_, err := mr.customers.Find(ctx, filter)
+	return err == nil
 }
 
 func NewMongoRepo(ctx context.Context, connectionString string) (*MongoRespository, error) {

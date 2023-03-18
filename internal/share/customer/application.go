@@ -46,16 +46,18 @@ func (c CustomerApplicationService) AddCustomer(ctx *gin.Context) {
 		return
 	}
 	// 创建新customer
-	if customer, err = NewCustomer(struct {
-		ID          string
-		Name        string
-		Grade       int
-		Contact     string
-		PhoneNumber string
-		Address     string
-		Note        string
-		State       int
-	}(req)); err != nil {
+	if customer, err = NewCustomer(
+		CustomerCMD{
+			ID:          req.ID,
+			Name:        req.Name,
+			Grade:       req.Grade,
+			Contact:     req.Contact,
+			PhoneNumber: req.PhoneNumber,
+			Address:     req.Address,
+			Note:        req.Note,
+			State:       req.State,
+		},
+	); err != nil {
 		return
 	}
 
