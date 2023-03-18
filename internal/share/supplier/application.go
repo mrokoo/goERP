@@ -54,8 +54,10 @@ func (s SupplierApplicationService) UpdateSupplier(ctx *gin.Context) {
 			Contact: req.Contact,
 			Email:   req.Email,
 			Address: req.Address,
+			Account: req.Account,
 			Bank:    req.Bank,
 			Note:    req.Note,
+			State:   req.State,
 			Debt:    req.Debt,
 		},
 	); err != nil {
@@ -111,8 +113,10 @@ func (s SupplierApplicationService) AddSupplier(ctx *gin.Context) {
 			Contact: req.Contact,
 			Email:   req.Email,
 			Address: req.Address,
+			Account: req.Account,
 			Bank:    req.Bank,
 			Note:    req.Note,
+			State:   req.State,
 			Debt:    req.Debt,
 		},
 	); err != nil {
@@ -128,7 +132,7 @@ func (s SupplierApplicationService) DeleteSupplier(ctx *gin.Context) {
 
 }
 
-func (s SupplierApplicationService) GetCustomerList(ctx *gin.Context) {
+func (s SupplierApplicationService) GetSupplierList(ctx *gin.Context) {
 	supplierList, err := s.repo.FetchAllSuppliers(context.Background())
 	if err != nil {
 		ctx.JSON(400, gin.H{
@@ -163,6 +167,6 @@ func LoadSupplierRouter(e *gin.Engine) {
 		r.POST("/addSupplier", service.AddSupplier)
 		r.PUT("/updateSupplier", service.UpdateSupplier)
 		r.DELETE("/deleteSupplier", service.DeleteSupplier)
-		r.GET("/getCustomerList", service.GetCustomerList)
+		r.GET("/getSupplierList", service.GetSupplierList)
 	}
 }

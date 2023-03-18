@@ -4,8 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
-
-	"github.com/Rhymond/go-money"
 )
 
 type Supplier struct {
@@ -18,7 +16,7 @@ type Supplier struct {
 	Bank    BankName
 	Note    string
 	State   StateType
-	Debt    money.Money
+	Debt    float64
 }
 
 type SupplierCMD struct {
@@ -169,6 +167,6 @@ func NewSupplier(cmd SupplierCMD) (_ Supplier, err error) {
 		return Supplier{}, err
 	}
 
-	supplier.Debt = *money.NewFromFloat(cmd.Debt, money.CNY)
+	supplier.Debt = cmd.Debt
 	return supplier, nil
 }

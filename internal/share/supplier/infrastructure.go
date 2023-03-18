@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Rhymond/go-money"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -28,6 +27,7 @@ type MongoRespository struct {
 
 func (mr *MongoRespository) SaveSupplier(ctx context.Context, supplier Supplier) error {
 	mongoS := toMongoSupplier(supplier)
+	fmt.Printf("%#v\n", mongoS)
 	_, err := mr.suppliers.InsertOne(ctx, mongoS)
 	if err != nil {
 		if mongo.IsDuplicateKeyError(err) {
@@ -62,7 +62,7 @@ func (mr *MongoRespository) ChangeSupplier(ctx context.Context, supplier Supplie
 		{Key: "bank", Value: mongoS.Bank},
 		{Key: "note", Value: mongoS.Note},
 		{Key: "state", Value: mongoS.State},
-		{Key: "debt", Value: mongoS.debt},
+		{Key: "debt", Value: mongoS.Debt},
 	}}}
 
 	result, err := mr.suppliers.UpdateOne(ctx, filter, update)
@@ -120,8 +120,8 @@ type MongoSupplier struct {
 	Bank    BankName
 	Note    string
 	State   StateType
-	debt    money.Money
-	time    time.Time
+	Debt    float64
+	Time    time.Time
 }
 
 func toMongoSupplier(s Supplier) MongoSupplier {
@@ -135,7 +135,7 @@ func toMongoSupplier(s Supplier) MongoSupplier {
 		Bank:    s.Bank,
 		Note:    s.Note,
 		State:   s.State,
-		debt:    s.Debt,
-		time:    time.Now(),
+		Debt:    s.Debt,
+		Time:    time.Now(),
 	}
 }
