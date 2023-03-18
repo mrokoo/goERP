@@ -68,7 +68,7 @@ func (c CustomerApplicationService) AddCustomer(ctx *gin.Context) {
 
 func (c CustomerApplicationService) DeleteCustomer(ctx *gin.Context) {
 	var req struct {
-		CustomerId string `json:"customerId"`
+		CustomerId string `json:"id"`
 	}
 
 	if err := ctx.BindJSON(&req); err != nil {

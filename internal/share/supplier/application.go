@@ -7,7 +7,7 @@ import (
 )
 
 type SupplierApplicationService struct {
-	repo Repositiory
+	repo Repository
 }
 
 func (s SupplierApplicationService) UpdateSupplier(ctx *gin.Context) {
@@ -129,7 +129,35 @@ func (s SupplierApplicationService) AddSupplier(ctx *gin.Context) {
 }
 
 func (s SupplierApplicationService) DeleteSupplier(ctx *gin.Context) {
+	var req struct {
+		SupplierId string `json:"id"`
+	}
 
+	if err := ctx.BindJSON(&req); err != nil {
+		ctx.JSON(400, gin.H{
+			"code":     -1,
+			"showMsg":  "failure",
+			"errorMsg": err.Error(),
+			"data":     nil,
+		})
+		return
+	}
+
+	if err := s.repo.DeleteSupplier(ctx, SupplierId(req.SupplierId)); err != nil {
+		ctx.JSON(400, gin.H{
+			"code":     -1,
+			"showMsg":  "failure",
+			"errorMsg": err.Error(),
+			"data":     nil,
+		})
+		return
+	}
+	ctx.JSON(200, gin.H{
+		"code":     1,
+		"showMsg":  "success",
+		"errorMsg": "",
+		"data":     nil,
+	})
 }
 
 func (s SupplierApplicationService) GetSupplierList(ctx *gin.Context) {
@@ -151,7 +179,7 @@ func (s SupplierApplicationService) GetSupplierList(ctx *gin.Context) {
 	})
 }
 
-func NewSupplierApplicationService(repo Repositiory) SupplierApplicationService {
+func NewSupplierApplicationService(repo Repository) SupplierApplicationService {
 	return SupplierApplicationService{repo: repo}
 }
 

@@ -15,20 +15,19 @@ import (
 
 var ErrNotUID = errors.New("the supplierId is not unique")
 
-type Repositiory interface {
+type Repository interface {
 	SaveSupplier(ctx context.Context, supplier Supplier) error
 	ChangeSupplier(ctx context.Context, supplier Supplier) error
 	FetchAllSuppliers(ctx context.Context) ([]Supplier, error)
 	DeleteSupplier(ctx context.Context, supplierID SupplierId) error
 }
 
-type MongoRespository struct {
+type MongoRepository struct {
 	suppliers *mongo.Collection
 }
 
-func (mr *MongoRespository) SaveSupplier(ctx context.Context, supplier Supplier) error {
+func (mr *MongoRepository) SaveSupplier(ctx context.Context, supplier Supplier) error {
 	mongoS := toMongoSupplier(supplier)
-	fmt.Printf("%#v\n", mongoS)
 	_, err := mr.suppliers.InsertOne(ctx, mongoS)
 	if err != nil {
 		if mongo.IsDuplicateKeyError(err) {
@@ -39,7 +38,7 @@ func (mr *MongoRespository) SaveSupplier(ctx context.Context, supplier Supplier)
 	return nil
 }
 
-func (mr *MongoRespository) DeleteSupplier(ctx context.Context, supplierID SupplierId) error {
+func (mr *MongoRepository) DeleteSupplier(ctx context.Context, supplierID SupplierId) error {
 	filter := bson.D{{Key: "id", Value: supplierID}}
 	result, err := mr.suppliers.DeleteOne(ctx, filter)
 	if result.DeletedCount == 0 {
@@ -51,7 +50,7 @@ func (mr *MongoRespository) DeleteSupplier(ctx context.Context, supplierID Suppl
 	return nil
 }
 
-func (mr *MongoRespository) ChangeSupplier(ctx context.Context, supplier Supplier) error {
+func (mr *MongoRepository) ChangeSupplier(ctx context.Context, supplier Supplier) error {
 	mongoS := toMongoSupplier(supplier)
 	filter := bson.D{{Key: "id", Value: supplier.ID}}
 	update := bson.D{{Key: "$set", Value: bson.D{
@@ -76,7 +75,7 @@ func (mr *MongoRespository) ChangeSupplier(ctx context.Context, supplier Supplie
 	return nil
 }
 
-func (mr *MongoRespository) FetchAllSuppliers(ctx context.Context) ([]Supplier, error) {
+func (mr *MongoRepository) FetchAllSuppliers(ctx context.Context) ([]Supplier, error) {
 	cursor, err := mr.suppliers.Find(ctx, bson.D{})
 
 	if err != nil {
@@ -99,14 +98,14 @@ func (mr *MongoRespository) FetchAllSuppliers(ctx context.Context) ([]Supplier, 
 	return results, nil
 }
 
-func NewMongoRepo(ctx context.Context, connectionString string) (*MongoRespository, error) {
+func NewMongoRepo(ctx context.Context, connectionString string) (*MongoRepository, error) {
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(connectionString))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create a mongo client: %w", err)
 	}
 
 	suppliers := client.Database("goERP").Collection("suppliers")
-	return &MongoRespository{
+	return &MongoRepository{
 		suppliers: suppliers,
 	}, nil
 }

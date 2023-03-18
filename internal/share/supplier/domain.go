@@ -34,43 +34,6 @@ type SupplierCMD struct {
 	Debt    float64
 }
 
-type SupplierId string
-
-func (s *SupplierId) CheckSupplierID() error {
-	regRuler := "^S[0-9]+$"
-	reg := regexp.MustCompile(regRuler)
-	if !reg.MatchString(string(*s)) {
-		return errors.New("the supplierID is wrong")
-	}
-	return nil
-}
-
-func NewSupplierID(id string) (SupplierId, error) {
-	sid := SupplierId(id)
-	if err := sid.CheckSupplierID(); err != nil {
-		return "", err
-	}
-	return sid, nil
-}
-
-type Account string
-
-func NewAccount(account string) (Account, error) {
-	if len(account) > 50 {
-		return "", errors.New("the account length is too length")
-	}
-	return Account(account), nil
-}
-
-type BankName string
-
-func NewBank(bank string) (BankName, error) {
-	if len(bank) > 50 {
-		return "", errors.New("the bank length is too length")
-	}
-	return BankName(bank), nil
-}
-
 func NewSupplier(cmd SupplierCMD) (_ Supplier, err error) {
 	defer func() {
 		if err != nil {
@@ -118,4 +81,41 @@ func NewSupplier(cmd SupplierCMD) (_ Supplier, err error) {
 
 	supplier.Debt = cmd.Debt
 	return supplier, nil
+}
+
+type SupplierId string
+
+func (s *SupplierId) CheckSupplierID() error {
+	regRuler := "^S[0-9]+$"
+	reg := regexp.MustCompile(regRuler)
+	if !reg.MatchString(string(*s)) {
+		return errors.New("the supplierID is wrong")
+	}
+	return nil
+}
+
+func NewSupplierID(id string) (SupplierId, error) {
+	sid := SupplierId(id)
+	if err := sid.CheckSupplierID(); err != nil {
+		return "", err
+	}
+	return sid, nil
+}
+
+type Account string
+
+func NewAccount(account string) (Account, error) {
+	if len(account) > 50 {
+		return "", errors.New("the account length is too length")
+	}
+	return Account(account), nil
+}
+
+type BankName string
+
+func NewBank(bank string) (BankName, error) {
+	if len(bank) > 50 {
+		return "", errors.New("the bank length is too length")
+	}
+	return BankName(bank), nil
 }
