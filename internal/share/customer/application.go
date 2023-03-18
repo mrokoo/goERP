@@ -13,6 +13,7 @@ type CustomerApplicationService struct {
 func (c CustomerApplicationService) AddCustomer(ctx *gin.Context) {
 	var err error
 	var customer Customer
+	// 最后处理错误
 	defer func() {
 		if err != nil {
 			ctx.JSON(400, gin.H{
@@ -30,7 +31,7 @@ func (c CustomerApplicationService) AddCustomer(ctx *gin.Context) {
 			})
 		}
 	}()
-
+	// 转换请求
 	var req struct {
 		ID          string `json:"id"`
 		Name        string `json:"name"`
@@ -44,7 +45,7 @@ func (c CustomerApplicationService) AddCustomer(ctx *gin.Context) {
 	if err = ctx.BindJSON(&req); err != nil {
 		return
 	}
-
+	// 创建新customer
 	if customer, err = NewCustomer(struct {
 		ID          string
 		Name        string
@@ -188,5 +189,4 @@ func LoadCustomerRouter(e *gin.Engine) {
 		r.DELETE("/deleteCustomer", service.DeleteCustomer)
 		r.PUT("/updateCustomer", service.UpdateCustomer)
 	}
-
 }
