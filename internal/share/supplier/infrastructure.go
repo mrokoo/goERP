@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/mrokoo/goERP/internal/share/valueobj"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -112,14 +113,14 @@ func NewMongoRepo(ctx context.Context, connectionString string) (*MongoResposito
 
 type MongoSupplier struct {
 	ID      SupplierId
-	Name    Name
-	Contact ContactName
-	Email   Email
-	Address Address
+	Name    valueobj.Name
+	Contact valueobj.Contact
+	Email   valueobj.Email
+	Address valueobj.Address
 	Account Account
 	Bank    BankName
 	Note    string
-	State   StateType
+	State   valueobj.StateType
 	Debt    float64
 	Time    time.Time
 }
