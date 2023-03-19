@@ -15,7 +15,7 @@ import (
 
 var ErrNotUID = errors.New("the customerId is not unique")
 
-type Respository interface {
+type Repository interface {
 	LoadCustomer(ctx context.Context, customerID CustomerId) (Customer, error)
 	SaveCustomer(ctx context.Context, customer Customer) error
 	DeleteCustomer(ctx context.Context, customerID CustomerId) error
@@ -77,10 +77,12 @@ func (mr *MongoRespository) ChangeCustomer(ctx context.Context, customer Custome
 		{Key: "name", Value: mongoCustomer.Name},
 		{Key: "grade", Value: mongoCustomer.Grade},
 		{Key: "contact", Value: mongoCustomer.Contact},
-		{Key: "phone", Value: mongoCustomer.PhoneNumber},
+		{Key: "phone", Value: mongoCustomer.Phone},
+		{Key: "email", Value: mongoCustomer.Email},
 		{Key: "address", Value: mongoCustomer.Address},
 		{Key: "note", Value: mongoCustomer.Note},
 		{Key: "state", Value: mongoCustomer.State},
+		{Key: "debt", Value: mongoCustomer.Debt},
 	}}}
 	result, err := mr.customers.UpdateOne(ctx, filter, update)
 
@@ -135,27 +137,31 @@ func NewMongoRepo(ctx context.Context, connectionString string) (*MongoResposito
 }
 
 type mongoCustomer struct {
-	ID          CustomerId
-	Name        valueobj.Name
-	Grade       GradeType
-	Contact     valueobj.Contact
-	PhoneNumber valueobj.PhoneNumber
-	Address     valueobj.Address
-	Note        string
-	State       valueobj.StateType
-	Time        time.Time
+	ID      CustomerId
+	Name    valueobj.Name
+	Grade   GradeType
+	Contact valueobj.Contact
+	Phone   valueobj.Phone
+	Email   valueobj.Email
+	Address valueobj.Address
+	Note    valueobj.Note
+	State   valueobj.StateType
+	Debt    valueobj.Money
+	Time    time.Time
 }
 
 func toMongoCustomer(c Customer) mongoCustomer {
 	return mongoCustomer{
-		ID:          c.ID,
-		Name:        c.Name,
-		Grade:       c.Grade,
-		Contact:     c.Contact,
-		PhoneNumber: c.PhoneNumber,
-		Address:     c.Address,
-		Note:        c.Note,
-		State:       c.State,
-		Time:        time.Now(),
+		ID:      c.ID,
+		Name:    c.Name,
+		Grade:   c.Grade,
+		Contact: c.Contact,
+		Phone:   c.Phone,
+		Email:   c.Email,
+		Address: c.Address,
+		Note:    c.Note,
+		State:   c.State,
+		Debt:    c.Debt,
+		Time:    time.Now(),
 	}
 }

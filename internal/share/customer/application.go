@@ -7,71 +7,43 @@ import (
 )
 
 type CustomerApplicationService struct {
-	repo Respository
+	repo Repository
 }
 
 func (c CustomerApplicationService) AddCustomer(ctx *gin.Context) {
-	var err error
 	var customer Customer
-	// 最后处理错误
-	defer func() {
-		if err != nil {
-			ctx.JSON(400, gin.H{
-				"code":     -1,
-				"showMsg":  "failure",
-				"errorMsg": err.Error(),
-				"data":     nil,
-			})
-		} else {
-			ctx.JSON(200, gin.H{
-				"code":     1,
-				"showMsg":  "success",
-				"errorMsg": "",
-				"data":     nil,
-			})
-		}
-	}()
-	// 转换请求
-	var req struct {
-		ID          string `json:"id"`
-		Name        string `json:"name"`
-		Grade       int    `json:"grade"`
-		Contact     string `json:"contact"`
-		PhoneNumber string `json:"phoneNumber"`
-		Address     string `json:"address"`
-		Note        string `json:"note"`
-		State       int    `json:"state"`
-	}
-	if err = ctx.BindJSON(&req); err != nil {
+	if err := ctx.ShouldBindJSON(&customer); err != nil {
+		ctx.JSON(400, gin.H{
+			"code":     -1,
+			"showMsg":  "failure",
+			"errorMsg": err.Error(),
+			"data":     nil,
+		})
 		return
 	}
-	// 创建新customer
-	if customer, err = NewCustomer(
-		CustomerCMD{
-			ID:          req.ID,
-			Name:        req.Name,
-			Grade:       req.Grade,
-			Contact:     req.Contact,
-			PhoneNumber: req.PhoneNumber,
-			Address:     req.Address,
-			Note:        req.Note,
-			State:       req.State,
-		},
-	); err != nil {
+	if err := c.repo.SaveCustomer(context.Background(), customer); err != nil {
+		ctx.JSON(400, gin.H{
+			"code":     -1,
+			"showMsg":  "failure",
+			"errorMsg": err.Error(),
+			"data":     nil,
+		})
 		return
 	}
-
-	if err = c.repo.SaveCustomer(context.Background(), customer); err != nil {
-		return
-	}
+	ctx.JSON(200, gin.H{
+		"code":     1,
+		"showMsg":  "success",
+		"errorMsg": "",
+		"data":     nil,
+	})
 }
 
 func (c CustomerApplicationService) DeleteCustomer(ctx *gin.Context) {
 	var req struct {
-		CustomerId string `json:"id"`
+		CustomerId string `json:"id" bson:"required"`
 	}
 
-	if err := ctx.BindJSON(&req); err != nil {
+	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(400, gin.H{
 			"code":     -1,
 			"showMsg":  "failure",
@@ -100,56 +72,32 @@ func (c CustomerApplicationService) DeleteCustomer(ctx *gin.Context) {
 
 func (c CustomerApplicationService) UpdateCustomer(ctx *gin.Context) {
 	var customer Customer
-	var err error
-	var req struct {
-		ID          string `json:"id"`
-		Name        string `json:"name"`
-		Grade       int    `json:"grade"`
-		Contact     string `json:"contact"`
-		PhoneNumber string `json:"phoneNumber"`
-		Address     string `json:"address"`
-		Note        string `json:"note"`
-		State       int    `json:"state"`
-	}
-	defer func() {
-		if err != nil {
-			ctx.JSON(400, gin.H{
-				"code":     -1,
-				"showMsg":  "failure",
-				"errorMsg": err.Error(),
-				"data":     nil,
-			})
-		} else {
-			ctx.JSON(200, gin.H{
-				"code":     1,
-				"showMsg":  "success",
-				"errorMsg": "",
-				"data":     nil,
-			})
-		}
-	}()
-
-	if err = ctx.BindJSON(&req); err != nil {
-		return
-	}
-	if customer, err = NewCustomer(
-		CustomerCMD{
-			ID:          req.ID,
-			Name:        req.Name,
-			Grade:       req.Grade,
-			Contact:     req.Contact,
-			PhoneNumber: req.PhoneNumber,
-			Address:     req.Address,
-			Note:        req.Note,
-			State:       req.State,
-		},
-	); err != nil {
+	if err := ctx.ShouldBindJSON(&customer); err != nil {
+		ctx.JSON(400, gin.H{
+			"code":     -1,
+			"showMsg":  "failure",
+			"errorMsg": err.Error(),
+			"data":     nil,
+		})
 		return
 	}
 
-	if err = c.repo.ChangeCustomer(context.Background(), customer); err != nil {
+	if err := c.repo.ChangeCustomer(context.Background(), customer); err != nil {
+		ctx.JSON(400, gin.H{
+			"code":     -1,
+			"showMsg":  "failure",
+			"errorMsg": err.Error(),
+			"data":     nil,
+		})
 		return
 	}
+
+	ctx.JSON(200, gin.H{
+		"code":     1,
+		"showMsg":  "success",
+		"errorMsg": "",
+		"data":     nil,
+	})
 }
 
 func (c CustomerApplicationService) GetCustomerList(ctx *gin.Context) {
@@ -171,7 +119,7 @@ func (c CustomerApplicationService) GetCustomerList(ctx *gin.Context) {
 	})
 }
 
-func NewCustomerApplicationService(repo Respository) CustomerApplicationService {
+func NewCustomerApplicationService(repo Repository) CustomerApplicationService {
 	return CustomerApplicationService{
 		repo: repo,
 	}

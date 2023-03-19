@@ -4,12 +4,13 @@ import (
 	"errors"
 
 	"github.com/google/uuid"
+	"github.com/mrokoo/goERP/internal/share/valueobj"
 )
 
 type Budget struct {
 	ID   uuid.UUID
 	Type BudgetType
-	Note string
+	Note valueobj.Note
 }
 
 type BudgetCMD struct {

@@ -27,14 +27,14 @@ type MongoRepo struct {
 }
 
 type MongoWarehouse struct {
-	ID          WarehouseId
-	Name        valueobj.Name
-	Admin       string
-	PhoneNumber valueobj.PhoneNumber
-	Address     valueobj.Address
-	Note        string
-	State       valueobj.StateType
-	Time        time.Time
+	ID      WarehouseId
+	Name    valueobj.Name
+	Admin   string
+	Phone   valueobj.Phone
+	Address valueobj.Address
+	Note    string
+	State   valueobj.StateType
+	Time    time.Time
 }
 
 func (mr *MongoRepo) SaveWarehouse(ctx context.Context, warehouse Warehouse) error {
@@ -67,7 +67,7 @@ func (mr *MongoRepo) ChangeWarehouse(ctx context.Context, warehouse Warehouse) e
 	update := bson.D{{Key: "$set", Value: bson.D{
 		{Key: "name", Value: mongoW.Name},
 		{Key: "admin", Value: mongoW.Admin},
-		{Key: "phoneNumber", Value: mongoW.PhoneNumber},
+		{Key: "phoneNumber", Value: mongoW.Phone},
 		{Key: "address", Value: mongoW.Address},
 		{Key: "note", Value: mongoW.Note},
 		{Key: "state", Value: mongoW.State},
@@ -108,14 +108,14 @@ func (mr *MongoRepo) FetchAllWarehouse(ctx context.Context) ([]Warehouse, error)
 
 func toMongoWarehouse(w Warehouse) MongoWarehouse {
 	return MongoWarehouse{
-		ID:          w.ID,
-		Name:        w.Name,
-		Admin:       w.Admin,
-		PhoneNumber: w.PhoneNumber,
-		Address:     w.Address,
-		Note:        w.Note,
-		State:       w.State,
-		Time:        time.Now(),
+		ID:      w.ID,
+		Name:    w.Name,
+		Admin:   w.Admin,
+		Phone:   w.Phone,
+		Address: w.Address,
+		Note:    w.Note,
+		State:   w.State,
+		Time:    time.Now(),
 	}
 }
 

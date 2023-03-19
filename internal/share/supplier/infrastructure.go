@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/mrokoo/goERP/internal/share/valueobj"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -53,19 +52,8 @@ func (mr *MongoRepository) DeleteSupplier(ctx context.Context, supplierID Suppli
 func (mr *MongoRepository) ChangeSupplier(ctx context.Context, supplier Supplier) error {
 	mongoS := toMongoSupplier(supplier)
 	filter := bson.D{{Key: "id", Value: supplier.ID}}
-	update := bson.D{{Key: "$set", Value: bson.D{
-		{Key: "name", Value: mongoS.Name},
-		{Key: "contact", Value: mongoS.Contact},
-		{Key: "email", Value: mongoS.Email},
-		{Key: "address", Value: mongoS.Address},
-		{Key: "account", Value: mongoS.Account},
-		{Key: "bank", Value: mongoS.Bank},
-		{Key: "note", Value: mongoS.Note},
-		{Key: "state", Value: mongoS.State},
-		{Key: "debt", Value: mongoS.Debt},
-	}}}
 
-	result, err := mr.suppliers.UpdateOne(ctx, filter, update)
+	result, err := mr.suppliers.ReplaceOne(ctx, filter, mongoS)
 	if result.MatchedCount == 0 {
 		return errors.New("fail to query the supplier")
 	}
@@ -89,11 +77,10 @@ func (mr *MongoRepository) FetchAllSuppliers(ctx context.Context) ([]Supplier, e
 
 	for _, result := range results {
 		cursor.Decode(&result)
-		output, err := json.MarshalIndent(result, "", "    ")
+		_, err := json.MarshalIndent(result, "", "  ")
 		if err != nil {
 			panic(err)
 		}
-		fmt.Printf("%s\n", output)
 	}
 	return results, nil
 }
@@ -111,31 +98,24 @@ func NewMongoRepo(ctx context.Context, connectionString string) (*MongoRepositor
 }
 
 type MongoSupplier struct {
-	ID      SupplierId
-	Name    valueobj.Name
-	Contact valueobj.Contact
-	Email   valueobj.Email
-	Address valueobj.Address
-	Account Account
-	Bank    BankName
-	Note    string
-	State   valueobj.StateType
-	Debt    float64
-	Time    time.Time
+	Supplier `bson:"inline"`
+	Time     time.Time
 }
 
 func toMongoSupplier(s Supplier) MongoSupplier {
 	return MongoSupplier{
-		ID:      s.ID,
-		Name:    s.Name,
-		Contact: s.Contact,
-		Email:   s.Email,
-		Address: s.Address,
-		Account: s.Account,
-		Bank:    s.Bank,
-		Note:    s.Note,
-		State:   s.State,
-		Debt:    s.Debt,
-		Time:    time.Now(),
+		Supplier: Supplier{
+			ID:      s.ID,
+			Name:    s.Name,
+			Contact: s.Contact,
+			Email:   s.Email,
+			Address: s.Address,
+			Account: s.Account,
+			Bank:    s.Bank,
+			Note:    s.Note,
+			State:   s.State,
+			Debt:    s.Debt,
+		},
+		Time: time.Now(),
 	}
 }

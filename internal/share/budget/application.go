@@ -52,7 +52,7 @@ func (b BudgetApplicationService) UpdateBudget(ctx *gin.Context) {
 		return
 	}
 	budget.Note = req.Note
-	err = b.repo.SaveBudget(context.Background(), budget)
+	err = b.repo.ChangeBudget(context.Background(), budget)
 	if err != nil {
 		return
 	}
@@ -157,7 +157,7 @@ func NewBudgetApplicationService(repo Repository) BudgetApplicationService {
 		repo: repo,
 	}
 }
-func LoadCustomerRouter(e *gin.Engine) {
+func LoadBudgetRouter(e *gin.Engine) {
 	mongoConString := "mongodb://localhost:27017/"
 	repo, err := NewMongoRepo(context.Background(), mongoConString)
 	if err != nil {
