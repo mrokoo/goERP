@@ -18,6 +18,7 @@ type Repository interface {
 	DeleteBudget(ctx context.Context, budgetId uuid.UUID) error
 	FetchAllBudget(ctx context.Context) ([]Budget, error)
 	ChangeBudget(ctx context.Context, budget Budget) error
+	LoadBudget(ctx context.Context, budgetId uuid.UUID) (Budget, error)
 }
 
 type MongoRepo struct {
@@ -90,6 +91,15 @@ func (mr *MongoRepo) FetchAllBudget(ctx context.Context) ([]Budget, error) {
 		fmt.Printf("%s\n", output)
 	}
 	return results, nil
+}
+
+func (mr *MongoRepo) LoadBudget(ctx context.Context, budgetId uuid.UUID) (Budget, error) {
+	var budget Budget
+	filter := bson.D{{Key: "id", Value: budgetId}}
+	if err := mr.budgets.FindOne(ctx, filter).Decode(&budget); err != nil {
+		return Budget{}, err
+	}
+	return budget, nil
 }
 
 func toMongoBudget(b Budget) MongoBudget {
