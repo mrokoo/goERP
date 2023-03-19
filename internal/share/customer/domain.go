@@ -7,16 +7,16 @@ import (
 )
 
 type Customer struct {
-	ID      CustomerId         `json:"id"`
-	Name    valueobj.Name      `json:"name"`
-	Grade   GradeType          `json:"grade"`
-	Contact valueobj.Contact   `json:"contact"`
-	Phone   valueobj.Phone     `json:"phone"`
-	Email   valueobj.Email     `json:"email"`
-	Address valueobj.Address   `json:"address"`
-	Note    valueobj.Note      `json:"note"`
-	State   valueobj.StateType `json:"state"`
-	Debt    valueobj.Money     `json:"debt"`
+	ID      CustomerId         `json:"id" binding:"required"`
+	Name    valueobj.Name      `json:"name" binding:"required"`
+	Grade   GradeType          `json:"grade" binding:"-"`
+	Contact valueobj.Contact   `json:"contact" binding:"-"`
+	Phone   valueobj.Phone     `json:"phone" binding:"-"`
+	Email   valueobj.Email     `json:"email" binding:"-"`
+	Address valueobj.Address   `json:"address" binding:"-"`
+	Note    valueobj.Note      `json:"note" binding:"-"`
+	State   valueobj.StateType `json:"state" binding:"-"`
+	Debt    valueobj.Money     `json:"debt" binding:"-"`
 }
 
 type CustomerId = string

@@ -10,7 +10,7 @@ type Supplier struct {
 	Contact valueobj.Contact   `json:"contact" binding:"-"`
 	Email   valueobj.Email     `json:"email" binding:"-"`
 	Address valueobj.Address   `json:"address" binding:"-"`
-	Account Account            `json:"account" binding:"-"`
+	Account BankAccount        `json:"account" binding:"-"`
 	Bank    Bank               `json:"bank" binding:"-"`
 	Note    valueobj.Note      `json:"note" binding:"-"`
 	State   valueobj.StateType `json:"state" binding:"-"`
@@ -19,6 +19,6 @@ type Supplier struct {
 
 type SupplierId = string
 
-type Account = string
+type BankAccount = string
 
 type Bank = string

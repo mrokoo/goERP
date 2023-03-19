@@ -5,8 +5,8 @@ import (
 )
 
 type Warehouse struct {
-	ID      WarehouseId        `json:"id"`
-	Name    valueobj.Name      `json:"name"`
+	ID      WarehouseId        `json:"id" binding:"required"`
+	Name    valueobj.Name      `json:"name" binding:"required"`
 	Admin   string             `json:"admin"`
 	Phone   valueobj.Phone     `json:"phone"`
 	Address valueobj.Address   `json:"address"`

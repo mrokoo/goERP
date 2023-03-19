@@ -10,34 +10,6 @@ type SupplierApplicationService struct {
 	repo Repository
 }
 
-func (s SupplierApplicationService) UpdateSupplier(ctx *gin.Context) {
-	var supplier Supplier
-	if err := ctx.ShouldBindJSON(&supplier); err != nil {
-		ctx.JSON(400, gin.H{
-			"code":     -1,
-			"showMsg":  "failure",
-			"errorMsg": err.Error(),
-			"data":     nil,
-		})
-		return
-	}
-	if err := s.repo.ChangeSupplier(context.Background(), supplier); err != nil {
-		ctx.JSON(400, gin.H{
-			"code":     -1,
-			"showMsg":  "failure",
-			"errorMsg": err.Error(),
-			"data":     nil,
-		})
-		return
-	}
-	ctx.JSON(200, gin.H{
-		"code":     1,
-		"showMsg":  "success",
-		"errorMsg": "",
-		"data":     nil,
-	})
-}
-
 func (s SupplierApplicationService) AddSupplier(ctx *gin.Context) {
 	var supplier Supplier
 	if err := ctx.ShouldBindJSON(&supplier); err != nil {
@@ -66,9 +38,37 @@ func (s SupplierApplicationService) AddSupplier(ctx *gin.Context) {
 	})
 }
 
+func (s SupplierApplicationService) UpdateSupplier(ctx *gin.Context) {
+	var supplier Supplier
+	if err := ctx.ShouldBindJSON(&supplier); err != nil {
+		ctx.JSON(400, gin.H{
+			"code":     -1,
+			"showMsg":  "failure",
+			"errorMsg": err.Error(),
+			"data":     nil,
+		})
+		return
+	}
+	if err := s.repo.ChangeSupplier(context.Background(), supplier); err != nil {
+		ctx.JSON(400, gin.H{
+			"code":     -1,
+			"showMsg":  "failure",
+			"errorMsg": err.Error(),
+			"data":     nil,
+		})
+		return
+	}
+	ctx.JSON(200, gin.H{
+		"code":     1,
+		"showMsg":  "success",
+		"errorMsg": "",
+		"data":     nil,
+	})
+}
+
 func (s SupplierApplicationService) DeleteSupplier(ctx *gin.Context) {
 	var req struct {
-		SupplierId string `json:"id"`
+		SupplierId string `json:"id" binding:"required"`
 	}
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {

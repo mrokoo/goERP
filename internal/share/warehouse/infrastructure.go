@@ -64,16 +64,7 @@ func (mr *MongoRepo) DeleteWarehouse(ctx context.Context, warehouseId WarehouseI
 func (mr *MongoRepo) ChangeWarehouse(ctx context.Context, warehouse Warehouse) error {
 	mongoW := toMongoWarehouse(warehouse)
 	filter := bson.D{{Key: "id", Value: warehouse.ID}}
-	update := bson.D{{Key: "$set", Value: bson.D{
-		{Key: "name", Value: mongoW.Name},
-		{Key: "admin", Value: mongoW.Admin},
-		{Key: "phoneNumber", Value: mongoW.Phone},
-		{Key: "address", Value: mongoW.Address},
-		{Key: "note", Value: mongoW.Note},
-		{Key: "state", Value: mongoW.State},
-	}}}
-
-	result, err := mr.warehouses.UpdateOne(ctx, filter, update)
+	result, err := mr.warehouses.ReplaceOne(ctx, filter, mongoW)
 	if result.MatchedCount == 0 {
 		return errors.New("fail to query the warehouse")
 	}
@@ -97,11 +88,10 @@ func (mr *MongoRepo) FetchAllWarehouse(ctx context.Context) ([]Warehouse, error)
 
 	for _, result := range results {
 		cursor.Decode(&result)
-		output, err := json.MarshalIndent(result, "", "    ")
+		_, err := json.MarshalIndent(result, "", "    ")
 		if err != nil {
 			panic(err)
 		}
-		fmt.Printf("%s\n", output)
 	}
 	return results, nil
 }

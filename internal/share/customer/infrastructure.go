@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/mrokoo/goERP/internal/share/valueobj"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -73,18 +72,7 @@ func (mr *MongoRespository) DeleteCustomer(ctx context.Context, customerID Custo
 func (mr *MongoRespository) ChangeCustomer(ctx context.Context, customer Customer) error {
 	mongoCustomer := toMongoCustomer(customer)
 	filter := bson.D{{Key: "id", Value: customer.ID}}
-	update := bson.D{{Key: "$set", Value: bson.D{
-		{Key: "name", Value: mongoCustomer.Name},
-		{Key: "grade", Value: mongoCustomer.Grade},
-		{Key: "contact", Value: mongoCustomer.Contact},
-		{Key: "phone", Value: mongoCustomer.Phone},
-		{Key: "email", Value: mongoCustomer.Email},
-		{Key: "address", Value: mongoCustomer.Address},
-		{Key: "note", Value: mongoCustomer.Note},
-		{Key: "state", Value: mongoCustomer.State},
-		{Key: "debt", Value: mongoCustomer.Debt},
-	}}}
-	result, err := mr.customers.UpdateOne(ctx, filter, update)
+	result, err := mr.customers.ReplaceOne(ctx, filter, mongoCustomer)
 
 	if result.MatchedCount == 0 {
 		return errors.New("fail to query the customer")
@@ -109,11 +97,10 @@ func (mr *MongoRespository) FetchAllCustomers(ctx context.Context) ([]Customer, 
 
 	for _, result := range results {
 		cursor.Decode(&result)
-		output, err := json.MarshalIndent(result, "", "    ")
+		_, err := json.MarshalIndent(result, "", "    ")
 		if err != nil {
 			panic(err)
 		}
-		fmt.Printf("%s\n", output)
 	}
 	return results, nil
 }
@@ -137,31 +124,13 @@ func NewMongoRepo(ctx context.Context, connectionString string) (*MongoResposito
 }
 
 type mongoCustomer struct {
-	ID      CustomerId
-	Name    valueobj.Name
-	Grade   GradeType
-	Contact valueobj.Contact
-	Phone   valueobj.Phone
-	Email   valueobj.Email
-	Address valueobj.Address
-	Note    valueobj.Note
-	State   valueobj.StateType
-	Debt    valueobj.Money
-	Time    time.Time
+	Customer `bson:"inline"`
+	Time     time.Time
 }
 
 func toMongoCustomer(c Customer) mongoCustomer {
 	return mongoCustomer{
-		ID:      c.ID,
-		Name:    c.Name,
-		Grade:   c.Grade,
-		Contact: c.Contact,
-		Phone:   c.Phone,
-		Email:   c.Email,
-		Address: c.Address,
-		Note:    c.Note,
-		State:   c.State,
-		Debt:    c.Debt,
-		Time:    time.Now(),
+		Customer: c,
+		Time:     time.Now(),
 	}
 }

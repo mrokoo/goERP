@@ -104,18 +104,7 @@ type MongoSupplier struct {
 
 func toMongoSupplier(s Supplier) MongoSupplier {
 	return MongoSupplier{
-		Supplier: Supplier{
-			ID:      s.ID,
-			Name:    s.Name,
-			Contact: s.Contact,
-			Email:   s.Email,
-			Address: s.Address,
-			Account: s.Account,
-			Bank:    s.Bank,
-			Note:    s.Note,
-			State:   s.State,
-			Debt:    s.Debt,
-		},
-		Time: time.Now(),
+		Supplier: s,
+		Time:     time.Now(),
 	}
 }
