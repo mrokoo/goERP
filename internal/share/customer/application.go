@@ -40,7 +40,7 @@ func (c CustomerApplicationService) AddCustomer(ctx *gin.Context) {
 
 func (c CustomerApplicationService) DeleteCustomer(ctx *gin.Context) {
 	var req struct {
-		CustomerId string `json:"id" bson:"required"`
+		CustomerId string `json:"id" binding:"required"`
 	}
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {

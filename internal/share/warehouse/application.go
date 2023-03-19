@@ -71,7 +71,7 @@ func (w WarehouseApplicationService) AddWarehouse(ctx *gin.Context) {
 
 func (w WarehouseApplicationService) DeleteWarehouse(ctx *gin.Context) {
 	var req struct {
-		WarehouseId string `json:"id"`
+		WarehouseId string `json:"id" binding:"required"`
 	}
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
