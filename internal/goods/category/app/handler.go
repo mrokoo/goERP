@@ -3,7 +3,7 @@ package app
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/mrokoo/goERP/internal/product/category/domain"
+	"github.com/mrokoo/goERP/internal/goods/category/domain"
 )
 
 type CategoryService interface {
