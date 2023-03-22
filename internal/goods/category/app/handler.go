@@ -3,15 +3,7 @@ package app
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/mrokoo/goERP/internal/goods/category/domain"
 )
-
-type CategoryService interface {
-	CreateCategory(name string, note string) (*domain.Category, error)
-	ChangeCategory(categoryId *uuid.UUID, name string, note string) (*domain.Category, error)
-	GetAllCategories() ([]domain.Category, error)
-	DeleteCategory(categoryId *uuid.UUID) error
-}
 
 type CategoryHandler struct {
 	categoryService CategoryService

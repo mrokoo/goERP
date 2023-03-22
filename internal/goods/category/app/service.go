@@ -5,6 +5,14 @@ import (
 	"github.com/mrokoo/goERP/internal/goods/category/domain"
 )
 
+type CategoryService interface {
+	CreateCategory(name string, note string) (*domain.Category, error)
+	ChangeCategory(categoryId *uuid.UUID, name string, note string) (*domain.Category, error)
+	GetAllCategories() ([]domain.Category, error)
+	DeleteCategory(categoryId *uuid.UUID) error
+	GetCategory(categoryId *uuid.UUID) (*domain.Category, error)
+}
+
 type CategoryServiceImpl struct {
 	categoryRepository domain.CategoryRepository
 }
@@ -55,4 +63,12 @@ func (s *CategoryServiceImpl) DeleteCategory(categoryId *uuid.UUID) error {
 		return err
 	}
 	return nil
+}
+
+func (s *CategoryServiceImpl) GetCategory(categoryId *uuid.UUID) (*domain.Category, error) {
+	category, err := s.categoryRepository.Get(categoryId)
+	if err != nil {
+		return nil, err
+	}
+	return category, nil
 }
