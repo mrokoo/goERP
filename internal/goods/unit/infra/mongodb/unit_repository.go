@@ -40,7 +40,7 @@ func (r *MongoUnitRepository) Save(unit *domain.Unit) error {
 
 func (r *MongoUnitRepository) Get(unitId *uuid.UUID) (*domain.Unit, error) {
 	filter := bson.D{{"id", unitId}}
-	var unit *domain.Unit
+	unit := &domain.Unit{}
 	err := r.units.FindOne(context.Background(), filter).Decode(unit)
 	if err != nil {
 		return nil, fmt.Errorf("fail to find unit: %w", err)
@@ -65,12 +65,6 @@ func (r *MongoUnitRepository) GetAll() ([]domain.Unit, error) {
 	var results []domain.Unit
 	if err = cursor.All(context.Background(), &results); err != nil {
 		return nil, fmt.Errorf("fail to get units: %w", err)
-	}
-
-	for _, result := range results {
-		if err := cursor.Decode(&result); err != nil {
-			return nil, fmt.Errorf("fail to get units: %w", err)
-		}
 	}
 	return results, nil
 }

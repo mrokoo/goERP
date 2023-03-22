@@ -1,6 +1,6 @@
 package valueobj
 
 type Info struct {
-	Img   string
-	Intro string
+	Img   string `json:"img"`
+	Intro string `json:"intro"`
 }

@@ -39,13 +39,14 @@ func (r *MongoProductRepository) Save(product *domain.Product) error {
 
 func (r *MongoProductRepository) Get(productId string) (*domain.Product, error) {
 	filter := bson.D{{"id", productId}}
-	var product *domain.Product
+	product := &domain.Product{}
 	err := r.products.FindOne(context.Background(), filter).Decode(product)
 	if err != nil {
 		return nil, fmt.Errorf("fail to find product: %w", err)
 	}
 	return product, nil
 }
+
 
 func (r *MongoProductRepository) Delete(productId string) error {
 	filter := bson.D{{"id", productId}}
@@ -64,12 +65,6 @@ func (r *MongoProductRepository) GetAll() ([]domain.Product, error) {
 	var results []domain.Product
 	if err = cursor.All(context.Background(), &results); err != nil {
 		return nil, fmt.Errorf("fail to get products: %w", err)
-	}
-
-	for _, result := range results {
-		if err := cursor.Decode(&result); err != nil {
-			return nil, fmt.Errorf("fail to get products: %w", err)
-		}
 	}
 	return results, nil
 }

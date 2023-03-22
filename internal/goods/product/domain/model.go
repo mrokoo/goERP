@@ -23,8 +23,8 @@ type Product struct {
 }
 
 type OpeningStock struct {
-	Warehouse warehouseDomain.WarehouseId
-	Amount    int
+	Warehouse warehouseDomain.WarehouseId `json:"warehouse_id"`
+	Amount    int                         `json:"amount"`
 }
 
 func (p *Product) Validate() error {

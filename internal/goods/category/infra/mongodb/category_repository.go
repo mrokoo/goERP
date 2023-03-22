@@ -40,7 +40,7 @@ func (r *MongoCategoryRepository) Save(category *domain.Category) error {
 
 func (r *MongoCategoryRepository) Get(categoryId *uuid.UUID) (*domain.Category, error) {
 	filter := bson.D{{"id", categoryId}}
-	var category *domain.Category
+	category := &domain.Category{}
 	err := r.categories.FindOne(context.Background(), filter).Decode(category)
 	if err != nil {
 		return nil, fmt.Errorf("fail to find category: %w", err)
@@ -65,12 +65,6 @@ func (r *MongoCategoryRepository) GetAll() ([]domain.Category, error) {
 	var results []domain.Category
 	if err = cursor.All(context.Background(), &results); err != nil {
 		return nil, fmt.Errorf("fail to get categories: %w", err)
-	}
-
-	for _, result := range results {
-		if err := cursor.Decode(&result); err != nil {
-			return nil, fmt.Errorf("fail to get categories: %w", err)
-		}
 	}
 	return results, nil
 }
