@@ -2,7 +2,6 @@ package supplier
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"time"
@@ -73,14 +72,6 @@ func (mr *MongoRepository) FetchAllSuppliers(ctx context.Context) ([]Supplier, e
 	var results []Supplier
 	if err = cursor.All(ctx, &results); err != nil {
 		return []Supplier{}, fmt.Errorf("fail to fetch suppliers: %w", err)
-	}
-
-	for _, result := range results {
-		cursor.Decode(&result)
-		_, err := json.MarshalIndent(result, "", "  ")
-		if err != nil {
-			panic(err)
-		}
 	}
 	return results, nil
 }

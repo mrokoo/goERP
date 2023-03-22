@@ -2,7 +2,6 @@ package budget
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"time"
@@ -82,14 +81,6 @@ func (mr *MongoRepo) FetchAllBudget(ctx context.Context) ([]Budget, error) {
 		return []Budget{}, fmt.Errorf("fail to fetch budgets: %w", err)
 	}
 
-	for _, result := range results {
-		cursor.Decode(&result)
-		output, err := json.MarshalIndent(result, "", "    ")
-		if err != nil {
-			panic(err)
-		}
-		fmt.Printf("%s\n", output)
-	}
 	return results, nil
 }
 

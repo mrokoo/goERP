@@ -2,7 +2,6 @@ package account
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"time"
@@ -61,14 +60,6 @@ func (mr *MongoRepo) FetchAll(ctx context.Context) ([]Account, error) {
 	var results []Account
 	if err = cursor.All(ctx, &results); err != nil {
 		return []Account{}, fmt.Errorf("fail to fetch accounts: %w", err)
-	}
-
-	for _, result := range results {
-		cursor.Decode(&result)
-		_, err := json.MarshalIndent(result, "", "  ")
-		if err != nil {
-			panic(err)
-		}
 	}
 	return results, nil
 }

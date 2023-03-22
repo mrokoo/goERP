@@ -2,7 +2,6 @@ package customer
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"time"
@@ -95,13 +94,6 @@ func (mr *MongoRespository) FetchAllCustomers(ctx context.Context) ([]Customer, 
 		return []Customer{}, fmt.Errorf("fail to fetch customers: %w", err)
 	}
 
-	for _, result := range results {
-		cursor.Decode(&result)
-		_, err := json.MarshalIndent(result, "", "    ")
-		if err != nil {
-			panic(err)
-		}
-	}
 	return results, nil
 }
 

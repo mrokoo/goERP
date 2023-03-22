@@ -2,7 +2,6 @@ package warehouse
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"time"
@@ -84,14 +83,6 @@ func (mr *MongoRepo) FetchAllWarehouse(ctx context.Context) ([]Warehouse, error)
 	var results []Warehouse
 	if err = cursor.All(ctx, &results); err != nil {
 		return []Warehouse{}, fmt.Errorf("fail to fetch warehouses: %w", err)
-	}
-
-	for _, result := range results {
-		cursor.Decode(&result)
-		_, err := json.MarshalIndent(result, "", "    ")
-		if err != nil {
-			panic(err)
-		}
 	}
 	return results, nil
 }

@@ -89,6 +89,7 @@ func (h *ProductHandler) DeleteProduct(ctx *gin.Context) {
 	})
 }
 
+// change的检验有点小多，需要慎重。（其实create中的检验可以直接应用到change中，继续看看吧一会再写
 // func (h *ProductHandler) ChangeProduct(ctx *gin.Context) {
 // 	var req struct {
 // 		ID   string `json:"id"`
