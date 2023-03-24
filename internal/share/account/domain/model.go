@@ -1,6 +1,9 @@
-package account
+//go:generate mockgen -destination=./mock/mock_article_repository.go -package=mock github.com/rectcircle/go-test-demo/02-mock/domain ArticleRepository
+package domain
 
-import "github.com/mrokoo/goERP/internal/share/valueobj"
+import (
+	"github.com/mrokoo/goERP/internal/share/valueobj"
+)
 
 type Account struct {
 	ID      AccountId          `json:"id" binding:"required"`
@@ -24,3 +27,7 @@ const (
 	TYPE_ALiPAY
 	TYPE_OTHER
 )
+
+func (t *Type) IsValidated() bool {
+	return *t >= 1 && *t <= 4
+}

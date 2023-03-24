@@ -2,20 +2,21 @@ package app
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
+	"github.com/mrokoo/goERP/internal/share/account/domain"
 )
 
-type CategoryHandler struct {
-	categoryService CategoryService
+type AccountHandler struct {
+	AccountService AccountService
 }
 
-func NewCategoryHandler(categoryService CategoryService) *CategoryHandler {
-	return &CategoryHandler{
-		categoryService: categoryService,
+func NewAccountHandler(accountService AccountService) *AccountHandler {
+	return &AccountHandler{
+		AccountService: accountService,
 	}
 }
-func (h *CategoryHandler) GetAllCategories(ctx *gin.Context) {
-	categories, err := h.categoryService.GetAllCategories()
+
+func (h *AccountHandler) GetAccountList(ctx *gin.Context) {
+	accounts, err := h.AccountService.GetAccountList()
 	if err != nil {
 		ctx.JSON(400, gin.H{
 			"code":     -1,
@@ -29,15 +30,12 @@ func (h *CategoryHandler) GetAllCategories(ctx *gin.Context) {
 		"code":     1,
 		"showMsg":  "success",
 		"errorMsg": "",
-		"data":     categories,
+		"data":     accounts,
 	})
 }
 
-func (h *CategoryHandler) CreateCategory(ctx *gin.Context) {
-	var req struct {
-		Name string `json:"name"`
-		Note string `json:"note"`
-	}
+func (h *AccountHandler) AddAccount(ctx *gin.Context) {
+	var req domain.Account
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(400, gin.H{
 			"code":     -1,
@@ -48,40 +46,8 @@ func (h *CategoryHandler) CreateCategory(ctx *gin.Context) {
 		return
 	}
 
-	c, err := h.categoryService.CreateCategory(req.Name, req.Note)
+	err := h.AccountService.AddAccount(req)
 	if err != nil {
-		ctx.JSON(400, gin.H{
-			"code":     -1,
-			"showMsg":  "failure",
-			"errorMsg": err.Error(),
-			"data":     nil,
-		})
-		return
-	}
-	ctx.JSON(200, gin.H{
-		"code":     1,
-		"showMsg":  "success",
-		"errorMsg": "",
-		"data":     c,
-	})
-}
-
-func (h *CategoryHandler) DeleteCategory(ctx *gin.Context) {
-	var req struct {
-		ID string `json:"id"`
-	}
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(400, gin.H{
-			"code":     -1,
-			"showMsg":  "failure",
-			"errorMsg": err.Error(),
-			"data":     nil,
-		})
-		return
-	}
-	var id uuid.UUID
-	id.UnmarshalText([]byte(req.ID))
-	if err := h.categoryService.DeleteCategory(&id); err != nil {
 		ctx.JSON(400, gin.H{
 			"code":     -1,
 			"showMsg":  "failure",
@@ -99,12 +65,8 @@ func (h *CategoryHandler) DeleteCategory(ctx *gin.Context) {
 	})
 }
 
-func (h *CategoryHandler) ChangeCategory(ctx *gin.Context) {
-	var req struct {
-		ID   string `json:"id"`
-		Name string `json:"name"`
-		Note string `json:"note"`
-	}
+func (h *AccountHandler) UpdateAccount(ctx *gin.Context) {
+	var req domain.Account
 	if err := ctx.ShouldBindJSON(req); err != nil {
 		ctx.JSON(400, gin.H{
 			"code":     -1,
@@ -115,8 +77,7 @@ func (h *CategoryHandler) ChangeCategory(ctx *gin.Context) {
 		return
 	}
 
-	id := uuid.MustParse(req.ID)
-	c, err := h.categoryService.ChangeCategory(&id, req.Name, req.Note)
+	err := h.AccountService.UpdateAccount(req)
 	if err != nil {
 		ctx.JSON(400, gin.H{
 			"code":     -1,
@@ -131,6 +92,38 @@ func (h *CategoryHandler) ChangeCategory(ctx *gin.Context) {
 		"code":     1,
 		"showMsg":  "success",
 		"errorMsg": "",
-		"data":     c,
+		"data":     nil,
+	})
+}
+
+func (h *AccountHandler) DeleteAccount(ctx *gin.Context) {
+	var req struct {
+		ID string `json:"id"`
+	}
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(400, gin.H{
+			"code":     -1,
+			"showMsg":  "failure",
+			"errorMsg": err.Error(),
+			"data":     nil,
+		})
+		return
+	}
+
+	if err := h.AccountService.DeleteAccount(req.ID); err != nil {
+		ctx.JSON(400, gin.H{
+			"code":     -1,
+			"showMsg":  "failure",
+			"errorMsg": err.Error(),
+			"data":     nil,
+		})
+		return
+	}
+
+	ctx.JSON(200, gin.H{
+		"code":     1,
+		"showMsg":  "success",
+		"errorMsg": "",
+		"data":     nil,
 	})
 }
