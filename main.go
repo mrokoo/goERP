@@ -4,8 +4,6 @@ import (
 	"context"
 
 	"github.com/gin-gonic/gin"
-	categoryapp "github.com/mrokoo/goERP/internal/goods/category/app"
-	categoryinfra "github.com/mrokoo/goERP/internal/goods/category/infra/mongodb"
 	"github.com/mrokoo/goERP/internal/share/budget"
 	"github.com/mrokoo/goERP/internal/share/customer"
 	"github.com/mrokoo/goERP/internal/share/supplier"
@@ -22,15 +20,13 @@ func SetupRouter() *gin.Engine {
 	if err != nil {
 		panic(err)
 	}
-	r := categoryinfra.NewMongoCategoryRepository(client)
-	s := categoryapp.NewCategoryServiceImpl(r)
-	categoryHandler := categoryapp.NewCategoryHandler(s)
-	routes.GoodsRoutes(router, categoryHandler)
+
+	routes.GoodsRoutes(router, client)
+	routes.AccountRoutes(router, client)
 	customer.LoadCustomerRouter(router)
 	supplier.LoadSupplierRouter(router)
 	warehouse.LoadWarehouseRouter(router)
 	budget.LoadBudgetRouter(router)
-	account.LoadAccountRouter(router)
 
 	return router
 }

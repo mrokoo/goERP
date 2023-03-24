@@ -14,6 +14,13 @@ type MongoRepository struct {
 	accounts *mongo.Collection
 }
 
+func NewMongoRepository(client *mongo.Client) *MongoRepository {
+	accounts := client.Database("goERP").Collection("suppliers")
+	return &MongoRepository{
+		accounts: accounts,
+	}
+}
+
 // 插入新文档
 func (r *MongoRepository) Save(account domain.Account) error {
 	_, err := r.accounts.InsertOne(context.Background(), account)
@@ -70,11 +77,4 @@ func (r *MongoRepository) Delete(accountID domain.AccountId) error {
 		return fmt.Errorf("fail to delete account: %w", err)
 	}
 	return nil
-}
-
-func NewMongoRepository(client *mongo.Client) (*MongoRepository, error) {
-	accounts := client.Database("goERP").Collection("suppliers")
-	return &MongoRepository{
-		accounts: accounts,
-	}, nil
 }

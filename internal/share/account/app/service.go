@@ -11,16 +11,15 @@ type AccountService interface {
 	GetAccountList() ([]domain.Account, error)
 	AddAccount(account domain.Account) error
 	UpdateAccount(account domain.Account) error
-	SaveAccount(account domain.Account) error
 	DeleteAccount(accountId domain.AccountId) error
 }
 
 type AccountServiceImpl struct {
-	checkAccountValidityService domain.CheckingAccountValidityService
+	checkAccountValidityService *domain.CheckingAccountValidityService
 	repo                        domain.Repository
 }
 
-func NewAccountServiceImpl(checkAccountValidityService domain.CheckingAccountValidityService, repo domain.Repository) *AccountServiceImpl {
+func NewAccountServiceImpl(checkAccountValidityService *domain.CheckingAccountValidityService, repo domain.Repository) *AccountServiceImpl {
 	return &AccountServiceImpl{
 		repo: repo,
 	}
