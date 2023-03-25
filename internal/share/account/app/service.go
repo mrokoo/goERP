@@ -46,7 +46,7 @@ func (s *AccountServiceImpl) GetAccountList() ([]domain.Account, error) {
 }
 
 func (s *AccountServiceImpl) AddAccount(account domain.Account) error {
-	// account验证逻辑
+	// 检查Account是否符合要求
 	if !s.checkAccountValidityService.IsValidated(account) {
 		return ErrAccountInVaildated
 	}
@@ -58,9 +58,6 @@ func (s *AccountServiceImpl) AddAccount(account domain.Account) error {
 }
 
 func (s *AccountServiceImpl) UpdateAccount(account domain.Account) error {
-	if !s.checkAccountValidityService.IsValidated(account) {
-		return ErrNotFound
-	}
 	if err := s.repo.Update(account); err != nil {
 		return err
 	}

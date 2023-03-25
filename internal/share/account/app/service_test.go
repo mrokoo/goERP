@@ -2,7 +2,6 @@
 package app_test
 
 import (
-	"errors"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -13,7 +12,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-var ErrNotFound = errors.New("the docment is not found")
+var ErrNotFound = mongo.ErrNoDocuments
+var ErrAccountInVaildated = app.ErrAccountInVaildated
 
 func TestAccountService_GetAccount(t *testing.T) {
 	want := domain.Account{
@@ -63,7 +63,8 @@ func TestAccountService_GetAccountList(t *testing.T) {
 			Balance: 2000,
 		},
 
-		{ID: "A002",
+		{
+			ID:      "A002",
 			Name:    "账号2",
 			Type:    2,
 			Holder:  "张三",
@@ -90,52 +91,49 @@ func TestAccountService_GetAccountList(t *testing.T) {
 	})
 }
 
-// func TestAccountService_UpdateAccount(t *testing.T) {
-// 	p := domain.Account{
-// 		ID:      "A001",
-// 		Name:    "账号1",
-// 		Type:    3,
-// 		Holder:  "张三",
-// 		Number:  "	402901000226",
-// 		Note:    "测试实例",
-// 		State:   2,
-// 		Balance: 2000,
-// 	}
-// 	p2 := domain.Account{
-// 		ID:      "A002",
-// 		Name:    "账号1",
-// 		Type:    3,
-// 		Holder:  "张三",
-// 		Number:  "	402901000226",
-// 		Note:    "测试实例",
-// 		State:   2,
-// 		Balance: 2000,
-// 	}
+func TestAccountService_UpdateAccount(t *testing.T) {
+	p := domain.Account{
+		ID:      "A001",
+		Name:    "账号1",
+		Type:    3,
+		Holder:  "张三",
+		Number:  "	402901000226",
+		Note:    "测试实例",
+		State:   2,
+		Balance: 2000,
+	}
+	p2 := domain.Account{
+		ID:      "A002",
+		Name:    "账号1",
+		Type:    3,
+		Holder:  "张三",
+		Number:  "	402901000226",
+		Note:    "测试实例",
+		State:   2,
+		Balance: 2000,
+	}
 
-// 	assert := assert.New(t)
+	assert := assert.New(t)
 
-// 	ctrl := gomock.NewController(t)
+	ctrl := gomock.NewController(t)
+	m := mock.NewMockRepository(ctrl)
+	ds := domain.NewCheckingAccountValidityService(m)
+	s := app.NewAccountServiceImpl(ds, m)
 
-// 	m := mock.NewMockRepository(ctrl)
+	m.EXPECT().Update(p).Return(nil)
+	m.EXPECT().Update(p2).Return(ErrNotFound)
 
-// 	m.EXPECT().Update(p).Return(nil)
+	t.Run("success", func(t *testing.T) {
+		err := s.UpdateAccount(p)
+		assert.NoError(err)
+	})
 
-// 	m.EXPECT().Get("A002").Return(nil)
-// 	m.EXPECT().Update(p2).Return(ErrNotFound)
-
-// 	ds := domain.NewCheckingAccountValidityService(m)
-// 	s := app.NewAccountServiceImpl(ds, m)
-
-// 	t.Run("success", func(t *testing.T) {
-// 		err := s.UpdateAccount(p)
-// 		assert.NoError(err)
-// 	})
-
-// 	t.Run("invalidated", func(t *testing.T) {
-// 		err := s.UpdateAccount(p2)
-// 		assert.ErrorIs(err, ErrNotFound)
-// 	})
-// }
+	// 根据传入account的ID属性没有查找到对应的文档，导致错误
+	t.Run("failure", func(t *testing.T) {
+		err := s.UpdateAccount(p2)
+		assert.ErrorIs(err, ErrNotFound)
+	})
+}
 
 func TestAccountService_AddAccount(t *testing.T) {
 
@@ -166,7 +164,7 @@ func TestAccountService_AddAccount(t *testing.T) {
 	s := app.NewAccountServiceImpl(ds, m)
 
 	t.Run("success", func(t *testing.T) {
-		m.EXPECT().Get("A001").Return(nil, mongo.ErrNoDocuments)
+		m.EXPECT().Get("A001").Return(nil, ErrNotFound)
 		m.EXPECT().Save(p).Return(nil)
 		err := s.AddAccount(p)
 		assert.NoError(err)
@@ -175,6 +173,27 @@ func TestAccountService_AddAccount(t *testing.T) {
 	t.Run("failure", func(t *testing.T) {
 		m.EXPECT().Get("A002").Return(&p2, nil)
 		err := s.AddAccount(p2)
-		assert.ErrorIs(err, app.ErrAccountInVaildated)
+		assert.ErrorIs(err, ErrAccountInVaildated)
 	})
+}
+
+func TestAccountService_DeleteAccount(t *testing.T) {
+	assert := assert.New(t)
+	ctrl := gomock.NewController(t)
+	m := mock.NewMockRepository(ctrl)
+	ds := domain.NewCheckingAccountValidityService(m)
+	s := app.NewAccountServiceImpl(ds, m)
+
+	t.Run("success", func(t *testing.T) {
+		m.EXPECT().Delete("A001").Return(nil)
+		err := s.DeleteAccount("A001")
+		assert.NoError(err)
+	})
+
+	t.Run("failure", func(t *testing.T) {
+		m.EXPECT().Delete("A002").Return(ErrNotFound)
+		err := s.DeleteAccount("A002")
+		assert.ErrorIs(err, ErrNotFound)
+	})
+
 }
