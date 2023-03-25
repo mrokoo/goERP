@@ -1,4 +1,4 @@
-package warehouse
+package domain
 
 import (
 	"github.com/mrokoo/goERP/internal/share/valueobj"
@@ -14,4 +14,4 @@ type Warehouse struct {
 	State   valueobj.StateType `json:"state"`
 }
 
-type WarehouseId string
+type WarehouseId = string

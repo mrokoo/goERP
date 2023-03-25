@@ -1,4 +1,4 @@
-package budget
+package domain
 
 import (
 	"errors"

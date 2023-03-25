@@ -1,4 +1,4 @@
-package supplier
+package domain
 
 import (
 	"github.com/mrokoo/goERP/internal/share/valueobj"
