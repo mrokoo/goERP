@@ -1,5 +1,7 @@
 package domain
 
+import "go.mongodb.org/mongo-driver/mongo"
+
 type CheckingAccountValidityService struct {
 	accountRepository Repository
 }
@@ -12,6 +14,6 @@ func NewCheckingAccountValidityService(accountRepository Repository) *CheckingAc
 
 func (ds *CheckingAccountValidityService) IsValidated(account Account) bool {
 	// ID唯一性校验
-	result, _ := ds.accountRepository.Get(account.ID)
-	return result == nil
+	_, err := ds.accountRepository.Get(account.ID)
+	return err == mongo.ErrNoDocuments
 }

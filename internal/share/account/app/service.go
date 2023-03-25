@@ -6,6 +6,9 @@ import (
 	"github.com/mrokoo/goERP/internal/share/account/domain"
 )
 
+var ErrNotFound = errors.New("the docment is not found")
+var ErrAccountInVaildated = errors.New("the validity check fails")
+
 type AccountService interface {
 	GetAccount(accountId domain.AccountId) (*domain.Account, error)
 	GetAccountList() ([]domain.Account, error)
@@ -21,7 +24,8 @@ type AccountServiceImpl struct {
 
 func NewAccountServiceImpl(checkAccountValidityService *domain.CheckingAccountValidityService, repo domain.Repository) *AccountServiceImpl {
 	return &AccountServiceImpl{
-		repo: repo,
+		checkAccountValidityService: checkAccountValidityService,
+		repo:                        repo,
 	}
 }
 
@@ -44,7 +48,7 @@ func (s *AccountServiceImpl) GetAccountList() ([]domain.Account, error) {
 func (s *AccountServiceImpl) AddAccount(account domain.Account) error {
 	// account验证逻辑
 	if !s.checkAccountValidityService.IsValidated(account) {
-		return errors.New("the validity check fails")
+		return ErrAccountInVaildated
 	}
 	err := s.repo.Save(account)
 	if err != nil {
@@ -55,7 +59,7 @@ func (s *AccountServiceImpl) AddAccount(account domain.Account) error {
 
 func (s *AccountServiceImpl) UpdateAccount(account domain.Account) error {
 	if !s.checkAccountValidityService.IsValidated(account) {
-		return errors.New("the validity check fails")
+		return ErrNotFound
 	}
 	if err := s.repo.Update(account); err != nil {
 		return err
