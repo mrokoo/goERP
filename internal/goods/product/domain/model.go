@@ -5,9 +5,10 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/mrokoo/goERP/internal/goods/product/domain/valueobj"
-	warehouseDomain "github.com/mrokoo/goERP/internal/share/warehouse"
+	warehouseDomain "github.com/mrokoo/goERP/internal/share/warehouse/domain"
 )
 
+// 序列化问题，能否从string直接转化为uuid.UUID
 type Product struct {
 	ID                 string             `json:"id"`
 	Name               string             `json:"name"`
