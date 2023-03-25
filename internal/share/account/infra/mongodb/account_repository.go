@@ -15,7 +15,7 @@ type MongoRepository struct {
 }
 
 func NewMongoRepository(client *mongo.Client) *MongoRepository {
-	accounts := client.Database("goERP").Collection("suppliers")
+	accounts := client.Database("goERP").Collection("accounts")
 	return &MongoRepository{
 		accounts: accounts,
 	}

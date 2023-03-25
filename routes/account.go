@@ -16,7 +16,7 @@ func AccountRoutes(r *gin.Engine, client *mongo.Client) {
 		s := app.NewAccountServiceImpl(ds, m)
 		h := app.NewAccountHandler(s)
 		account.GET("/getAccountList", h.GetAccountList)
-		account.POST("/addAccountList", h.AddAccount)
+		account.POST("/addAccount", h.AddAccount)
 		account.DELETE("/deleteAccount", h.DeleteAccount)
 		account.PUT("/updateAccount", h.UpdateAccount)
 	}
