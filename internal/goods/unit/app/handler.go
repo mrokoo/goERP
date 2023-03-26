@@ -17,6 +17,12 @@ type UnitHandler struct {
 	unitService UnitService
 }
 
+func NewUnitHandler(s UnitService) *UnitHandler {
+	return &UnitHandler{
+		unitService: s,
+	}
+}
+
 func (h *UnitHandler) GetAllUnits(ctx *gin.Context) {
 	units, err := h.unitService.GetAllUnits()
 	if err != nil {

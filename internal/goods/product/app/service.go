@@ -9,15 +9,18 @@ type ProductService interface {
 	CreateProduct(product *domain.Product) (*domain.Product, error)
 	GetAllProducts() ([]domain.Product, error)
 	DeleteProduct(productId string) error
+	UpdateProduct(product *domain.Product) error
 }
 
 type ProductServiceImpl struct {
-	productRepository domain.ProductRepository
+	productRepository              domain.ProductRepository
+	checkingProductValidityService domain.CheckingProductValidityService
 }
 
-func NewProductServiceImpl(productRepository domain.ProductRepository) *ProductServiceImpl {
+func NewProductServiceImpl(productRepository domain.ProductRepository, s domain.CheckingProductValidityService) *ProductServiceImpl {
 	return &ProductServiceImpl{
-		productRepository: productRepository,
+		productRepository:              productRepository,
+		checkingProductValidityService: s,
 	}
 }
 
@@ -27,9 +30,11 @@ func (s *ProductServiceImpl) CreateProduct(product *domain.Product) (*domain.Pro
 		return nil, err
 	}
 	product.State = state
-	if err := product.Validate(); err != nil {
+
+	if err := s.checkingProductValidityService.IsValidated(product); err != nil {
 		return nil, err
 	}
+
 	if err := s.productRepository.Create(product); err != nil {
 		return nil, err
 	}
@@ -46,6 +51,16 @@ func (s *ProductServiceImpl) GetAllProducts() ([]domain.Product, error) {
 
 func (s *ProductServiceImpl) DeleteProduct(productId string) error {
 	if err := s.productRepository.Delete(productId); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *ProductServiceImpl) UpdateProduct(product *domain.Product) error {
+	if err := domain.CheckDate(product); err != nil {
+		return err
+	}
+	if err := s.productRepository.Save(product); err != nil {
 		return err
 	}
 	return nil

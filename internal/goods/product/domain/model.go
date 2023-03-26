@@ -8,6 +8,8 @@ import (
 	warehouseDomain "github.com/mrokoo/goERP/internal/share/warehouse/domain"
 )
 
+var ErrInvalidDate = errors.New("the date is invalid")
+
 // 序列化问题，能否从string直接转化为uuid.UUID
 type Product struct {
 	ID                 string             `json:"id"`
@@ -28,9 +30,10 @@ type OpeningStock struct {
 	Amount    int                         `json:"amount"`
 }
 
-func (p *Product) Validate() error {
-	if p.ExpirationDay <= p.AlertExpirationDay {
-		return errors.New("ExpirationDay must be greater than AlertExpirationDay")
+// 检查ExpirationDay与AlertExpirationDay的合法性
+func CheckDate(product *Product) error {
+	if product.ExpirationDay <= product.AlertExpirationDay {
+		return ErrInvalidDate
 	}
 	return nil
 }
