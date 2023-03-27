@@ -20,7 +20,7 @@ func TestMongoRepository_Save(t *testing.T) {
 	}
 	r = NewMongoRepository(client)
 	role := &domain.Role{
-		Name:       "admin",
+		Name:       "admintest",
 		Permission: []domain.PermissionItem{"supplier", "customer"},
 	}
 
@@ -38,7 +38,7 @@ func TestMongoRepository_Update(t *testing.T) {
 	}
 	r = NewMongoRepository(client)
 	role := &domain.Role{
-		Name:       "admin",
+		Name:       "admintest",
 		Permission: []domain.PermissionItem{"account", "customer"},
 	}
 	err = r.Update(role)
@@ -54,12 +54,12 @@ func TestMongoRepository_FindByName(t *testing.T) {
 		panic(err)
 	}
 	r = NewMongoRepository(client)
-	role, err := r.FindByName("admin")
+	role, err := r.FindByName("admintest")
 	if err != nil {
 		t.Error(err)
 	}
 	role2 := &domain.Role{
-		Name:       "admin",
+		Name:       "admintest",
 		Permission: []domain.PermissionItem{"account", "customer"},
 	}
 	assert.Equal(t, *role2, *role)
@@ -73,7 +73,7 @@ func TestMongoRepository_FindAll(t *testing.T) {
 	}
 	r = NewMongoRepository(client)
 	role2 := &domain.Role{
-		Name:       "admin",
+		Name:       "admintest",
 		Permission: []domain.PermissionItem{"account", "customer"},
 	}
 	result, err := r.FindaAll()
@@ -90,7 +90,7 @@ func TestMongoRepository_Delete(t *testing.T) {
 		panic(err)
 	}
 	r = NewMongoRepository(client)
-	err = r.Delete("admin")
+	err = r.Delete("admintest")
 	if err != nil {
 		t.Error(err)
 	}
