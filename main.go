@@ -20,9 +20,9 @@ func SetupRouter() *gin.Engine {
 	routes.GoodsRoutes(router, client)
 	routes.AccountRoutes(router, client)
 	routes.BudgetRoutes(router, client)
-	routes.WarehouseRoutes(router, client)
 	routes.CustomerRoutes(router, client)
 	routes.SupplierRoutes(router, client)
+	routes.WarehouseRoutes(router, client)
 
 	return router
 }
