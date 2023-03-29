@@ -10,9 +10,8 @@ import (
 
 var ErrInvalidDate = errors.New("the date is invalid")
 
-// 序列化问题，能否从string直接转化为uuid.UUID
 type Product struct {
-	ID                 string             `json:"id"`
+	ID                 ProductId          `json:"id"`
 	Name               string             `json:"name"`
 	CategoryID         uuid.UUID          `json:"categoryId"`
 	UnitID             uuid.UUID          `json:"unitId"`
@@ -25,6 +24,7 @@ type Product struct {
 	OpeningStock       []OpeningStock     `json:"openingStock"`
 }
 
+type ProductId = string
 type OpeningStock struct {
 	Warehouse warehouseDomain.WarehouseId `json:"warehouse_id"`
 	Amount    int                         `json:"amount"`
