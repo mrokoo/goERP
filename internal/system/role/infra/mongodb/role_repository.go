@@ -57,7 +57,7 @@ func (r *MongoRepository) Update(role *domain.Role) error {
 }
 
 func (r *MongoRepository) Delete(name string) error {
-	_, err := r.e.RemoveFilteredPolicy(0, name)
+	_, err := r.e.DeleteRole(name)
 	if err != nil {
 		return err
 	}
@@ -106,4 +106,31 @@ func removeRepByMap(slc []string) []string {
 		}
 	}
 	return result
+}
+
+func (r *MongoRepository) AddRoleForUser(username string, role string) error {
+	roles, err := r.GetRolesForUser(username)
+	if err != nil {
+		return err
+	}
+
+	if len(roles) != 0 {
+		return errors.New("the user already have role")
+	}
+	if _, err := r.FindByName(role); err != nil {
+		return err
+	}
+	_, err = r.e.AddRoleForUser(username, role)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *MongoRepository) GetRolesForUser(name string) ([]string, error) {
+	roles, err := r.e.GetRolesForUser(name)
+	if err != nil {
+		return nil, err
+	}
+	return roles, nil
 }

@@ -95,3 +95,17 @@ func TestMongoRepository_Delete(t *testing.T) {
 		t.Error(err)
 	}
 }
+
+func TestMongoRepository_AddRoleForUser(t *testing.T) {
+	connectionString := "mongodb://localhost:27017/"
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(connectionString))
+	if err != nil {
+		panic(err)
+	}
+
+	r = NewMongoRepository(client)
+	err = r.AddRoleForUser("wang", "admintest")
+	if err != nil {
+		t.Error(err)
+	}
+}
