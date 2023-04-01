@@ -19,13 +19,13 @@ type CustomerService interface {
 
 type CustomerServiceImpl struct {
 	checkCustomerValidityService *domain.CheckingCustomerValidityService
-	repo                        domain.Repository
+	repo                         domain.Repository
 }
 
 func NewCustomerServiceImpl(checkCustomerValidityService *domain.CheckingCustomerValidityService, repo domain.Repository) *CustomerServiceImpl {
 	return &CustomerServiceImpl{
 		checkCustomerValidityService: checkCustomerValidityService,
-		repo:                        repo,
+		repo:                         repo,
 	}
 }
 

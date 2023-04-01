@@ -47,6 +47,7 @@ func (r *MongoRepository) Save(role *domain.Role) error {
 }
 
 func (r *MongoRepository) Update(role *domain.Role) error {
+	// to do 事务处理
 	if err := r.Delete(role.Name); err != nil {
 		return ErrFailUpdate
 	}

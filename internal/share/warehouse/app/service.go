@@ -19,13 +19,13 @@ type WarehouseService interface {
 
 type WarehouseServiceImpl struct {
 	checkWarehouseValidityService *domain.CheckingWarehouseValidityService
-	repo                        domain.Repository
+	repo                          domain.Repository
 }
 
 func NewWarehouseServiceImpl(checkWarehouseValidityService *domain.CheckingWarehouseValidityService, repo domain.Repository) *WarehouseServiceImpl {
 	return &WarehouseServiceImpl{
 		checkWarehouseValidityService: checkWarehouseValidityService,
-		repo:                        repo,
+		repo:                          repo,
 	}
 }
 

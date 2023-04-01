@@ -19,13 +19,13 @@ type SupplierService interface {
 
 type SupplierServiceImpl struct {
 	checkSupplierValidityService *domain.CheckingSupplierValidityService
-	repo                        domain.Repository
+	repo                         domain.Repository
 }
 
 func NewSupplierServiceImpl(checkSupplierValidityService *domain.CheckingSupplierValidityService, repo domain.Repository) *SupplierServiceImpl {
 	return &SupplierServiceImpl{
 		checkSupplierValidityService: checkSupplierValidityService,
-		repo:                        repo,
+		repo:                         repo,
 	}
 }
 

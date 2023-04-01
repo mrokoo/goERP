@@ -47,7 +47,6 @@ func (r *MongoProductRepository) Get(productId string) (*domain.Product, error) 
 	return product, nil
 }
 
-
 func (r *MongoProductRepository) Delete(productId string) error {
 	filter := bson.D{{"id", productId}}
 	_, err := r.products.DeleteOne(context.Background(), filter)

@@ -16,5 +16,3 @@ type PurchaseOrder struct {
 	Items       []item.Item
 	Biling      biling.Biling
 }
-
-
