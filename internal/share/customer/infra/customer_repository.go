@@ -51,7 +51,8 @@ func (r *MongoRepository) Save(customer *domain.Customer) error {
 
 func (r *MongoRepository) Replace(customer *domain.Customer) error {
 	filter := bson.D{{Key: "id", Value: customer.ID}}
-	err := r.customers.FindOneAndReplace(context.Background(), filter, customer).Decode(nil)
+	var c domain.Customer
+	err := r.customers.FindOneAndReplace(context.Background(), filter, customer).Decode(&c)
 	if err != nil {
 		return err
 	}
@@ -60,7 +61,8 @@ func (r *MongoRepository) Replace(customer *domain.Customer) error {
 
 func (r *MongoRepository) Delete(customerID string) error {
 	filter := bson.D{{Key: "id", Value: customerID}}
-	err := r.customers.FindOneAndDelete(context.Background(), filter).Decode(nil)
+	var c domain.Customer
+	err := r.customers.FindOneAndDelete(context.Background(), filter).Decode(&c)
 	if err != nil {
 		return err
 	}

@@ -110,12 +110,14 @@ func (h *CustomerHandler) AddCustomer(ctx *gin.Context) {
 		})
 		return
 	}
-	ctx.JSON(http.StatusCreated, reponse.Reponse{})
+	ctx.JSON(http.StatusCreated, reponse.Reponse{
+		Data: req,
+	})
 }
 
 func (h *CustomerHandler) ReplaceCustomer(ctx *gin.Context) {
+	id := ctx.Param("id")
 	var req struct {
-		ID      string `json:"id" binding:"required"`
 		Name    string `json:"name" binding:"required"`
 		Grade   string `json:"grade" binding:"oneof=high medium low"`
 		Contact string `json:"contact" binding:"-"`
@@ -140,7 +142,7 @@ func (h *CustomerHandler) ReplaceCustomer(ctx *gin.Context) {
 		return
 	}
 	customer := domain.Customer{
-		ID:      req.ID,
+		ID:      id,
 		Name:    req.Name,
 		Grade:   domain.GradeType(req.Grade),
 		Contact: req.Contact,
