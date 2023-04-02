@@ -51,7 +51,8 @@ func (r *MongoRepository) Save(warehouse *domain.Warehouse) error {
 
 func (r *MongoRepository) Replace(warehouse *domain.Warehouse) error {
 	filter := bson.D{{Key: "id", Value: warehouse.ID}}
-	err := r.warehouses.FindOneAndReplace(context.Background(), filter, warehouse).Decode(nil)
+	var w domain.Warehouse
+	err := r.warehouses.FindOneAndReplace(context.Background(), filter, warehouse).Decode(&w)
 	if err != nil {
 		return err
 	}
@@ -60,7 +61,8 @@ func (r *MongoRepository) Replace(warehouse *domain.Warehouse) error {
 
 func (r *MongoRepository) Delete(warehouseID string) error {
 	filter := bson.D{{Key: "id", Value: warehouseID}}
-	err := r.warehouses.FindOneAndDelete(context.Background(), filter).Decode(nil)
+	var w domain.Warehouse
+	err := r.warehouses.FindOneAndDelete(context.Background(), filter).Decode(&w)
 	if err != nil {
 		return err
 	}

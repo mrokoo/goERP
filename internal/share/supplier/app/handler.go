@@ -111,12 +111,14 @@ func (h *SupplierHandler) AddSupplier(ctx *gin.Context) {
 		})
 		return
 	}
-	ctx.JSON(http.StatusCreated, reponse.Reponse{})
+	ctx.JSON(http.StatusCreated, reponse.Reponse{
+		Data: supplier,
+	})
 }
 
 func (h *SupplierHandler) ReplaceSupplier(ctx *gin.Context) {
+	id := ctx.Param("id")
 	var req struct {
-		ID      string      `json:"id" binding:"required"`
 		Name    string      `json:"name" binding:"required"`
 		Contact string      `json:"contact" binding:"-"`
 		Email   string      `json:"email" binding:"-"`
@@ -142,7 +144,7 @@ func (h *SupplierHandler) ReplaceSupplier(ctx *gin.Context) {
 		return
 	}
 	supplier := domain.Supplier{
-		ID:      req.ID,
+		ID:      id,
 		Name:    req.Name,
 		Contact: req.Contact,
 		Email:   req.Email,

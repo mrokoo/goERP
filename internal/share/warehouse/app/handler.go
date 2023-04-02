@@ -99,12 +99,14 @@ func (h *WarehouseHandler) AddWarehouse(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, reponse.Reponse{})
+	ctx.JSON(http.StatusCreated, reponse.Reponse{
+		Data: warehouse,
+	})
 }
 
 func (h *WarehouseHandler) ReplaceWarehouse(ctx *gin.Context) {
+	id := ctx.Param("id")
 	var req struct {
-		ID      string      `json:"id" binding:"required"`
 		Name    string      `json:"name" binding:"required"`
 		Admin   string      `json:"admin" binding:"-"`
 		Phone   string      `json:"phone" binding:"-"`
@@ -121,7 +123,7 @@ func (h *WarehouseHandler) ReplaceWarehouse(ctx *gin.Context) {
 	}
 
 	warehouse := domain.Warehouse{
-		ID:      req.ID,
+		ID:      id,
 		Name:    req.Name,
 		Admin:   req.Admin,
 		Phone:   req.Phone,
