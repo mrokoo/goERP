@@ -1,11 +1,17 @@
 package domain
 
-import "github.com/google/uuid"
+import (
+	"github.com/google/uuid"
+)
 
-type CategoryRepository interface {
-	Create(category *Category) error
+const (
+	CollectionCategory = "categorys"
+)
+
+type Repository interface {
+	GetAll() ([]*Category, error)
+	GetByID(categoryID uuid.UUID) (*Category, error)
 	Save(category *Category) error
-	Get(categoryId *uuid.UUID) (*Category, error)
-	GetAll() ([]Category, error)
-	Delete(categoryId *uuid.UUID) error
+	Replace(category *Category) error
+	Delete(categoryID uuid.UUID) error
 }

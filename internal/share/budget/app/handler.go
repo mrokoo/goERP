@@ -14,9 +14,9 @@ type BudgetHandler struct {
 	BudgetService BudgetService
 }
 
-func NewBudgetHandler(accountService BudgetService) *BudgetHandler {
+func NewBudgetHandler(budgetService BudgetService) *BudgetHandler {
 	return &BudgetHandler{
-		BudgetService: accountService,
+		BudgetService: budgetService,
 	}
 }
 

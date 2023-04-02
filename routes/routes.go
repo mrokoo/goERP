@@ -8,4 +8,8 @@ import (
 func Setup(db *mongo.Database, gin *gin.Engine) {
 	publicRouter := gin.Group("v1")
 	NewAccountRouter(db, publicRouter)
+	NewBudgetRouter(db, publicRouter)
+	NewCustomerRouter(db, publicRouter)
+	NewSupplierRouter(db, publicRouter)
+	NewWarehouseRouter(db, publicRouter)
 }
