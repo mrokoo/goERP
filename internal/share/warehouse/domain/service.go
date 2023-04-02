@@ -12,8 +12,8 @@ func NewCheckingWarehouseValidityService(warehouseRepository Repository) *Checki
 	}
 }
 
-func (ds *CheckingWarehouseValidityService) IsValidated(warehouse Warehouse) bool {
+func (ds *CheckingWarehouseValidityService) IsValidated(warehouse *Warehouse) bool {
 	// ID唯一性校验
-	_, err := ds.warehouseRepository.Get(warehouse.ID)
+	_, err := ds.warehouseRepository.GetByID(warehouse.ID)
 	return err == mongo.ErrNoDocuments
 }

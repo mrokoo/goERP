@@ -6,15 +6,14 @@ import (
 	"github.com/mrokoo/goERP/internal/share/customer/domain"
 )
 
-var ErrNotFound = errors.New("the docment is not found")
-var ErrCustomerInVaildated = errors.New("the validity check fails")
+var ErrCustomerInVaildated = errors.New("客户ID检验无效")
 
 type CustomerService interface {
-	GetCustomer(customerId domain.CustomerId) (*domain.Customer, error)
-	GetCustomerList() ([]domain.Customer, error)
-	AddCustomer(customer domain.Customer) error
-	UpdateCustomer(customer domain.Customer) error
-	DeleteCustomer(customerId domain.CustomerId) error
+	GetCustomer(customerID string) (*domain.Customer, error)
+	GetCustomerList() ([]*domain.Customer, error)
+	AddCustomer(customer *domain.Customer) error
+	ReplaceCustomer(customer *domain.Customer) error
+	DeleteCustomer(customerID string) error
 }
 
 type CustomerServiceImpl struct {
@@ -29,15 +28,15 @@ func NewCustomerServiceImpl(checkCustomerValidityService *domain.CheckingCustome
 	}
 }
 
-func (s *CustomerServiceImpl) GetCustomer(customerId domain.CustomerId) (*domain.Customer, error) {
-	customer, err := s.repo.Get(customerId)
+func (s *CustomerServiceImpl) GetCustomer(customerID string) (*domain.Customer, error) {
+	customer, err := s.repo.GetByID(customerID)
 	if err != nil {
 		return nil, err
 	}
 	return customer, nil
 }
 
-func (s *CustomerServiceImpl) GetCustomerList() ([]domain.Customer, error) {
+func (s *CustomerServiceImpl) GetCustomerList() ([]*domain.Customer, error) {
 	customers, err := s.repo.GetAll()
 	if err != nil {
 		return nil, err
@@ -45,8 +44,8 @@ func (s *CustomerServiceImpl) GetCustomerList() ([]domain.Customer, error) {
 	return customers, nil
 }
 
-func (s *CustomerServiceImpl) AddCustomer(customer domain.Customer) error {
-	// 检查Customer是否符合要求
+func (s *CustomerServiceImpl) AddCustomer(customer *domain.Customer) error {
+
 	if !s.checkCustomerValidityService.IsValidated(customer) {
 		return ErrCustomerInVaildated
 	}
@@ -57,15 +56,15 @@ func (s *CustomerServiceImpl) AddCustomer(customer domain.Customer) error {
 	return nil
 }
 
-func (s *CustomerServiceImpl) UpdateCustomer(customer domain.Customer) error {
-	if err := s.repo.Update(customer); err != nil {
+func (s *CustomerServiceImpl) ReplaceCustomer(customer *domain.Customer) error {
+	if err := s.repo.Replace(customer); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (s *CustomerServiceImpl) DeleteCustomer(customerId domain.CustomerId) error {
-	if err := s.repo.Delete(customerId); err != nil {
+func (s *CustomerServiceImpl) DeleteCustomer(customerID string) error {
+	if err := s.repo.Delete(customerID); err != nil {
 		return err
 	}
 	return nil

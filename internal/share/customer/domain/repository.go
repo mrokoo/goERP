@@ -1,9 +1,13 @@
 package domain
 
+const (
+	CollectionCustomer = "customers"
+)
+
 type Repository interface {
-	Get(customerID CustomerId) (*Customer, error)
-	GetAll() ([]Customer, error)
-	Update(customer Customer) error
-	Save(customer Customer) error
-	Delete(customerID CustomerId) error
+	GetAll() ([]*Customer, error)
+	GetByID(customerID string) (*Customer, error)
+	Save(customer *Customer) error
+	Replace(customer *Customer) error
+	Delete(customerID string) error
 }

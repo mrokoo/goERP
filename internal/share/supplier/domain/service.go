@@ -12,8 +12,8 @@ func NewCheckingSupplierValidityService(supplierRepository Repository) *Checking
 	}
 }
 
-func (ds *CheckingSupplierValidityService) IsValidated(supplier Supplier) bool {
+func (ds *CheckingSupplierValidityService) IsValidated(supplier *Supplier) bool {
 	// ID唯一性校验
-	_, err := ds.supplierRepository.Get(supplier.ID)
+	_, err := ds.supplierRepository.GetByID(supplier.ID)
 	return err == mongo.ErrNoDocuments
 }

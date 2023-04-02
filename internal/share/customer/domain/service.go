@@ -12,8 +12,8 @@ func NewCheckingCustomerValidityService(customerRepository Repository) *Checking
 	}
 }
 
-func (ds *CheckingCustomerValidityService) IsValidated(customer Customer) bool {
+func (ds *CheckingCustomerValidityService) IsValidated(customer *Customer) bool {
 	// ID唯一性校验
-	_, err := ds.customerRepository.Get(customer.ID)
+	_, err := ds.customerRepository.GetByID(customer.ID)
 	return err == mongo.ErrNoDocuments
 }

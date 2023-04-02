@@ -5,15 +5,23 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type Supplier struct {
+type Customer struct {
 	ID      string          `json:"id" binding:"required"`
 	Name    string          `json:"name" binding:"required"`
+	Grade   GradeType       `json:"grade" binding:"-"`
 	Contact string          `json:"contact" binding:"-"`
+	Phone   string          `json:"phone" binding:"-"`
 	Email   string          `json:"email" binding:"-"`
 	Address string          `json:"address" binding:"-"`
-	Account string          `json:"account" binding:"-"`
-	Bank    string          `json:"bank" binding:"-"`
 	Note    string          `json:"note" binding:"-"`
 	State   state.State     `json:"state" binding:"-"`
 	Debt    decimal.Decimal `json:"debt" binding:"-"`
 }
+
+type GradeType string
+
+const (
+	GRADE_HIGH   GradeType = "high"
+	GRADE_MEDIUM GradeType = "medium"
+	GRADE_LOW    GradeType = "low"
+)

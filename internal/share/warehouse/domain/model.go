@@ -14,4 +14,4 @@ type Warehouse struct {
 	State   state.State `json:"state"`
 }
 
-type WarehouseId = string
+
