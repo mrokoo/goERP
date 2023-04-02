@@ -108,7 +108,9 @@ func (h *AccountHandler) AddAccount(ctx *gin.Context) {
 		})
 		return
 	}
-	ctx.JSON(http.StatusCreated, reponse.Reponse{})
+	ctx.JSON(http.StatusCreated, reponse.Reponse{
+		Data: account,
+	})
 }
 
 func (h *AccountHandler) ReplaceAccount(ctx *gin.Context) {

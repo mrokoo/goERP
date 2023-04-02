@@ -61,7 +61,6 @@ func (h *BudgetHandler) GetBudget(ctx *gin.Context) {
 
 func (h *BudgetHandler) AddBudget(ctx *gin.Context) {
 	var req struct {
-		ID   string `json:"id" binding:"required"`
 		Type string `json:"type" binding:"oneof=out in"`
 		Note string `json:"note" binding:"-"`
 	}
@@ -71,24 +70,33 @@ func (h *BudgetHandler) AddBudget(ctx *gin.Context) {
 		})
 		return
 	}
-	budget := domain.Budget{
-		ID:   uuid.MustParse(req.ID),
-		Type: domain.BudgetType(req.Type),
-		Note: req.Note,
-	}
-	err := h.BudgetService.AddBudget(&budget)
+	id, err := uuid.NewUUID()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
 			Message: err.Error(),
 		})
 		return
 	}
-	ctx.JSON(http.StatusCreated, reponse.Reponse{})
+	budget := domain.Budget{
+		ID:   id,
+		Type: domain.BudgetType(req.Type),
+		Note: req.Note,
+	}
+	err = h.BudgetService.AddBudget(&budget)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
+			Message: err.Error(),
+		})
+		return
+	}
+	ctx.JSON(http.StatusCreated, reponse.Reponse{
+		Data: budget,
+	})
 }
 
 func (h *BudgetHandler) ReplaceBudget(ctx *gin.Context) {
+	id := ctx.Param("id")
 	var req struct {
-		ID   string `json:"id" binding:"required"`
 		Type string `json:"type" binding:"oneof=out in"`
 		Note string `json:"note" binding:"-"`
 	}
@@ -99,7 +107,7 @@ func (h *BudgetHandler) ReplaceBudget(ctx *gin.Context) {
 		return
 	}
 	budget := domain.Budget{
-		ID:   uuid.MustParse(req.ID),
+		ID:   uuid.MustParse(id),
 		Type: domain.BudgetType(req.Type),
 		Note: req.Note,
 	}

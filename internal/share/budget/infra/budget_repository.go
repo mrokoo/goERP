@@ -52,7 +52,8 @@ func (r *MongoRepository) Save(budget *domain.Budget) error {
 
 func (r *MongoRepository) Replace(budget *domain.Budget) error {
 	filter := bson.D{{Key: "id", Value: budget.ID}}
-	err := r.budgets.FindOneAndReplace(context.Background(), filter, budget).Decode(nil)
+	var b domain.Budget
+	err := r.budgets.FindOneAndReplace(context.Background(), filter, budget).Decode(&b)
 	if err != nil {
 		return err
 	}
@@ -61,7 +62,8 @@ func (r *MongoRepository) Replace(budget *domain.Budget) error {
 
 func (r *MongoRepository) Delete(budgetID uuid.UUID) error {
 	filter := bson.D{{Key: "id", Value: budgetID}}
-	err := r.budgets.FindOneAndDelete(context.Background(), filter).Decode(nil)
+	var b domain.Budget
+	err := r.budgets.FindOneAndDelete(context.Background(), filter).Decode(&b)
 	if err != nil {
 		return err
 	}
