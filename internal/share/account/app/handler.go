@@ -112,8 +112,8 @@ func (h *AccountHandler) AddAccount(ctx *gin.Context) {
 }
 
 func (h *AccountHandler) ReplaceAccount(ctx *gin.Context) {
+	id := ctx.Param("id")
 	var req struct {
-		ID      string `json:"id" binding:"required"`
 		Name    string `json:"name" binding:"required"`
 		Type    string `json:"type" binding:"oneof=cash  weipay alipay other"`
 		Holder  string `json:"holder" binding:"-"`
@@ -137,7 +137,7 @@ func (h *AccountHandler) ReplaceAccount(ctx *gin.Context) {
 		return
 	}
 	account := domain.Account{
-		ID:      req.ID,
+		ID:      id,
 		Name:    req.Name,
 		Type:    domain.PayType(req.Type),
 		Holder:  req.Holder,

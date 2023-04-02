@@ -5,13 +5,12 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/mrokoo/goERP/internal/goods/product/domain/valueobj"
-	warehouseDomain "github.com/mrokoo/goERP/internal/share/warehouse/domain"
 )
 
 var ErrInvalidDate = errors.New("the date is invalid")
 
 type Product struct {
-	ID                 ProductId          `json:"id"`
+	ID                 string             `json:"id"`
 	Name               string             `json:"name"`
 	CategoryID         uuid.UUID          `json:"categoryId"`
 	UnitID             uuid.UUID          `json:"unitId"`
@@ -26,8 +25,8 @@ type Product struct {
 
 type ProductId = string
 type OpeningStock struct {
-	Warehouse warehouseDomain.WarehouseId `json:"warehouse_id"`
-	Amount    int                         `json:"amount"`
+	Warehouse string `json:"warehouse_id"`
+	Amount    int    `json:"amount"`
 }
 
 // 检查ExpirationDay与AlertExpirationDay的合法性

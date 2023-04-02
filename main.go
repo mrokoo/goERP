@@ -9,25 +9,17 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func SetupRouter() *gin.Engine {
-	router := gin.Default()
+func main() {
+	gin := gin.Default()
 	connectionString := "mongodb://localhost:27017/"
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(connectionString))
+	defer func() {
+		client.Disconnect(context.Background())
+	}()
+	db := client.Database("goERP")
 	if err != nil {
 		panic(err)
 	}
-
-	routes.GoodsRoutes(router, client)
-	routes.AccountRoutes(router, client)
-	routes.BudgetRoutes(router, client)
-	routes.CustomerRoutes(router, client)
-	routes.SupplierRoutes(router, client)
-	routes.WarehouseRoutes(router, client)
-
-	return router
-}
-
-func main() {
-	router := SetupRouter()
-	router.Run()
+	routes.Setup(db, gin)
+	gin.Run()
 }
