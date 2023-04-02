@@ -1,145 +1,149 @@
 package app
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/mrokoo/goERP/internal/goods/unit/domain"
+	"github.com/mrokoo/goERP/pkg/reponse"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type UnitService interface {
-	CreateUnit(name string, note string) (*domain.Unit, error)
-	ChangeUnit(unitId *uuid.UUID, name string, note string) (*domain.Unit, error)
-	GetAllUnits() ([]domain.Unit, error)
-	DeleteUnit(unitId *uuid.UUID) error
-}
-
 type UnitHandler struct {
-	unitService UnitService
+	UnitService UnitService
 }
 
-func NewUnitHandler(s UnitService) *UnitHandler {
+func NewUnitHandler(unitService UnitService) *UnitHandler {
 	return &UnitHandler{
-		unitService: s,
+		UnitService: unitService,
 	}
 }
 
-func (h *UnitHandler) GetAllUnits(ctx *gin.Context) {
-	units, err := h.unitService.GetAllUnits()
+func (h *UnitHandler) GetUnitList(ctx *gin.Context) {
+	categories, err := h.UnitService.GetUnitList()
 	if err != nil {
-		ctx.JSON(400, gin.H{
-			"code":     -1,
-			"showMsg":  "failure",
-			"errorMsg": err.Error(),
-			"data":     nil,
+		ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
+			Message: err.Error(),
+			Data:    nil,
 		})
 		return
 	}
-	ctx.JSON(200, gin.H{
-		"code":     1,
-		"showMsg":  "success",
-		"errorMsg": "",
-		"data":     units,
+	ctx.JSON(http.StatusOK, reponse.Reponse{
+		Message: "",
+		Data:    categories,
 	})
 }
 
-func (h *UnitHandler) CreateUnit(ctx *gin.Context) {
+func (h *UnitHandler) GetUnit(ctx *gin.Context) {
+	id := ctx.Param("id")
+	uid := uuid.MustParse(id)
+	unit, err := h.UnitService.GetUnit(uid)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			ctx.JSON(http.StatusNotFound, reponse.Reponse{
+				Message: "Unit not found with the given id",
+				Data:    nil,
+			})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
+			Message: err.Error(),
+			Data:    nil,
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, reponse.Reponse{
+		Message: "",
+		Data:    unit,
+	})
+}
+
+func (h *UnitHandler) AddUnit(ctx *gin.Context) {
 	var req struct {
-		Name string `json:"name"`
-		Note string `json:"note"`
+		Name string `json:"name" binding:"required"`
+		Note string `json:"note" binding:"-"`
 	}
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(400, gin.H{
-			"code":     -1,
-			"showMsg":  "failure",
-			"errorMsg": err.Error(),
-			"data":     nil,
+		ctx.JSON(http.StatusBadRequest, reponse.Reponse{
+			Message: "Request parameter verification failed",
 		})
 		return
 	}
-
-	c, err := h.unitService.CreateUnit(req.Name, req.Note)
+	id, err := uuid.NewUUID()
 	if err != nil {
-		ctx.JSON(400, gin.H{
-			"code":     -1,
-			"showMsg":  "failure",
-			"errorMsg": err.Error(),
-			"data":     nil,
+		ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
+			Message: err.Error(),
 		})
 		return
 	}
-	ctx.JSON(200, gin.H{
-		"code":     1,
-		"showMsg":  "success",
-		"errorMsg": "",
-		"data":     c,
+	unit := domain.Unit{
+		ID:   id,
+		Name: req.Name,
+		Note: req.Note,
+	}
+	err = h.UnitService.AddUnit(&unit)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
+			Message: err.Error(),
+		})
+		return
+	}
+	ctx.JSON(http.StatusCreated, reponse.Reponse{
+		Data: unit,
 	})
+}
+
+func (h *UnitHandler) ReplaceUnit(ctx *gin.Context) {
+	id := ctx.Param("id")
+	var req struct {
+		Name string `json:"name" binding:"required"`
+		Note string `json:"note" binding:"-"`
+	}
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, reponse.Reponse{
+			Message: "Request parameter verification failed",
+		})
+		return
+	}
+	unit := domain.Unit{
+		ID:   uuid.MustParse(id),
+		Name: req.Name,
+		Note: req.Note,
+	}
+	err := h.UnitService.ReplaceUnit(&unit)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			ctx.JSON(http.StatusBadRequest, reponse.Reponse{
+				Message: "Budget not found with the given id",
+			})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
+			Message: err.Error(),
+		})
+		return
+	}
+	ctx.JSON(http.StatusCreated, reponse.Reponse{})
 }
 
 func (h *UnitHandler) DeleteUnit(ctx *gin.Context) {
-	var req struct {
-		ID string `json:"id"`
-	}
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(400, gin.H{
-			"code":     -1,
-			"showMsg":  "failure",
-			"errorMsg": err.Error(),
-			"data":     nil,
-		})
-		return
-	}
-	var id uuid.UUID
-	id.UnmarshalText([]byte(req.ID))
-	if err := h.unitService.DeleteUnit(&id); err != nil {
-		ctx.JSON(400, gin.H{
-			"code":     -1,
-			"showMsg":  "failure",
-			"errorMsg": err.Error(),
-			"data":     nil,
+	id := ctx.Param("id")
+	uid := uuid.MustParse(id)
+	if err := h.UnitService.DeleteUnit(uid); err != nil {
+		if err == mongo.ErrNoDocuments {
+			ctx.JSON(http.StatusNotFound, reponse.Reponse{
+				Message: "Unit not found with the given id",
+				Data:    nil,
+			})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
+			Message: err.Error(),
+			Data:    nil,
 		})
 		return
 	}
 
-	ctx.JSON(200, gin.H{
-		"code":     1,
-		"showMsg":  "success",
-		"errorMsg": "",
-		"data":     nil,
-	})
-}
-
-func (h *UnitHandler) ChangeUnit(ctx *gin.Context) {
-	var req struct {
-		ID   string `json:"id"`
-		Name string `json:"name"`
-		Note string `json:"note"`
-	}
-	if err := ctx.ShouldBindJSON(req); err != nil {
-		ctx.JSON(400, gin.H{
-			"code":     -1,
-			"showMsg":  "failure",
-			"errorMsg": err.Error(),
-			"data":     nil,
-		})
-		return
-	}
-	var id uuid.UUID
-	id.UnmarshalText([]byte(req.ID))
-	c, err := h.unitService.ChangeUnit(&id, req.Name, req.Note)
-	if err != nil {
-		ctx.JSON(400, gin.H{
-			"code":     -1,
-			"showMsg":  "failure",
-			"errorMsg": err.Error(),
-			"data":     nil,
-		})
-		return
-	}
-
-	ctx.JSON(200, gin.H{
-		"code":     1,
-		"showMsg":  "success",
-		"errorMsg": "",
-		"data":     c,
-	})
+	ctx.JSON(http.StatusNoContent, reponse.Reponse{})
 }
