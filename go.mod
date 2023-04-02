@@ -17,12 +17,15 @@ require (
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/sergi/go-diff v1.1.0 // indirect
+	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/stretchr/objx v0.5.0 // indirect
 	github.com/stretchr/testify v1.8.2 // indirect
+	github.com/yuin/goldmark v1.5.4 // indirect
 	golang.org/x/exp v0.0.0-20221031165847-c99f073a8326 // indirect
 	golang.org/x/exp/typeparams v0.0.0-20221031165847-c99f073a8326 // indirect
-	golang.org/x/mod v0.8.0 // indirect
-	golang.org/x/tools v0.6.0 // indirect
+	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616 // indirect
+	golang.org/x/mod v0.9.0 // indirect
+	golang.org/x/tools v0.7.0 // indirect
 	golang.org/x/tools/gopls v0.11.0 // indirect
 	golang.org/x/vuln v0.0.0-20221109205719-3af8368ee4fe // indirect
 	honnef.co/go/tools v0.3.3 // indirect

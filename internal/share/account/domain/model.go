@@ -2,32 +2,40 @@
 package domain
 
 import (
-	"github.com/mrokoo/goERP/internal/share/valueobj"
+	"github.com/mrokoo/goERP/internal/share/valueobj/state"
+	"github.com/shopspring/decimal"
 )
 
 type Account struct {
-	ID      AccountId          `json:"id" binding:"required"`
-	Name    valueobj.Name      `json:"name" binding:"required"`
-	Type    Type               `json:"type"`
-	Holder  string             `json:"holder"`
-	Number  string             `json:"number"`
-	Note    valueobj.Note      `json:"note"`
-	State   valueobj.StateType `json:"state"`
-	Balance valueobj.Balance   `json:"balance"`
+	ID      string
+	Name    string
+	Type    PayType
+	Holder  string
+	Number  string
+	Note    string
+	State   state.State
+	Balance decimal.Decimal
 }
 
-type AccountId = string
 
-type Type int
+type PayType string
 
 const (
-	TYPE_INVALID = iota
-	TYPE_CASH
-	TYPE_WEIPAY
-	TYPE_ALiPAY
-	TYPE_OTHER
+	TYPE_CASH   PayType = "cash"
+	TYPE_WEIPAY PayType = "weipay"
+	TYPE_ALiPAY PayType = "alipay"
+	TYPE_OTHER  PayType = "other"
 )
 
-func (t *Type) IsValidated() bool {
-	return *t >= 1 && *t <= 4
+func (p *PayType) String() string {
+	switch *p {
+	case TYPE_CASH:
+		return "cash"
+	case TYPE_WEIPAY:
+		return "weipay"
+	case TYPE_ALiPAY:
+		return "alipay"
+	default:
+		return "other"
+	}
 }

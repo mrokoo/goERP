@@ -1,9 +1,13 @@
 package app
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/mrokoo/goERP/internal/share/budget/domain"
+	"github.com/mrokoo/goERP/pkg/reponse"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type BudgetHandler struct {
@@ -17,114 +21,122 @@ func NewBudgetHandler(accountService BudgetService) *BudgetHandler {
 }
 
 func (h *BudgetHandler) GetBudgetList(ctx *gin.Context) {
-	accounts, err := h.BudgetService.GetBudgetList()
+	budgets, err := h.BudgetService.GetBudgetList()
 	if err != nil {
-		ctx.JSON(400, gin.H{
-			"code":     -1,
-			"showMsg":  "failure",
-			"errorMsg": err.Error(),
-			"data":     nil,
+		ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
+			Message: err.Error(),
+			Data:    nil,
 		})
 		return
 	}
-	ctx.JSON(200, gin.H{
-		"code":     1,
-		"showMsg":  "success",
-		"errorMsg": "",
-		"data":     accounts,
+	ctx.JSON(http.StatusOK, reponse.Reponse{
+		Message: "",
+		Data:    budgets,
+	})
+}
+
+func (h *BudgetHandler) GetBudget(ctx *gin.Context) {
+	id := ctx.Param("id")
+	uid := uuid.MustParse(id)
+	budget, err := h.BudgetService.GetBudget(uid)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			ctx.JSON(http.StatusNotFound, reponse.Reponse{
+				Message: "Budget not found with the given id",
+				Data:    nil,
+			})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
+			Message: err.Error(),
+			Data:    nil,
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, reponse.Reponse{
+		Message: "",
+		Data:    budget,
 	})
 }
 
 func (h *BudgetHandler) AddBudget(ctx *gin.Context) {
-	var req domain.Budget
+	var req struct {
+		ID   string `json:"id" binding:"required"`
+		Type string `json:"type" binding:"oneof=out in"`
+		Note string `json:"note" binding:"-"`
+	}
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(400, gin.H{
-			"code":     -1,
-			"showMsg":  "failure",
-			"errorMsg": err.Error(),
-			"data":     nil,
+		ctx.JSON(http.StatusBadRequest, reponse.Reponse{
+			Message: "Request parameter verification failed",
 		})
 		return
 	}
-
-	err := h.BudgetService.AddBudget(req)
+	budget := domain.Budget{
+		ID:   uuid.MustParse(req.ID),
+		Type: domain.BudgetType(req.Type),
+		Note: req.Note,
+	}
+	err := h.BudgetService.AddBudget(&budget)
 	if err != nil {
-		ctx.JSON(400, gin.H{
-			"code":     -1,
-			"showMsg":  "failure",
-			"errorMsg": err.Error(),
-			"data":     nil,
+		ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
+			Message: err.Error(),
 		})
 		return
 	}
-
-	ctx.JSON(200, gin.H{
-		"code":     1,
-		"showMsg":  "success",
-		"errorMsg": "",
-		"data":     nil,
-	})
+	ctx.JSON(http.StatusCreated, reponse.Reponse{})
 }
 
-func (h *BudgetHandler) UpdateBudget(ctx *gin.Context) {
-	var req domain.Budget
-	if err := ctx.ShouldBindJSON(req); err != nil {
-		ctx.JSON(400, gin.H{
-			"code":     -1,
-			"showMsg":  "failure",
-			"errorMsg": err.Error(),
-			"data":     nil,
+func (h *BudgetHandler) ReplaceBudget(ctx *gin.Context) {
+	var req struct {
+		ID   string `json:"id" binding:"required"`
+		Type string `json:"type" binding:"oneof=out in"`
+		Note string `json:"note" binding:"-"`
+	}
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, reponse.Reponse{
+			Message: "Request parameter verification failed",
 		})
 		return
 	}
-
-	err := h.BudgetService.UpdateBudget(req)
+	budget := domain.Budget{
+		ID:   uuid.MustParse(req.ID),
+		Type: domain.BudgetType(req.Type),
+		Note: req.Note,
+	}
+	err := h.BudgetService.ReplaceBudget(&budget)
 	if err != nil {
-		ctx.JSON(400, gin.H{
-			"code":     -1,
-			"showMsg":  "failure",
-			"errorMsg": err.Error(),
-			"data":     nil,
+		if err == mongo.ErrNoDocuments {
+			ctx.JSON(http.StatusBadRequest, reponse.Reponse{
+				Message: "Budget not found with the given id",
+			})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
+			Message: err.Error(),
 		})
 		return
 	}
 
-	ctx.JSON(200, gin.H{
-		"code":     1,
-		"showMsg":  "success",
-		"errorMsg": "",
-		"data":     nil,
-	})
+	ctx.JSON(http.StatusCreated, reponse.Reponse{})
 }
 
 func (h *BudgetHandler) DeleteBudget(ctx *gin.Context) {
-	var req struct {
-		ID string `json:"id"`
-	}
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(400, gin.H{
-			"code":     -1,
-			"showMsg":  "failure",
-			"errorMsg": err.Error(),
-			"data":     nil,
-		})
-		return
-	}
-	id := uuid.MustParse(req.ID)
-	if err := h.BudgetService.DeleteBudget(id); err != nil {
-		ctx.JSON(400, gin.H{
-			"code":     -1,
-			"showMsg":  "failure",
-			"errorMsg": err.Error(),
-			"data":     nil,
+	id := ctx.Param("id")
+	uid := uuid.MustParse(id)
+	if err := h.BudgetService.DeleteBudget(uid); err != nil {
+		if err == mongo.ErrNoDocuments {
+			ctx.JSON(http.StatusNotFound, reponse.Reponse{
+				Message: "Budget not found with the given id",
+				Data:    nil,
+			})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
+			Message: err.Error(),
+			Data:    nil,
 		})
 		return
 	}
 
-	ctx.JSON(200, gin.H{
-		"code":     1,
-		"showMsg":  "success",
-		"errorMsg": "",
-		"data":     nil,
-	})
+	ctx.JSON(http.StatusNoContent, reponse.Reponse{})
 }

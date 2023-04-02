@@ -1,38 +1,27 @@
 package domain
 
 import (
-	"errors"
-
 	"github.com/mrokoo/goERP/internal/share/valueobj"
+	"github.com/mrokoo/goERP/internal/share/valueobj/state"
 )
 
 type Customer struct {
-	ID      CustomerId         `json:"id" binding:"required"`
-	Name    valueobj.Name      `json:"name" binding:"required"`
-	Grade   GradeType          `json:"grade" binding:"-"`
-	Contact valueobj.Contact   `json:"contact" binding:"-"`
-	Phone   valueobj.Phone     `json:"phone" binding:"-"`
-	Email   valueobj.Email     `json:"email" binding:"-"`
-	Address valueobj.Address   `json:"address" binding:"-"`
-	Note    valueobj.Note      `json:"note" binding:"-"`
-	State   valueobj.StateType `json:"state" binding:"-"`
-	Debt    valueobj.Money     `json:"debt" binding:"-"`
+	ID      string         `json:"id" binding:"required"`
+	Name    string         `json:"name" binding:"required"`
+	Grade   GradeType      `json:"grade" binding:"-"`
+	Contact string         `json:"contact" binding:"-"`
+	Phone   string         `json:"phone" binding:"-"`
+	Email   string         `json:"email" binding:"-"`
+	Address string         `json:"address" binding:"-"`
+	Note    string         `json:"note" binding:"-"`
+	State   state.State    `json:"state" binding:"-"`
+	Debt    valueobj.Money `json:"debt" binding:"-"`
 }
 
-type CustomerId = string
-
-type GradeType int
+type GradeType string
 
 const (
-	GRADE_INVAILD = iota
-	GRADE_HIGH
-	GRADE_MEDIUM
-	GRADE_LOW
+	GRADE_HIGH   GradeType = "high"
+	GRADE_MEDIUM GradeType = "medium"
+	GRADE_LOW    GradeType = "low"
 )
-
-func NewGrade(grade int) (GradeType, error) {
-	if grade < 1 || grade > 3 {
-		return GRADE_INVAILD, errors.New("the grade is invaild")
-	}
-	return GradeType(grade), nil
-}

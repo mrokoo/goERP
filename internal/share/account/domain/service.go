@@ -12,8 +12,8 @@ func NewCheckingAccountValidityService(accountRepository Repository) *CheckingAc
 	}
 }
 
-func (ds *CheckingAccountValidityService) IsValidated(account Account) bool {
+func (ds *CheckingAccountValidityService) IsValidated(account *Account) bool {
 	// ID唯一性校验
-	_, err := ds.accountRepository.Get(account.ID)
+	_, err := ds.accountRepository.GetByID(account.ID)
 	return err == mongo.ErrNoDocuments
 }
