@@ -11,6 +11,4 @@ type User struct {
 	Phone    string
 	Email    string
 	Gender   string
-	State    int
-	Role     string
 }

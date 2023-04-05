@@ -1,9 +1,13 @@
 package domain
 
+const (
+	CollectionAccount = "accounts"
+)
+
 type Repository interface {
-	Get(accountID AccountId) (*Account, error)
-	GetAll() ([]Account, error)
-	Update(account Account) error
-	Save(account Account) error
-	Delete(accountID AccountId) error
+	GetAll() ([]*Account, error)
+	GetByID(accountID string) (*Account, error)
+	Save(account *Account) error
+	Replace(account *Account) error
+	Delete(accountID string) error
 }

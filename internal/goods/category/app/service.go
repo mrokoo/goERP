@@ -6,51 +6,24 @@ import (
 )
 
 type CategoryService interface {
-	CreateCategory(name string, note string) (*domain.Category, error)
-	ChangeCategory(categoryId *uuid.UUID, name string, note string) (*domain.Category, error)
-	GetAllCategories() ([]domain.Category, error)
-	DeleteCategory(categoryId *uuid.UUID) error
-	GetCategory(categoryId *uuid.UUID) (*domain.Category, error)
+	GetCategory(categoryID uuid.UUID) (*domain.Category, error)
+	GetCategoryList() ([]*domain.Category, error)
+	AddCategory(category *domain.Category) error
+	ReplaceCategory(category *domain.Category) error
+	DeleteCategory(categoryID uuid.UUID) error
 }
 
 type CategoryServiceImpl struct {
-	categoryRepository domain.CategoryRepository
+	categoryRepository domain.Repository
 }
 
-func NewCategoryServiceImpl(categoryRepository domain.CategoryRepository) *CategoryServiceImpl {
+func NewCategoryServiceImpl(categoryRepository domain.Repository) *CategoryServiceImpl {
 	return &CategoryServiceImpl{
 		categoryRepository: categoryRepository,
 	}
 }
 
-func (s *CategoryServiceImpl) CreateCategory(name string, note string) (*domain.Category, error) {
-	category := &domain.Category{
-		ID:   uuid.New(),
-		Name: name,
-		Note: note,
-	}
-
-	if err := s.categoryRepository.Create(category); err != nil {
-		return nil, err
-	}
-
-	return category, nil
-}
-
-func (s *CategoryServiceImpl) ChangeCategory(categoryId *uuid.UUID, name string, note string) (*domain.Category, error) {
-	c, err := s.categoryRepository.Get(categoryId)
-	if err != nil {
-		return nil, err
-	}
-	c.ChangeName(name)
-	c.ChangeNote(note)
-	if err := s.categoryRepository.Save(c); err != nil {
-		return nil, err
-	}
-	return c, nil
-}
-
-func (s *CategoryServiceImpl) GetAllCategories() ([]domain.Category, error) {
+func (s *CategoryServiceImpl) GetCategoryList() ([]*domain.Category, error) {
 	categories, err := s.categoryRepository.GetAll()
 	if err != nil {
 		return nil, err
@@ -58,17 +31,32 @@ func (s *CategoryServiceImpl) GetAllCategories() ([]domain.Category, error) {
 	return categories, nil
 }
 
-func (s *CategoryServiceImpl) DeleteCategory(categoryId *uuid.UUID) error {
-	if err := s.categoryRepository.Delete(categoryId); err != nil {
+func (s *CategoryServiceImpl) GetCategory(categoryID uuid.UUID) (*domain.Category, error) {
+	category, err := s.categoryRepository.GetByID(categoryID)
+	if err != nil {
+		return nil, err
+	}
+	return category, nil
+}
+
+func (s *CategoryServiceImpl) AddCategory(category *domain.Category) error {
+	if err := s.categoryRepository.Save(category); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (s *CategoryServiceImpl) GetCategory(categoryId *uuid.UUID) (*domain.Category, error) {
-	category, err := s.categoryRepository.Get(categoryId)
+func (s *CategoryServiceImpl) ReplaceCategory(category *domain.Category) error {
+	err := s.categoryRepository.Replace(category)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return category, nil
+	return nil
+}
+
+func (s *CategoryServiceImpl) DeleteCategory(categoryID uuid.UUID) error {
+	if err := s.categoryRepository.Delete(categoryID); err != nil {
+		return err
+	}
+	return nil
 }

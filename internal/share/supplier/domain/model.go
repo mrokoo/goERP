@@ -1,24 +1,19 @@
 package domain
 
 import (
-	"github.com/mrokoo/goERP/internal/share/valueobj"
+	"github.com/mrokoo/goERP/internal/share/valueobj/state"
+	"github.com/shopspring/decimal"
 )
 
 type Supplier struct {
-	ID      SupplierId         `json:"id" binding:"required"`
-	Name    valueobj.Name      `json:"name" binding:"required"`
-	Contact valueobj.Contact   `json:"contact" binding:"-"`
-	Email   valueobj.Email     `json:"email" binding:"-"`
-	Address valueobj.Address   `json:"address" binding:"-"`
-	Account BankAccount        `json:"account" binding:"-"`
-	Bank    Bank               `json:"bank" binding:"-"`
-	Note    valueobj.Note      `json:"note" binding:"-"`
-	State   valueobj.StateType `json:"state" binding:"-"`
-	Debt    valueobj.Money     `json:"debt" binding:"-"`
+	ID      string          `json:"id" binding:"required"`
+	Name    string          `json:"name" binding:"required"`
+	Contact string          `json:"contact" binding:"-"`
+	Email   string          `json:"email" binding:"-"`
+	Address string          `json:"address" binding:"-"`
+	Account string          `json:"account" binding:"-"`
+	Bank    string          `json:"bank" binding:"-"`
+	Note    string          `json:"note" binding:"-"`
+	State   state.State     `json:"state" binding:"-"`
+	Debt    decimal.Decimal `json:"debt" binding:"-"`
 }
-
-type SupplierId = string
-
-type BankAccount = string
-
-type Bank = string

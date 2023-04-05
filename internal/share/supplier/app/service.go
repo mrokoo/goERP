@@ -6,38 +6,37 @@ import (
 	"github.com/mrokoo/goERP/internal/share/supplier/domain"
 )
 
-var ErrNotFound = errors.New("the docment is not found")
-var ErrSupplierInVaildated = errors.New("the validity check fails")
+var ErrSupplierInVaildated = errors.New("供应商ID检验无效")
 
 type SupplierService interface {
-	GetSupplier(supplierId domain.SupplierId) (*domain.Supplier, error)
-	GetSupplierList() ([]domain.Supplier, error)
-	AddSupplier(supplier domain.Supplier) error
-	UpdateSupplier(supplier domain.Supplier) error
-	DeleteSupplier(supplierId domain.SupplierId) error
+	GetSupplier(supplierID string) (*domain.Supplier, error)
+	GetSupplierList() ([]*domain.Supplier, error)
+	AddSupplier(supplier *domain.Supplier) error
+	ReplaceSupplier(supplier *domain.Supplier) error
+	DeleteSupplier(supplierID string) error
 }
 
 type SupplierServiceImpl struct {
 	checkSupplierValidityService *domain.CheckingSupplierValidityService
-	repo                        domain.Repository
+	repo                         domain.Repository
 }
 
 func NewSupplierServiceImpl(checkSupplierValidityService *domain.CheckingSupplierValidityService, repo domain.Repository) *SupplierServiceImpl {
 	return &SupplierServiceImpl{
 		checkSupplierValidityService: checkSupplierValidityService,
-		repo:                        repo,
+		repo:                         repo,
 	}
 }
 
-func (s *SupplierServiceImpl) GetSupplier(supplierId domain.SupplierId) (*domain.Supplier, error) {
-	supplier, err := s.repo.Get(supplierId)
+func (s *SupplierServiceImpl) GetSupplier(supplierID string) (*domain.Supplier, error) {
+	supplier, err := s.repo.GetByID(supplierID)
 	if err != nil {
 		return nil, err
 	}
 	return supplier, nil
 }
 
-func (s *SupplierServiceImpl) GetSupplierList() ([]domain.Supplier, error) {
+func (s *SupplierServiceImpl) GetSupplierList() ([]*domain.Supplier, error) {
 	suppliers, err := s.repo.GetAll()
 	if err != nil {
 		return nil, err
@@ -45,8 +44,8 @@ func (s *SupplierServiceImpl) GetSupplierList() ([]domain.Supplier, error) {
 	return suppliers, nil
 }
 
-func (s *SupplierServiceImpl) AddSupplier(supplier domain.Supplier) error {
-	// 检查Supplier是否符合要求
+func (s *SupplierServiceImpl) AddSupplier(supplier *domain.Supplier) error {
+
 	if !s.checkSupplierValidityService.IsValidated(supplier) {
 		return ErrSupplierInVaildated
 	}
@@ -57,15 +56,15 @@ func (s *SupplierServiceImpl) AddSupplier(supplier domain.Supplier) error {
 	return nil
 }
 
-func (s *SupplierServiceImpl) UpdateSupplier(supplier domain.Supplier) error {
-	if err := s.repo.Update(supplier); err != nil {
+func (s *SupplierServiceImpl) ReplaceSupplier(supplier *domain.Supplier) error {
+	if err := s.repo.Replace(supplier); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (s *SupplierServiceImpl) DeleteSupplier(supplierId domain.SupplierId) error {
-	if err := s.repo.Delete(supplierId); err != nil {
+func (s *SupplierServiceImpl) DeleteSupplier(supplierID string) error {
+	if err := s.repo.Delete(supplierID); err != nil {
 		return err
 	}
 	return nil

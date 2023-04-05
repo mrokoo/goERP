@@ -1,11 +1,17 @@
 package domain
 
-import "github.com/google/uuid"
+import (
+	"github.com/google/uuid"
+)
 
-type UnitRepository interface {
-	Create(unit *Unit) error
+const (
+	CollectionUnit = "units"
+)
+
+type Repository interface {
+	GetAll() ([]*Unit, error)
+	GetByID(unitID uuid.UUID) (*Unit, error)
 	Save(unit *Unit) error
-	Get(unitId *uuid.UUID) (*Unit, error)
-	GetAll() ([]Unit, error)
-	Delete(unitId *uuid.UUID) error
+	Replace(unit *Unit) error
+	Delete(unitID uuid.UUID) error
 }

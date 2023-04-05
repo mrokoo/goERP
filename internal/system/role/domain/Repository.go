@@ -6,4 +6,6 @@ type Repository interface {
 	Delete(name string) error
 	FindByName(name string) (*Role, error)
 	FindaAll() ([]*Role, error)
+	AddRoleForUser(username string, role string) error
+	GetRolesForUser(name string) ([]string, error)
 }

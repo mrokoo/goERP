@@ -8,10 +8,3 @@ type Unit struct {
 	Note string    `json:"note"`
 }
 
-func (u *Unit) ChangeName(name string) {
-	u.Name = name
-}
-
-func (u *Unit) ChangeNote(note string) {
-	u.Note = note
-}

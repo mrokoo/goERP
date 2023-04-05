@@ -6,38 +6,37 @@ import (
 	"github.com/mrokoo/goERP/internal/share/warehouse/domain"
 )
 
-var ErrNotFound = errors.New("the docment is not found")
-var ErrWarehouseInVaildated = errors.New("the validity check fails")
+var ErrWarehouseInVaildated = errors.New("仓库ID检验无效")
 
 type WarehouseService interface {
-	GetWarehouse(warehouseId domain.WarehouseId) (*domain.Warehouse, error)
-	GetWarehouseList() ([]domain.Warehouse, error)
-	AddWarehouse(warehouse domain.Warehouse) error
-	UpdateWarehouse(warehouse domain.Warehouse) error
-	DeleteWarehouse(warehouseId domain.WarehouseId) error
+	GetWarehouse(warehouseID string) (*domain.Warehouse, error)
+	GetWarehouseList() ([]*domain.Warehouse, error)
+	AddWarehouse(warehouse *domain.Warehouse) error
+	ReplaceWarehouse(warehouse *domain.Warehouse) error
+	DeleteWarehouse(warehouseID string) error
 }
 
 type WarehouseServiceImpl struct {
 	checkWarehouseValidityService *domain.CheckingWarehouseValidityService
-	repo                        domain.Repository
+	repo                          domain.Repository
 }
 
 func NewWarehouseServiceImpl(checkWarehouseValidityService *domain.CheckingWarehouseValidityService, repo domain.Repository) *WarehouseServiceImpl {
 	return &WarehouseServiceImpl{
 		checkWarehouseValidityService: checkWarehouseValidityService,
-		repo:                        repo,
+		repo:                          repo,
 	}
 }
 
-func (s *WarehouseServiceImpl) GetWarehouse(warehouseId domain.WarehouseId) (*domain.Warehouse, error) {
-	warehouse, err := s.repo.Get(warehouseId)
+func (s *WarehouseServiceImpl) GetWarehouse(warehouseID string) (*domain.Warehouse, error) {
+	warehouse, err := s.repo.GetByID(warehouseID)
 	if err != nil {
 		return nil, err
 	}
 	return warehouse, nil
 }
 
-func (s *WarehouseServiceImpl) GetWarehouseList() ([]domain.Warehouse, error) {
+func (s *WarehouseServiceImpl) GetWarehouseList() ([]*domain.Warehouse, error) {
 	warehouses, err := s.repo.GetAll()
 	if err != nil {
 		return nil, err
@@ -45,8 +44,8 @@ func (s *WarehouseServiceImpl) GetWarehouseList() ([]domain.Warehouse, error) {
 	return warehouses, nil
 }
 
-func (s *WarehouseServiceImpl) AddWarehouse(warehouse domain.Warehouse) error {
-	// 检查Warehouse是否符合要求
+func (s *WarehouseServiceImpl) AddWarehouse(warehouse *domain.Warehouse) error {
+
 	if !s.checkWarehouseValidityService.IsValidated(warehouse) {
 		return ErrWarehouseInVaildated
 	}
@@ -57,15 +56,15 @@ func (s *WarehouseServiceImpl) AddWarehouse(warehouse domain.Warehouse) error {
 	return nil
 }
 
-func (s *WarehouseServiceImpl) UpdateWarehouse(warehouse domain.Warehouse) error {
-	if err := s.repo.Update(warehouse); err != nil {
+func (s *WarehouseServiceImpl) ReplaceWarehouse(warehouse *domain.Warehouse) error {
+	if err := s.repo.Replace(warehouse); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (s *WarehouseServiceImpl) DeleteWarehouse(warehouseId domain.WarehouseId) error {
-	if err := s.repo.Delete(warehouseId); err != nil {
+func (s *WarehouseServiceImpl) DeleteWarehouse(warehouseID string) error {
+	if err := s.repo.Delete(warehouseID); err != nil {
 		return err
 	}
 	return nil

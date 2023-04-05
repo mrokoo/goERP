@@ -47,6 +47,7 @@ func (r *MongoRepository) Save(role *domain.Role) error {
 }
 
 func (r *MongoRepository) Update(role *domain.Role) error {
+	// to do 事务处理
 	if err := r.Delete(role.Name); err != nil {
 		return ErrFailUpdate
 	}
@@ -57,7 +58,7 @@ func (r *MongoRepository) Update(role *domain.Role) error {
 }
 
 func (r *MongoRepository) Delete(name string) error {
-	_, err := r.e.RemoveFilteredPolicy(0, name)
+	_, err := r.e.DeleteRole(name)
 	if err != nil {
 		return err
 	}
@@ -95,17 +96,42 @@ func toRole(p [][]string) []domain.PermissionItem {
 	return removeRepByMap(pp)
 }
 
-// slice去重
 func removeRepByMap(slc []string) []string {
-	result := []string{}         //存放返回的不重复切片
-	tempMap := map[string]byte{} // 存放不重复主键
+	result := []string{}
+	tempMap := map[string]byte{}
 	for _, e := range slc {
 		l := len(tempMap)
-		tempMap[e] = 0 //当e存在于tempMap中时，再次添加是添加不进去的，，因为key不允许重复
-		//如果上一行添加成功，那么长度发生变化且此时元素一定不重复
-		if len(tempMap) != l { // 加入map后，map长度变化，则元素不重复
-			result = append(result, e) //当元素不重复时，将元素添加到切片result中
+		tempMap[e] = 0
+		if len(tempMap) != l {
+			result = append(result, e)
 		}
 	}
 	return result
+}
+
+func (r *MongoRepository) AddRoleForUser(username string, role string) error {
+	roles, err := r.GetRolesForUser(username)
+	if err != nil {
+		return err
+	}
+
+	if len(roles) != 0 {
+		return errors.New("the user already have role")
+	}
+	if _, err := r.FindByName(role); err != nil {
+		return err
+	}
+	_, err = r.e.AddRoleForUser(username, role)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *MongoRepository) GetRolesForUser(name string) ([]string, error) {
+	roles, err := r.e.GetRolesForUser(name)
+	if err != nil {
+		return nil, err
+	}
+	return roles, nil
 }

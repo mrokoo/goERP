@@ -1,9 +1,13 @@
 package domain
 
-type ProductRepository interface {
-	Create(product *Product) error
+const (
+	CollectionProduct = "products"
+)
+
+type Repository interface {
+	GetAll() ([]*Product, error)
+	GetByID(productID string) (*Product, error)
 	Save(product *Product) error
-	Get(productId string) (*Product, error)
-	GetAll() ([]Product, error)
-	Delete(productId string) error
+	Replace(product *Product) error
+	Delete(productID string) error
 }
