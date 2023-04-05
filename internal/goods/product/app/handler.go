@@ -1,8 +1,11 @@
 package app
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/mrokoo/goERP/internal/goods/product/domain"
+	"github.com/mrokoo/goERP/pkg/reponse"
 )
 
 type ProductHandler struct {
@@ -15,52 +18,43 @@ func NewProductHandler(s ProductService) *ProductHandler {
 	}
 }
 
-func (h *ProductHandler) GetAllProducts(ctx *gin.Context) {
-	products, err := h.productService.GetAllProducts()
+func (h *ProductHandler) GetProductList(ctx *gin.Context) {
+	products, err := h.productService.GetProductList()
 	if err != nil {
-		ctx.JSON(400, gin.H{
-			"code":     -1,
-			"showMsg":  "failure",
-			"errorMsg": err.Error(),
-			"data":     nil,
+		ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
+			Message: err.Error(),
+			Data:    nil,
 		})
 		return
 	}
-	ctx.JSON(200, gin.H{
-		"code":     1,
-		"showMsg":  "success",
-		"errorMsg": "",
-		"data":     products,
+	ctx.JSON(http.StatusOK, reponse.Reponse{
+		Message: "",
+		Data:    products,
 	})
 }
 
-func (h *ProductHandler) CreateProduct(ctx *gin.Context) {
-	var req domain.Product
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(400, gin.H{
-			"code":     -1,
-			"showMsg":  "failure",
-			"errorMsg": err.Error(),
-			"data":     nil,
-		})
-		return
-	}
-	c, err := h.productService.CreateProduct(&req)
+func (h *ProductHandler) GetProduct(ctx *gin.Context) {
+	id := ctx.Param("id")
+	product, err := h.productService.GetProduct(id)
 	if err != nil {
-		ctx.JSON(400, gin.H{
-			"code":     -1,
-			"showMsg":  "failure",
-			"errorMsg": err.Error(),
-			"data":     nil,
+		if err == mongo.ErrNoDocuments {
+			ctx.JSON(http.StatusNotFound, reponse.Reponse{
+				Message: "Product not found with the given id",
+				Data:    nil,
+			})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
+			Message: err.Error(),
+			Data:    nil,
 		})
 		return
+}
+
+func (h *ProductHandler) AddProduct(ctx *gin.Context) {
+	var req struct {
+		ID
 	}
-	ctx.JSON(200, gin.H{
-		"code":     1,
-		"showMsg":  "success",
-		"errorMsg": "",
-		"data":     c,
-	})
 }
 
 func (h *ProductHandler) DeleteProduct(ctx *gin.Context) {

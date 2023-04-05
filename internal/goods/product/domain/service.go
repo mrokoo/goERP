@@ -1,32 +1,19 @@
 package domain
 
-import (
-	"errors"
-
-	"go.mongodb.org/mongo-driver/mongo"
-)
-
-var ErrNotUniqueID = errors.New("the id is not unique")
+import "go.mongodb.org/mongo-driver/mongo"
 
 type CheckingProductValidityService struct {
-	productRepository ProductRepository
+	productRepository Repository
 }
 
-func NewCheckingProductValidityService(productRepository ProductRepository) *CheckingProductValidityService {
+func NewCheckingProductValidityService(productRepository Repository) *CheckingProductValidityService {
 	return &CheckingProductValidityService{
 		productRepository: productRepository,
 	}
 }
 
-func (ds *CheckingProductValidityService) IsValidated(product *Product) error {
+func (ds *CheckingProductValidityService) IsValidated(product *Product) bool {
 	// ID唯一性校验
-	_, err := ds.productRepository.Get(product.ID)
-	if err != mongo.ErrNoDocuments {
-		return ErrNotUniqueID
-	}
-	// 日期校验
-	if err := CheckDate(product); err != nil {
-		return err
-	}
-	return nil
+	_, err := ds.productRepository.GetByID(product.ID)
+	return err == mongo.ErrNoDocuments
 }

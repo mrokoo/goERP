@@ -1,4 +1,4 @@
-package valueobj
+package info
 
 type Info struct {
 	Img   string `json:"img"`
