@@ -52,9 +52,9 @@ func (h *ProductHandler) GetProduct(ctx *gin.Context) {
 }
 
 func (h *ProductHandler) AddProduct(ctx *gin.Context) {
-	var req struct {
-		ID
-	}
+	// var req struct {
+	// 	ID
+	// }
 }
 
 func (h *ProductHandler) DeleteProduct(ctx *gin.Context) {
