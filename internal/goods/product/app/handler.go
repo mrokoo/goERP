@@ -119,3 +119,4 @@ func (h *ProductHandler) ChangeProduct(ctx *gin.Context) {
 		"data":     req,
 	})
 }
+

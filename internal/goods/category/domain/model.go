@@ -5,9 +5,9 @@ import (
 )
 
 type Category struct {
-	ID   uuid.UUID `json:"id" bson:"id"`
-	Name string    `json:"name" bson:"name"`
-	Note string    `json:"note" bson:"note"`
+	ID   uuid.UUID `gorm:"primaryKey;<-:create"`
+	Name string    `gorm:"not null"`
+	Note string   
 }
 
 func (c *Category) ChangeName(name string) {

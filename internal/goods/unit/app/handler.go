@@ -6,8 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/mrokoo/goERP/internal/goods/unit/domain"
+	repository "github.com/mrokoo/goERP/internal/goods/unit/infra"
 	"github.com/mrokoo/goERP/pkg/reponse"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type UnitHandler struct {
@@ -40,7 +40,7 @@ func (h *UnitHandler) GetUnit(ctx *gin.Context) {
 	uid := uuid.MustParse(id)
 	unit, err := h.UnitService.GetUnit(uid)
 	if err != nil {
-		if err == mongo.ErrNoDocuments {
+		if err == repository.ErrNotFound {
 			ctx.JSON(http.StatusNotFound, reponse.Reponse{
 				Message: "Unit not found with the given id",
 				Data:    nil,
@@ -113,7 +113,7 @@ func (h *UnitHandler) ReplaceUnit(ctx *gin.Context) {
 	}
 	err := h.UnitService.ReplaceUnit(&unit)
 	if err != nil {
-		if err == mongo.ErrNoDocuments {
+		if err == repository.ErrNotFound {
 			ctx.JSON(http.StatusBadRequest, reponse.Reponse{
 				Message: "Budget not found with the given id",
 			})
@@ -131,7 +131,7 @@ func (h *UnitHandler) DeleteUnit(ctx *gin.Context) {
 	id := ctx.Param("id")
 	uid := uuid.MustParse(id)
 	if err := h.UnitService.DeleteUnit(uid); err != nil {
-		if err == mongo.ErrNoDocuments {
+		if err == repository.ErrNotFound {
 			ctx.JSON(http.StatusNotFound, reponse.Reponse{
 				Message: "Unit not found with the given id",
 				Data:    nil,
