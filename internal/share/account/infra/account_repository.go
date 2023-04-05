@@ -34,8 +34,10 @@ func (r *AccountRepository) GetAll() ([]*Account, error) {
 }
 
 func (r *AccountRepository) GetByID(accountID string) (*Account, error) {
-	var account Account
-	result := r.db.Find(&account, accountID)
+	account := Account{
+		ID: accountID,
+	}
+	result := r.db.First(&account)
 	if err := result.Error; err != nil {
 		return nil, err
 	}
@@ -53,6 +55,8 @@ func (r *AccountRepository) Replace(account *domain.Account) error {
 }
 
 func (r *AccountRepository) Delete(accountID string) error {
-	result := r.db.Delete(&Account{}, accountID)
+	result := r.db.Delete(&Account{
+		ID: accountID,
+	})
 	return result.Error
 }

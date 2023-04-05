@@ -5,10 +5,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/mrokoo/goERP/internal/share/supplier/domain"
+	repository "github.com/mrokoo/goERP/internal/share/supplier/infra"
 	"github.com/mrokoo/goERP/internal/share/valueobj/state"
 	"github.com/mrokoo/goERP/pkg/reponse"
-	"github.com/shopspring/decimal"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type SupplierHandler struct {
@@ -40,7 +39,7 @@ func (h *SupplierHandler) GetSupplier(ctx *gin.Context) {
 	id := ctx.Param("id")
 	spplier, err := h.SupplierService.GetSupplier(id)
 	if err != nil {
-		if err == mongo.ErrNoDocuments {
+		if err == repository.ErrNotFound {
 			ctx.JSON(http.StatusNotFound, reponse.Reponse{
 				Message: "Supplier not found with the given id",
 				Data:    nil,
@@ -70,7 +69,7 @@ func (h *SupplierHandler) AddSupplier(ctx *gin.Context) {
 		Bank    string      `json:"bank" binding:"-"`
 		Note    string      `json:"note" binding:"-"`
 		State   state.State `json:"state" binding:"oneof=active freeze"`
-		Debt    string      `json:"debt" binding:"numeric"`
+		Debt    float64     `json:"debt"`
 	}
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, reponse.Reponse{
@@ -79,13 +78,6 @@ func (h *SupplierHandler) AddSupplier(ctx *gin.Context) {
 		return
 	}
 
-	debt, err := decimal.NewFromString(req.Debt)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, reponse.Reponse{
-			Message: "Request parameter verification failed",
-		})
-		return
-	}
 	supplier := domain.Supplier{
 		ID:      req.ID,
 		Name:    req.Name,
@@ -96,9 +88,9 @@ func (h *SupplierHandler) AddSupplier(ctx *gin.Context) {
 		Bank:    req.Bank,
 		Note:    req.Note,
 		State:   req.State,
-		Debt:    debt,
+		Debt:    req.Debt,
 	}
-	err = h.SupplierService.AddSupplier(&supplier)
+	err := h.SupplierService.AddSupplier(&supplier)
 	if err != nil {
 		if err == ErrSupplierInVaildated {
 			ctx.JSON(http.StatusBadRequest, reponse.Reponse{
@@ -127,7 +119,7 @@ func (h *SupplierHandler) ReplaceSupplier(ctx *gin.Context) {
 		Bank    string      `json:"bank" binding:"-"`
 		Note    string      `json:"note" binding:"-"`
 		State   state.State `json:"state" binding:"oneof=active freeze"`
-		Debt    string      `json:"debt" binding:"numeric"`
+		Debt    float64     `json:"debt"`
 	}
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, reponse.Reponse{
@@ -136,13 +128,6 @@ func (h *SupplierHandler) ReplaceSupplier(ctx *gin.Context) {
 		return
 	}
 
-	debt, err := decimal.NewFromString(req.Debt)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, reponse.Reponse{
-			Message: "Request parameter verification failed",
-		})
-		return
-	}
 	supplier := domain.Supplier{
 		ID:      id,
 		Name:    req.Name,
@@ -153,11 +138,11 @@ func (h *SupplierHandler) ReplaceSupplier(ctx *gin.Context) {
 		Bank:    req.Bank,
 		Note:    req.Note,
 		State:   req.State,
-		Debt:    debt,
+		Debt:    req.Debt,
 	}
-	err = h.SupplierService.ReplaceSupplier(&supplier)
+	err := h.SupplierService.ReplaceSupplier(&supplier)
 	if err != nil {
-		if err == mongo.ErrNoDocuments {
+		if err == repository.ErrNotFound {
 			ctx.JSON(http.StatusBadRequest, reponse.Reponse{
 				Message: "Account not found with the given id",
 			})
@@ -176,7 +161,7 @@ func (h *SupplierHandler) DeleteSupplier(ctx *gin.Context) {
 	id := ctx.Param("id")
 
 	if err := h.SupplierService.DeleteSupplier(id); err != nil {
-		if err == mongo.ErrNoDocuments {
+		if err == repository.ErrNotFound {
 			ctx.JSON(http.StatusNotFound, reponse.Reponse{
 				Message: "Supplier not found with the given id",
 				Data:    nil,

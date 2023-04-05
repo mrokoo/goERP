@@ -5,8 +5,8 @@ import (
 )
 
 type Budget struct {
-	ID   uuid.UUID
-	Type BudgetType
+	ID   uuid.UUID  `gorm:"primaryKey;<-:create"`
+	Type BudgetType `gorm:"default:in"`
 	Note string
 }
 

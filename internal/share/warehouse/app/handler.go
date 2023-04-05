@@ -6,8 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/mrokoo/goERP/internal/share/valueobj/state"
 	"github.com/mrokoo/goERP/internal/share/warehouse/domain"
+	repository "github.com/mrokoo/goERP/internal/share/warehouse/infra"
 	"github.com/mrokoo/goERP/pkg/reponse"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type WarehouseHandler struct {
@@ -39,7 +39,7 @@ func (h *WarehouseHandler) GetWarehouse(ctx *gin.Context) {
 	id := ctx.Param("id")
 	warehouse, err := h.WarehouseService.GetWarehouse(id)
 	if err != nil {
-		if err == mongo.ErrNoDocuments {
+		if err == repository.ErrNotFound {
 			ctx.JSON(http.StatusNotFound, reponse.Reponse{
 				Message: "Warehouse not found with the given id",
 				Data:    nil,
@@ -134,7 +134,7 @@ func (h *WarehouseHandler) ReplaceWarehouse(ctx *gin.Context) {
 
 	err := h.WarehouseService.ReplaceWarehouse(&warehouse)
 	if err != nil {
-		if err == mongo.ErrNoDocuments {
+		if err == repository.ErrNotFound {
 			ctx.JSON(http.StatusBadRequest, reponse.Reponse{
 				Message: "Account not found with the given id",
 			})
@@ -153,7 +153,7 @@ func (h *WarehouseHandler) DeleteWarehouse(ctx *gin.Context) {
 	id := ctx.Param("id")
 
 	if err := h.WarehouseService.DeleteWarehouse(id); err != nil {
-		if err == mongo.ErrNoDocuments {
+		if err == repository.ErrNotFound {
 			ctx.JSON(http.StatusNotFound, reponse.Reponse{
 				Message: "Warehouse not found with the given id",
 				Data:    nil,

@@ -6,8 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/mrokoo/goERP/internal/share/budget/domain"
+	repository "github.com/mrokoo/goERP/internal/share/budget/infra"
 	"github.com/mrokoo/goERP/pkg/reponse"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type BudgetHandler struct {
@@ -40,7 +40,7 @@ func (h *BudgetHandler) GetBudget(ctx *gin.Context) {
 	uid := uuid.MustParse(id)
 	budget, err := h.BudgetService.GetBudget(uid)
 	if err != nil {
-		if err == mongo.ErrNoDocuments {
+		if err == repository.ErrNotFound {
 			ctx.JSON(http.StatusNotFound, reponse.Reponse{
 				Message: "Budget not found with the given id",
 				Data:    nil,
@@ -113,7 +113,7 @@ func (h *BudgetHandler) ReplaceBudget(ctx *gin.Context) {
 	}
 	err := h.BudgetService.ReplaceBudget(&budget)
 	if err != nil {
-		if err == mongo.ErrNoDocuments {
+		if err == repository.ErrNotFound {
 			ctx.JSON(http.StatusBadRequest, reponse.Reponse{
 				Message: "Budget not found with the given id",
 			})
@@ -132,7 +132,7 @@ func (h *BudgetHandler) DeleteBudget(ctx *gin.Context) {
 	id := ctx.Param("id")
 	uid := uuid.MustParse(id)
 	if err := h.BudgetService.DeleteBudget(uid); err != nil {
-		if err == mongo.ErrNoDocuments {
+		if err == repository.ErrNotFound {
 			ctx.JSON(http.StatusNotFound, reponse.Reponse{
 				Message: "Budget not found with the given id",
 				Data:    nil,

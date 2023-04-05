@@ -2,10 +2,10 @@ package routes
 
 import (
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/mongo"
+	"gorm.io/gorm"
 )
 
-func Setup(db *mongo.Database, gin *gin.Engine) {
+func Setup(db *gorm.DB, gin *gin.Engine) {
 	publicRouter := gin.Group("v1")
 	NewAccountRouter(db, publicRouter)
 	NewBudgetRouter(db, publicRouter)
