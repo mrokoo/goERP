@@ -1,6 +1,8 @@
 package domain
 
-import "go.mongodb.org/mongo-driver/mongo"
+import (
+	repository "github.com/mrokoo/goERP/internal/goods/unit/infra"
+)
 
 type CheckingProductValidityService struct {
 	productRepository Repository
@@ -15,5 +17,5 @@ func NewCheckingProductValidityService(productRepository Repository) *CheckingPr
 func (ds *CheckingProductValidityService) IsValidated(product *Product) bool {
 	// ID唯一性校验
 	_, err := ds.productRepository.GetByID(product.ID)
-	return err == mongo.ErrNoDocuments
+	return err == repository.ErrNotFound
 }

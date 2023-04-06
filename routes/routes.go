@@ -12,4 +12,7 @@ func Setup(db *gorm.DB, gin *gin.Engine) {
 	NewCustomerRouter(db, publicRouter)
 	NewSupplierRouter(db, publicRouter)
 	NewWarehouseRouter(db, publicRouter)
+	NewUnitRouter(db, publicRouter)
+	NewCategoryRouter(db, publicRouter)
+	NewProductRouter(db, publicRouter)
 }

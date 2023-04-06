@@ -12,30 +12,28 @@ import (
 	warehouse "github.com/mrokoo/goERP/internal/share/warehouse/domain"
 )
 
-type Product = domain.Product
-type Stock = stock.Stock
 type Category = category.Category
 type Unit = unit.Unit
 type Warehouse = warehouse.Warehouse
 
 // mysql product模型
-type ProductModel struct {
-	ID           string       `gorm:"primaryKey"`
-	Name         string       `gorm:"not null"`
-	CategoryID   uuid.UUID    `gorm:"default:null"`
-	Category     Category     `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	UnitID       uuid.UUID    `gorm:"default:null"`
-	Unit         Unit         `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	OpeningStock []StockModel `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	State        state.State  `gorm:"default:active"`
+type Product struct {
+	ID           string      `gorm:"primaryKey"`
+	Name         string      `gorm:"not null"`
+	CategoryID   uuid.UUID   `gorm:"default:null"`
+	Category     Category    `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	UnitID       uuid.UUID   `gorm:"default:null"`
+	Unit         Unit        `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	OpeningStock []Stock     `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	State        state.State `gorm:"default:active"`
 	Note         string
 	price.Price
 	info.Info
 }
 
-func toProductModel(product *Product) *ProductModel {
-	openingStock := toStockModel(product.OpeningStock)
-	return &ProductModel{
+func toMySQLProduct(product *domain.Product) *Product {
+	openingStock := toMySQLStock(product.OpeningStock)
+	return &Product{
 		ID:           product.ID,
 		Name:         product.Name,
 		CategoryID:   product.CategoryID,
@@ -48,12 +46,12 @@ func toProductModel(product *Product) *ProductModel {
 	}
 }
 
-func (p *ProductModel) toProduct() *Product {
-	var openingstock []Stock
+func (p *Product) toProduct() *domain.Product {
+	var openingstock []stock.Stock
 	for _, s := range p.OpeningStock {
 		openingstock = append(openingstock, s.toStock())
 	}
-	return &Product{
+	return &domain.Product{
 		ID:           p.ID,
 		Name:         p.Name,
 		CategoryID:   p.CategoryID,
@@ -67,28 +65,28 @@ func (p *ProductModel) toProduct() *Product {
 }
 
 // mysql Stock模型
-type StockModel struct {
+type Stock struct {
 	ProductID   string    `gorm:"primaryKey"`
 	WarehouseID string    `gorm:"primaryKey"`
 	Warehouse   Warehouse `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;size:191"`
 	Amount      int
 }
 
-func toStockModel(stocks []Stock) []StockModel {
-	var stockModels []StockModel
+func toMySQLStock(stocks []stock.Stock) []Stock {
+	var mysqlstock []Stock
 	for _, stock := range stocks {
-		s := StockModel{
+		s := Stock{
 			ProductID:   stock.ProductID,
 			WarehouseID: stock.WarehouseID,
 			Amount:      stock.Amount,
 		}
-		stockModels = append(stockModels, s)
+		mysqlstock = append(mysqlstock, s)
 	}
-	return stockModels
+	return mysqlstock
 }
 
-func (s *StockModel) toStock() Stock {
-	return Stock{
+func (s *Stock) toStock() stock.Stock {
+	return stock.Stock{
 		ProductID:   s.ProductID,
 		WarehouseID: s.WarehouseID,
 		Amount:      s.Amount,
