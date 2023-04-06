@@ -100,8 +100,8 @@ func (h *ProductHandler) AddProduct(ctx *gin.Context) {
 }
 
 func (h *ProductHandler) ReplaceProduct(ctx *gin.Context) {
+	id := ctx.Param("id")
 	var req struct {
-		ID           string    `json:"id" binding:"required"`
 		Name         string    `json:"name" binding:"required"`
 		CategoryID   uuid.UUID `json:"category_id" binding:"-"`
 		UnitID       uuid.UUID `json:"unit_id" binding:"-"`
@@ -117,7 +117,17 @@ func (h *ProductHandler) ReplaceProduct(ctx *gin.Context) {
 		})
 		return
 	}
-	product := domain.Product(req)
+	product := domain.Product{
+		ID:           id,
+		Name:         req.Name,
+		CategoryID:   req.CategoryID,
+		UnitID:       req.UnitID,
+		OpeningStock: req.OpeningStock,
+		State:        req.State,
+		Note:         req.Note,
+		Price:        req.Price,
+		Info:         req.Info,
+	}
 
 	err := h.productService.ReplaceProduct(&product)
 	if err != nil {

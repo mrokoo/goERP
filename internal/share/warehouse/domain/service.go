@@ -1,6 +1,8 @@
 package domain
 
-import "go.mongodb.org/mongo-driver/mongo"
+import (
+	repository "github.com/mrokoo/goERP/internal/share/supplier/infra"
+)
 
 type CheckingWarehouseValidityService struct {
 	warehouseRepository Repository
@@ -15,5 +17,5 @@ func NewCheckingWarehouseValidityService(warehouseRepository Repository) *Checki
 func (ds *CheckingWarehouseValidityService) IsValidated(warehouse *Warehouse) bool {
 	// ID唯一性校验
 	_, err := ds.warehouseRepository.GetByID(warehouse.ID)
-	return err == mongo.ErrNoDocuments
+	return err == repository.ErrNotFound
 }
