@@ -28,8 +28,8 @@ func (r *UnitRepository) GetAll() ([]*Unit, error) {
 		return nil, err
 	}
 	var unitsp []*Unit
-	for _, v := range units {
-		unitsp = append(unitsp, &v)
+	for i := range units {
+		unitsp = append(unitsp, &units[i])
 	}
 	return unitsp, nil
 }

@@ -27,8 +27,8 @@ func (r *SupplierRepository) GetAll() ([]*Supplier, error) {
 		return nil, err
 	}
 	var suppliersp []*Supplier
-	for _, v := range suppliers {
-		suppliersp = append(suppliersp, &v)
+	for i := range suppliers {
+		suppliersp = append(suppliersp, &suppliers[i])
 	}
 	return suppliersp, nil
 }

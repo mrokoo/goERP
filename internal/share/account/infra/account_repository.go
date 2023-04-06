@@ -27,8 +27,8 @@ func (r *AccountRepository) GetAll() ([]*Account, error) {
 		return nil, err
 	}
 	var accountsp []*Account
-	for _, v := range accounts {
-		accountsp = append(accountsp, &v)
+	for i := range accounts {
+		accountsp = append(accountsp, &accounts[i])
 	}
 	return accountsp, nil
 }

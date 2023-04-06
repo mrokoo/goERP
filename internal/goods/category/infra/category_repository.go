@@ -28,8 +28,8 @@ func (r *CategoryRepository) GetAll() ([]*Category, error) {
 		return nil, err
 	}
 	var categorysp []*Category
-	for _, v := range categorys {
-		categorysp = append(categorysp, &v)
+	for i := range categorys {
+		categorysp = append(categorysp, &categorys[i])
 	}
 	return categorysp, nil
 }

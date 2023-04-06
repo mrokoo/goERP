@@ -27,8 +27,8 @@ func (r *WarehouseRepository) GetAll() ([]*Warehouse, error) {
 		return nil, err
 	}
 	var warehousesp []*Warehouse
-	for _, v := range warehouses {
-		warehousesp = append(warehousesp, &v)
+	for i := range warehouses {
+		warehousesp = append(warehousesp, &warehouses[i])
 	}
 	return warehousesp, nil
 }

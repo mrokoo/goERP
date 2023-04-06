@@ -28,8 +28,8 @@ func (r *BudgetRepository) GetAll() ([]*Budget, error) {
 		return nil, err
 	}
 	var budgetsp []*Budget
-	for _, v := range budgets {
-		budgetsp = append(budgetsp, &v)
+	for i := range budgets {
+		budgetsp = append(budgetsp, &budgets[i])
 	}
 	return budgetsp, nil
 }

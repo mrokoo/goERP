@@ -27,8 +27,8 @@ func (r *CustomerRepository) GetAll() ([]*Customer, error) {
 		return nil, err
 	}
 	var customersp []*Customer
-	for _, v := range customers {
-		customersp = append(customersp, &v)
+	for i := range customers {
+		customersp = append(customersp, &customers[i])
 	}
 	return customersp, nil
 }
