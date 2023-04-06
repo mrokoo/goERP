@@ -54,7 +54,7 @@ func (r *ProductRepository) Save(product *domain.Product) error {
 
 func (r *ProductRepository) Replace(product *domain.Product) error {
 	pm := toMySQLProduct(product)
-	result := r.db.Save(pm)
+	result := r.db.Session(&gorm.Session{FullSaveAssociations: true}).Updates(&pm)
 	return result.Error
 }
 

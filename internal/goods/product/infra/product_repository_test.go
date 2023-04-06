@@ -12,16 +12,8 @@ import (
 	"gorm.io/gorm"
 )
 
-var r *repository.ProductRepository
+// var r *repository.ProductRepository
 
-func TestMain(m *testing.M) {
-	dsn := "root:123456@tcp(127.0.0.1:3306)/goerp?charset=utf8mb4&parseTime=True&loc=Local"
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	if err != nil {
-		panic(err)
-	}
-	r = repository.NewProductRepository(db)
-}
 func TestNewProductRepository(t *testing.T) {
 	dsn := "root:123456@tcp(127.0.0.1:3306)/goerp?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
@@ -32,6 +24,13 @@ func TestNewProductRepository(t *testing.T) {
 }
 
 func TestProductRepository_Save(t *testing.T) {
+	dsn := "root:123456@tcp(127.0.0.1:3306)/goerp?charset=utf8mb4&parseTime=True&loc=Local"
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	if err != nil {
+		panic(err)
+	}
+	r := repository.NewProductRepository(db)
+
 	product := domain.Product{
 		ID:     "P001",
 		Name:   "chanpin1",
@@ -49,19 +48,60 @@ func TestProductRepository_Save(t *testing.T) {
 			},
 		},
 	}
-	err := r.Save(&product)
+	err = r.Save(&product)
 	assert := assert.New(t)
 	assert.NoError(err)
 }
 
 func TestProductRepository_GetAll(t *testing.T) {
-	_, err := r.GetAll()
+	dsn := "root:123456@tcp(127.0.0.1:3306)/goerp?charset=utf8mb4&parseTime=True&loc=Local"
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	if err != nil {
+		panic(err)
+	}
+	r := repository.NewProductRepository(db)
+
+	_, err = r.GetAll()
 	assert := assert.New(t)
 	assert.NoError(err)
 }
 
+func TestProductRepository_Replace(t *testing.T) {
+	dsn := "root:123456@tcp(127.0.0.1:3306)/goerp?charset=utf8mb4&parseTime=True&loc=Local"
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	if err != nil {
+		panic(err)
+	}
+	r := repository.NewProductRepository(db)
+	product := domain.Product{
+		ID:     "P001",
+		Name:   "chanpin1",
+		UnitID: uuid.MustParse("2ce0d254-7ce1-4257-b3be-4a9dc08218e3"),
+		OpeningStock: []stock.Stock{
+			{
+				ProductID:   "P001",
+				WarehouseID: "W001",
+				Amount:      1113,
+			},
+			{
+				ProductID:   "P001",
+				WarehouseID: "W002",
+				Amount:      23,
+			},
+		},
+	}
+	err = r.Replace(&product)
+	assert.NoError(t, err)
+}
+
 func TestProductRepository_Delete(t *testing.T) {
+	dsn := "root:123456@tcp(127.0.0.1:3306)/goerp?charset=utf8mb4&parseTime=True&loc=Local"
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	if err != nil {
+		panic(err)
+	}
+	r := repository.NewProductRepository(db)
 	assert := assert.New(t)
-	err := r.Delete("P001")
+	err = r.Delete("P001")
 	assert.NoError(err)
 }
