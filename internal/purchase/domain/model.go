@@ -12,7 +12,7 @@ type PurchaseOrder struct {
 	SupplierID  string
 	WarehouseID string
 	HandlerID   string
-	CreatedTime time.Time
+	CreatedAt   time.Time
 	Items       []item.Item
-	Biling      biling.Biling
+	biling.Biling
 }

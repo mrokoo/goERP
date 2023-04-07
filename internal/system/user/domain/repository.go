@@ -5,9 +5,9 @@ import (
 )
 
 type Repository interface {
-	Get(userID uuid.UUID) (*User, error)
-	GetAll() ([]User, error)
-	Update(user User) error
-	Save(user User) error
+	GetAll() ([]*User, error)
+	GetByID(userID uuid.UUID) (*User, error)
+	Save(user *User) error
+	Replace(user *User) error
 	Delete(userID uuid.UUID) error
 }

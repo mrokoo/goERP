@@ -1,6 +1,7 @@
 package infra
 
 import (
+	"context"
 	"errors"
 
 	"github.com/casbin/casbin/v2"
@@ -12,7 +13,8 @@ import (
 var ErrFailUpdate = errors.New("fail to update role")
 
 type MongoRepository struct {
-	e *casbin.Enforcer
+	e      *casbin.Enforcer
+	client *mongo.Client
 }
 
 func NewMongoRepository(client *mongo.Client) *MongoRepository {
@@ -28,7 +30,8 @@ func NewMongoRepository(client *mongo.Client) *MongoRepository {
 		panic(err)
 	}
 	return &MongoRepository{
-		e: e,
+		e:      e,
+		client: client,
 	}
 }
 
@@ -47,13 +50,20 @@ func (r *MongoRepository) Save(role *domain.Role) error {
 }
 
 func (r *MongoRepository) Update(role *domain.Role) error {
-	// to do 事务处理
+	session, err := r.client.StartSession()
+	if err != nil {
+		return err
+	}
+	defer session.EndSession(context.TODO())
 	if err := r.Delete(role.Name); err != nil {
+		session.AbortTransaction(context.TODO())
 		return ErrFailUpdate
 	}
 	if err := r.Save(role); err != nil {
+		session.AbortTransaction(context.TODO())
 		return ErrFailUpdate
 	}
+	session.CommitTransaction(context.TODO())
 	return nil
 }
 
