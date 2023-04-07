@@ -11,8 +11,10 @@ type PurchaseOrder struct {
 	ID          string
 	SupplierID  string
 	WarehouseID string
-	HandlerID   string
-	CreatedAt   time.Time
-	Items       []item.Item
+	UserID      string
+	Date        time.Time
+	Items       []item.PurchaseOrderItem
+	Note        string
 	biling.Biling
+	IsValidated bool
 }
