@@ -56,3 +56,7 @@ func (r *PurchaseOrderRepository) InValidate(purchaseOrderID string) error {
 	result := r.db.Model(&PurchaseOrder{}).Where("id", purchaseOrderID).Update("is_validated", true)
 	return result.Error
 }
+
+func (r PurchaseOrderRepository) getName() {
+	
+}
