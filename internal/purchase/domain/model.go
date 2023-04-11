@@ -12,9 +12,22 @@ type PurchaseOrder struct {
 	SupplierID  string
 	WarehouseID string
 	UserID      string
-	Date        time.Time
-	Items       []item.PurchaseOrderItem
-	Note        string
+	Items       []item.OrderItem
 	biling.Biling
 	IsValidated bool
+	Note        string
+	Date        time.Time
+}
+
+type PurchaseReturnOrder struct {
+	ID              string
+	PurchaseOrderID string // 并不强制要求
+	SupplierID      string
+	WarehouseID     string
+	UserID          string
+	Items           []item.ReturnOrderItem
+	biling.Biling
+	IsValidated bool
+	Note        string
+	Date        time.Time
 }

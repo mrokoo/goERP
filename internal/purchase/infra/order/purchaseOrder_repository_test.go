@@ -1,4 +1,4 @@
-package repository
+package order
 
 import (
 	"fmt"
@@ -36,8 +36,8 @@ func TestPurchaseOrderRepository_Save(t *testing.T) {
 		WarehouseID: "W001",
 		UserID:      "U001",
 		Date:        time.Now(),
-		Items: []item.PurchaseOrderItem{
-			item.New("PO001", "P002", 12, 3.21),
+		Items: []item.OrderItem{
+			item.NewOrderItem("P002", 12, 3.21),
 		},
 	}
 	err = r.Save(&purchaseOrder)

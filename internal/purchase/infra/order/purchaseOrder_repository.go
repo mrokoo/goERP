@@ -1,4 +1,4 @@
-package repository
+package order
 
 import (
 	"github.com/mrokoo/goERP/internal/purchase/domain"
@@ -55,8 +55,4 @@ func (r *PurchaseOrderRepository) Save(purchaseOrder *domain.PurchaseOrder) erro
 func (r *PurchaseOrderRepository) InValidate(purchaseOrderID string) error {
 	result := r.db.Model(&PurchaseOrder{}).Where("id", purchaseOrderID).Update("is_validated", true)
 	return result.Error
-}
-
-func (r PurchaseOrderRepository) getName() {
-	
 }

@@ -1,9 +1,6 @@
 package item
 
 type Item struct {
-	Name      string
-	ID        string
-	UnitID    string
+	ProductID string
 	Quantity  int
-	Remaining int
 }

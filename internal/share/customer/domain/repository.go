@@ -1,9 +1,5 @@
 package domain
 
-const (
-	CollectionCustomer = "customers"
-)
-
 type Repository interface {
 	GetAll() ([]*Customer, error)
 	GetByID(customerID string) (*Customer, error)

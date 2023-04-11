@@ -1,4 +1,4 @@
-package repository
+package order
 
 import (
 	"time"
@@ -20,32 +20,32 @@ type PurchaseOrder struct {
 	Warehouse   warehouse.Warehouse `gorm:"constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
 	UserID      string              `gorm:"size:191"`
 	User        user.User           `gorm:"constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
-	Date        time.Time
+	biling.Biling
+	IsValidated bool                `gorm:"default:false"`
 	Items       []PurchaseOrderItem `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Note        string
-	biling.Biling
-	IsValidated bool `gorm:"default:false"`
+	Date        time.Time
 }
 
-func toMySQLPurchaseOrder(purchaseorder *domain.PurchaseOrder) *PurchaseOrder {
-	pots := toMySQLPurchaseOrderItem(purchaseorder.Items)
+func toMySQLPurchaseOrder(order *domain.PurchaseOrder) *PurchaseOrder {
+	pots := toMySQLPurchaseOrderItem(order.ID, order.Items)
 	return &PurchaseOrder{
-		ID:          purchaseorder.ID,
-		SupplierID:  purchaseorder.SupplierID,
-		WarehouseID: purchaseorder.WarehouseID,
-		UserID:      purchaseorder.UserID,
-		Date:        purchaseorder.Date,
+		ID:          order.ID,
+		SupplierID:  order.SupplierID,
+		WarehouseID: order.WarehouseID,
+		UserID:      order.UserID,
 		Items:       pots,
-		Note:        purchaseorder.Note,
-		Biling:      purchaseorder.Biling,
-		IsValidated: purchaseorder.IsValidated,
+		Biling:      order.Biling,
+		IsValidated: order.IsValidated,
+		Note:        order.Note,
+		Date:        order.Date,
 	}
 }
 
 func (p *PurchaseOrder) toPurchaseOrder() *domain.PurchaseOrder {
-	var pots []item.PurchaseOrderItem
+	var pois []item.OrderItem
 	for _, poi := range p.Items {
-		pots = append(pots, poi.toPurchaseOrderItem())
+		pois = append(pois, poi.toPurchaseOrderItem())
 	}
 
 	return &domain.PurchaseOrder{
@@ -54,7 +54,7 @@ func (p *PurchaseOrder) toPurchaseOrder() *domain.PurchaseOrder {
 		WarehouseID: p.WarehouseID,
 		UserID:      p.UserID,
 		Date:        p.Date,
-		Items:       pots,
+		Items:       pois,
 		Note:        p.Note,
 		Biling:      p.Biling,
 		IsValidated: p.IsValidated,
@@ -67,30 +67,29 @@ type PurchaseOrderItem struct {
 	Product         product.Product `gorm:"constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
 	Quantity        int
 	Price           float64
-	TotalAmount     float64
+	TotalPayment    float64
 }
 
-func toMySQLPurchaseOrderItem(items []item.PurchaseOrderItem) []PurchaseOrderItem {
-	var pot []PurchaseOrderItem
+func toMySQLPurchaseOrderItem(OrderID string, items []item.OrderItem) []PurchaseOrderItem {
+	var poi []PurchaseOrderItem
 	for _, item := range items {
 		p := PurchaseOrderItem{
-			PurchaseOrderID: item.PurchaseOrderID,
+			PurchaseOrderID: OrderID,
 			ProductID:       item.ProductID,
 			Quantity:        item.Quantity,
 			Price:           item.Price,
-			TotalAmount:     item.TotalAmount,
+			TotalPayment:    item.TotalPayment,
 		}
-		pot = append(pot, p)
+		poi = append(poi, p)
 	}
-	return pot
+	return poi
 }
 
-func (pot *PurchaseOrderItem) toPurchaseOrderItem() item.PurchaseOrderItem {
-	return item.PurchaseOrderItem{
-		PurchaseOrderID: pot.PurchaseOrderID,
-		ProductID:       pot.ProductID,
-		Quantity:        pot.Quantity,
-		Price:           pot.Price,
-		TotalAmount:     pot.TotalAmount,
+func (pot *PurchaseOrderItem) toPurchaseOrderItem() item.OrderItem {
+	return item.OrderItem{
+		ProductID:    pot.ProductID,
+		Quantity:     pot.Quantity,
+		Price:        pot.Price,
+		TotalPayment: pot.TotalPayment,
 	}
 }
