@@ -1,6 +1,11 @@
 package item
 
-type Item struct {
+type InItem struct {
+	ProductID string
+	Quantity  int
+}
+
+type OutItem struct {
 	ProductID string
 	Quantity  int
 }

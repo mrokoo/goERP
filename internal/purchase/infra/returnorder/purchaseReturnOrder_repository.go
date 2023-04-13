@@ -5,18 +5,18 @@ import (
 	"gorm.io/gorm"
 )
 
-type PurchaseReturnRepository struct {
+type PurchaseReturnOrderRepository struct {
 	db *gorm.DB
 }
 
-func NewPurchaseReturnRepository(db *gorm.DB) *PurchaseReturnRepository {
+func NewPurchaseReturnOrderRepository(db *gorm.DB) *PurchaseReturnOrderRepository {
 	db.AutoMigrate(&PurchaseReturnOrder{})
 	db.AutoMigrate(&PurchaseReturnOrderItem{})
-	return &PurchaseReturnRepository{
+	return &PurchaseReturnOrderRepository{
 		db: db,
 	}
 }
-func (r *PurchaseReturnRepository) GetAll() ([]*domain.PurchaseReturnOrder, error) {
+func (r *PurchaseReturnOrderRepository) GetAll() ([]*domain.PurchaseReturnOrder, error) {
 	var pom []PurchaseReturnOrder
 	result := r.db.Preload("Items").Find(&pom)
 	if err := result.Error; err != nil {
@@ -30,7 +30,7 @@ func (r *PurchaseReturnRepository) GetAll() ([]*domain.PurchaseReturnOrder, erro
 	return po, nil
 }
 
-func (r *PurchaseReturnRepository) GetByID(purchaseOrderID string) (*domain.PurchaseReturnOrder, error) {
+func (r *PurchaseReturnOrderRepository) GetByID(purchaseOrderID string) (*domain.PurchaseReturnOrder, error) {
 	po := PurchaseReturnOrder{
 		ID: purchaseOrderID,
 	}
@@ -43,13 +43,13 @@ func (r *PurchaseReturnRepository) GetByID(purchaseOrderID string) (*domain.Purc
 	return purchaseOrder, nil
 }
 
-func (r *PurchaseReturnRepository) Save(purchaseOrder *domain.PurchaseReturnOrder) error {
+func (r *PurchaseReturnOrderRepository) Save(purchaseOrder *domain.PurchaseReturnOrder) error {
 	po := toMySQLPurchaseReturnOrder(purchaseOrder)
 	result := r.db.Create(&po)
 	return result.Error
 }
 
-func (r *PurchaseReturnRepository) InValidate(purchaseOrderID string) error {
+func (r *PurchaseReturnOrderRepository) InValidate(purchaseOrderID string) error {
 	result := r.db.Model(&PurchaseReturnOrder{}).Where("id", purchaseOrderID).Update("is_validated", true)
 	return result.Error
 }

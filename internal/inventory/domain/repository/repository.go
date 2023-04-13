@@ -1,15 +1,26 @@
 package domain
 
 import (
-	"github.com/mrokoo/goERP/internal/inventory/domain/aggregate/flow"
-	"github.com/mrokoo/goERP/internal/inventory/domain/aggregate/notification"
-	"github.com/mrokoo/goERP/internal/inventory/domain/valueobj/record"
+	"github.com/mrokoo/goERP/internal/inventory/domain/aggregate/flowrecord"
+	"github.com/mrokoo/goERP/internal/inventory/domain/aggregate/task"
 )
 
-type Repository[T flow.InventoryFlow | record.Record | notification.Notificaion] interface {
-	GetAll() ([]*T, error)
-	GetByID(ID string) (*T, error)
-	Save(e *T) error
-	Replace(e *T) error
-	Delete(ID string) error
+type InventoryFlowRepository interface {
+	GetAll() ([]*flowrecord.InventoryFlow, error)
+	GetByID(ID string) (*flowrecord.InventoryFlow, error)
+	Save(flowRecord *flowrecord.InventoryFlow) error
 }
+
+type InTaskRepository interface {
+	GetAll() ([]*task.InTask, error)
+	GetByID() (*task.InTask, error)
+	Save(inTask *task.InTask) error
+}
+
+type OutTaskRepository interface {
+	GetAll() ([]*task.OutTask, error)
+	GetByID() (*task.OutTask, error)
+	Save(outTask *task.OutTask) error
+}
+
+

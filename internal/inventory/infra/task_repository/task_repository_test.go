@@ -1,26 +1,25 @@
 package task_repository
 
 import (
-	"reflect"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 	"testing"
 )
 
 func TestNewInTaskRepository(t *testing.T) {
-	type args struct {
-		db *gorm.DB
+	dsn := "root:123456@tcp(127.0.0.1:3306)/goerp?charset=utf8mb4&parseTime=True&loc=Local"
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	if err != nil {
+		panic(err)
 	}
-	tests := []struct {
-		name string
-		args args
-		want *InTaskRepository
-	}{
-		// TODO: Add test cases.
+	NewInTaskRepository(db)
+}
+
+func TestNewOutTaskRepository(t *testing.T) {
+	dsn := "root:123456@tcp(127.0.0.1:3306)/goerp?charset=utf8mb4&parseTime=True&loc=Local"
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	if err != nil {
+		panic(err)
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := NewInTaskRepository(tt.args.db); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewInTaskRepository() = %v, want %v", got, tt.want)
-			}
-		})
-	}
+	NewOutTaskRepository(db)
 }

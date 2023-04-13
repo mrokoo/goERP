@@ -15,14 +15,14 @@ import (
 
 type PurchaseOrder = order.PurchaseOrder
 type PurchaseReturnOrder struct {
-	ID              string        `gorm:"primaryKey"`
-	PurchaseOrderID string        `gorm:"default:null;"` // 并不强制要求
-	PurchaseOrder   PurchaseOrder `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	SupplierID      string
-	Supplier        supplier.Supplier `gorm:"constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
-	WarehouseID     string
-	Warehouse       warehouse.Warehouse `gorm:"constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
-	UserID          string
+	ID              string                    `gorm:"primaryKey"`
+	PurchaseOrderID string                    `gorm:"default:null;"` // 并不强制要求
+	PurchaseOrder   PurchaseOrder             `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	SupplierID      string                    `gorm:"size:191"`
+	Supplier        supplier.Supplier         `gorm:"constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
+	WarehouseID     string                    `gorm:"size:191"`
+	Warehouse       warehouse.Warehouse       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
+	UserID          string                    `gorm:"size:191"`
 	User            user.User                 `gorm:"constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
 	Items           []PurchaseReturnOrderItem `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	biling.Biling
