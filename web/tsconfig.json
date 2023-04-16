@@ -13,21 +13,23 @@
       "ESNext",
       "DOM"
     ],
+    "baseUrl": ".", // this must be specified if "paths" is specified.
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ],
+    },
     "skipLibCheck": true,
-    "noEmit": true
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
   },
   "include": [
+    "src/**/*",
     "src/**/*.ts",
     "src/**/*.d.ts",
     "src/**/*.tsx",
     "src/**/*.vue"
   ],
-  "baseUrl": ".",
-  "paths": {
-    "@/*": [
-      "src/*"
-    ]
-  },
   "references": [
     {
       "path": "./tsconfig.node.json"
