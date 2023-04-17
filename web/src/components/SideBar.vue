@@ -131,7 +131,7 @@ const menuOptions: MenuOption[] = [
             RouterLink,
             {
               to: {
-                name: "warehouse",
+                name: "warehousem",
               },
             },
             { default: () => "仓库管理" }

@@ -1,8 +1,3 @@
-<script setup lang="ts">
-  
-</script>
-<template>
-  
-</template>
-<style scoped>
-</style>
+<script setup lang="ts"></script>
+<template><h1>account</h1></template>
+<style scoped></style>

@@ -9,12 +9,16 @@ type InventoryFlowRepository struct {
 	db *gorm.DB
 }
 
+// The function returns a new instance of an InventoryFlowRepository with a given database connection.
 func NewInventoryFlowRepository(db *gorm.DB) *InventoryFlowRepository {
+	db.AutoMigrate(&flowrecord.InventoryFlow{})
 	return &InventoryFlowRepository{
 		db: db,
 	}
 }
 
+// These are methods of the `InventoryFlowRepository` struct that interact with the database to perform
+// CRUD operations on `flowrecord.InventoryFlow` entities.
 func (r InventoryFlowRepository) GetAll() ([]*flowrecord.InventoryFlow, error) {
 	var flows []InventoryFlow
 	result := r.db.Find(&flows)

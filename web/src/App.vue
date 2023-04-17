@@ -22,7 +22,11 @@ const themec = computed(() => {
     <component :is="layout">
       <router-view #default="{ Component }">
         <transition name="fade" mode="out-in" appear>
-          <Component :is="Component" />
+          <Component
+            :is="Component"
+            :currentLayout="layout"
+            @update:currentLayout="(newLayout:any) => (layout = newLayout)"
+          />
         </transition>
       </router-view>
     </component>

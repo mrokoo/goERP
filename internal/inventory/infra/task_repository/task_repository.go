@@ -9,6 +9,20 @@ type InTaskRepository struct {
 	db *gorm.DB
 }
 
+/*
+NewInTaskRepository initializes and returns an InTaskRepository struct
+that uses the given *gorm.DB object to interact with the database. This
+function also automatically migrates the InTask, InRecord, and InItem
+tables to ensure they match their corresponding Go struct definitions.
+
+Parameters:
+- db (*gorm.DB): the GORM database object to use for interactions with
+  the database.
+
+Returns:
+- (*InTaskRepository): a pointer to a new InTaskRepository struct that
+  uses the given *gorm.DB object.
+*/
 func NewInTaskRepository(db *gorm.DB) *InTaskRepository {
 	db.AutoMigrate(&InTask{})
 	db.AutoMigrate(&InRecord{})
@@ -18,6 +32,13 @@ func NewInTaskRepository(db *gorm.DB) *InTaskRepository {
 	}
 }
 
+/*
+GetAll retrieves all InTask objects from the repository.
+
+Returns:
+- []*task.InTask: A slice of InTask objects, converted to task.InTask objects.
+- error: An error if the operation failed, nil otherwise.
+*/
 func (r InTaskRepository) GetAll() ([]*task.InTask, error) {
 	var inTasks []InTask
 	result := r.db.Preload("Records").Find(&inTasks)

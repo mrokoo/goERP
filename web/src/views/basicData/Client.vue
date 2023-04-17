@@ -8,7 +8,7 @@ const center = {
   "justify-content": "center",
 };
 
-const column = reactive([
+const columns = [
   {
     title: "Name",
     key: "name",
@@ -21,24 +21,38 @@ const column = reactive([
     title: "Address",
     key: "address",
   },
-  {
-    title: "Tags",
-    key: "tags",
-  },
-  {
-    title: "Action",
-    key: "actions",
-  },
-]);
+];
 
-const data = reactive([]);
+const data = Array.from({ length: 46 }).map((_, index) => ({
+  key: index,
+  name: `Edward King ${index}`,
+  age: 32,
+  address: `London, Park Lane no. ${index}`,
+}));
+const paginationReactive = reactive({
+  page: 1,
+  pageSize: 12,
+  onChange: (page: number) => {
+    paginationReactive.page = page;
+  },
+});
 </script>
 <template>
-  <n-card title="客户" :segmented="true" :footer-style="center">
-    <n-data-table :columns="column" :data="data"></n-data-table>
-    <template class="center" #footer>
-      <n-pagination v-model:page="page" :page-count="20" />
-    </template>
-  </n-card>
+  <div class="container">
+    <n-card title="客户" :segmented="true" :footer-style="center">
+      <n-data-table
+        :columns="columns"
+        :data="data"
+        :pagination="paginationReactive"
+      ></n-data-table>
+    </n-card>
+  </div>
 </template>
-<style scoped></style>
+<style scoped>
+.container {
+  display: flex;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+}
+</style>

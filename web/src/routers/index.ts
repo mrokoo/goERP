@@ -1,10 +1,22 @@
 import * as VueRouter from "vue-router";
-import Home from "../views/Home.vue";
+import Home from "@/views/Home.vue";
+import Login from "@/views/Login.vue";
 import saleRoutes from "@/routers/sale";
 import warehouseRoutes from "@/routers/warehouse";
 import financeRoutes from "@/routers/finance";
 import systemRoutes from "@/routers/system";
 const routes = [
+  {
+    path: "/",
+    redirect: {
+      name: "home",
+    },
+  },
+  {
+    path: "/login",
+    name: "login",
+    component: Login,
+  },
   {
     path: "/home",
     name: "home",
@@ -12,6 +24,7 @@ const routes = [
   },
   {
     path: "/report",
+    name: "report",
     children: [
       {
         path: "sale",
@@ -37,6 +50,7 @@ const routes = [
   },
   {
     path: "/basicData",
+    name: "basicData",
     children: [
       {
         path: "client",
@@ -61,13 +75,14 @@ const routes = [
       },
       {
         path: "warehouse",
-        name: "warehouse",
+        name: "warehousem",
         component: () => import("@/views/basicData/Warehouse.vue"),
       },
     ],
   },
   {
     path: "/goods",
+    name: "goods",
     children: [
       {
         path: "category",
@@ -88,6 +103,7 @@ const routes = [
   },
   {
     path: "/purchase",
+    name: "purchase",
     children: [
       {
         path: "purchase_create",
@@ -115,6 +131,7 @@ const routes = [
   warehouseRoutes,
   financeRoutes,
   ...systemRoutes,
+
   {
     path: "/:pathMatch(.*)*",
     name: "NotFound",

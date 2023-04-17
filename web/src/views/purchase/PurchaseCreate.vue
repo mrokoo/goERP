@@ -1,8 +1,5 @@
-<script setup lang="ts">
-  
-</script>
+<script setup lang="ts"></script>
 <template>
-  
+  <h1>采购开单</h1>
 </template>
-<style scoped>
-</style>
+<style scoped></style>

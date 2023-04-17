@@ -11,6 +11,7 @@ type InTask struct {
 	Records []record.InRecord
 }
 
+
 type InBasis struct {
 	PurchaseOrderID string
 	// 调拨、销售退货

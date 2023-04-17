@@ -36,7 +36,7 @@ const options = [
       </template>
     </n-switch>
     <n-dropdown :options="options" trigger="click">
-      <n-avatar round size="large"> 未登入 </n-avatar>
+      <n-avatar round size="large"> 未登录 </n-avatar>
     </n-dropdown>
   </div>
 </template>
