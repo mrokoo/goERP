@@ -1,7 +1,7 @@
 package domain
 
 import (
-	"github.com/mrokoo/goERP/internal/inventory/domain/aggregate/flowrecord"
+	flowrecord "github.com/mrokoo/goERP/internal/inventory/domain/aggregate/flow"
 	"github.com/mrokoo/goERP/internal/inventory/domain/aggregate/task"
 )
 
@@ -11,16 +11,8 @@ type InventoryFlowRepository interface {
 	Save(flowRecord *flowrecord.InventoryFlow) error
 }
 
-type InTaskRepository interface {
-	GetAll() ([]*task.InTask, error)
-	GetByID() (*task.InTask, error)
-	Save(inTask *task.InTask) error
+type TaskRepository interface {
+	GetAll() ([]*task.Task, error)
+	GetByID(ID string) (*task.Task, error)
+	Save(task *task.Task) error
 }
-
-type OutTaskRepository interface {
-	GetAll() ([]*task.OutTask, error)
-	GetByID() (*task.OutTask, error)
-	Save(outTask *task.OutTask) error
-}
-
-

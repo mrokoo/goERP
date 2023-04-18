@@ -13,6 +13,7 @@ require (
 	github.com/casbin/casbin/v2 v2.66.0 // indirect
 	github.com/casbin/mongodb-adapter/v3 v3.4.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/duke-git/lancet/v2 v2.1.18 // indirect
 	github.com/go-sql-driver/mysql v1.7.0 // indirect
 	github.com/golang/mock v1.6.0 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
@@ -24,7 +25,7 @@ require (
 	github.com/stretchr/objx v0.5.0 // indirect
 	github.com/stretchr/testify v1.8.2 // indirect
 	github.com/yuin/goldmark v1.5.4 // indirect
-	golang.org/x/exp v0.0.0-20221031165847-c99f073a8326 // indirect
+	golang.org/x/exp v0.0.0-20221208152030-732eee02a75a // indirect
 	golang.org/x/exp/typeparams v0.0.0-20221031165847-c99f073a8326 // indirect
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616 // indirect
 	golang.org/x/mod v0.9.0 // indirect

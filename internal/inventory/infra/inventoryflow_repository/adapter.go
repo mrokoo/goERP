@@ -3,7 +3,7 @@ package inventoryflow_repository
 import (
 	"time"
 
-	"github.com/mrokoo/goERP/internal/inventory/domain/aggregate/flowrecord"
+	flowrecord "github.com/mrokoo/goERP/internal/inventory/domain/aggregate/flow"
 	"github.com/mrokoo/goERP/internal/inventory/infra/task_repository"
 )
 

@@ -3,111 +3,70 @@ package task_repository
 import (
 	"github.com/mrokoo/goERP/internal/inventory/domain/aggregate/task"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
-type InTaskRepository struct {
+type TaskRepository struct {
 	db *gorm.DB
 }
 
-/*
-NewInTaskRepository initializes and returns an InTaskRepository struct
-that uses the given *gorm.DB object to interact with the database. This
-function also automatically migrates the InTask, InRecord, and InItem
-tables to ensure they match their corresponding Go struct definitions.
-
-Parameters:
-- db (*gorm.DB): the GORM database object to use for interactions with
-  the database.
-
-Returns:
-- (*InTaskRepository): a pointer to a new InTaskRepository struct that
-  uses the given *gorm.DB object.
-*/
-func NewInTaskRepository(db *gorm.DB) *InTaskRepository {
-	db.AutoMigrate(&InTask{})
-	db.AutoMigrate(&InRecord{})
-	db.AutoMigrate(&InItem{})
-	return &InTaskRepository{
-		db: db,
-	}
+func NewTaskRepository(db *gorm.DB) *TaskRepository {
+	db.AutoMigrate(&MySQLTask{})
+	db.AutoMigrate(&MySQLTaskItem{})
+	db.AutoMigrate(&MySQLRecord{})
+	db.AutoMigrate(&MySQLRecordItem{})
+	return &TaskRepository{db: db}
 }
 
-/*
-GetAll retrieves all InTask objects from the repository.
-
-Returns:
-- []*task.InTask: A slice of InTask objects, converted to task.InTask objects.
-- error: An error if the operation failed, nil otherwise.
-*/
-func (r InTaskRepository) GetAll() ([]*task.InTask, error) {
-	var inTasks []InTask
-	result := r.db.Preload("Records").Find(&inTasks)
-	if err := result.Error; err != nil {
+func (t *TaskRepository) GetAll() ([]*task.Task, error) {
+	var tasks []*MySQLTask
+	if err := t.db.Preload(clause.Associations).Find(&tasks).Error; err != nil {
 		return nil, err
 	}
-	var inTaskList []*task.InTask
-	for _, inTask := range inTasks {
-		inTaskList = append(inTaskList, inTask.toTask())
+	var tasks2 []*task.Task
+	for _, ms := range tasks {
+		task_ := ms.toTask()
+		tasks2 = append(tasks2, &task_)
 	}
-	return inTaskList, nil
+	return tasks2, nil
 }
 
-func (r InTaskRepository) GetByID(ID string) (*task.InTask, error) {
-	inTask := InTask{
-		ID: ID,
-	}
-	result := r.db.First(&inTask)
-	if err := result.Error; err != nil {
+func (t *TaskRepository) GetByID(ID string) (*task.Task, error) {
+	var task MySQLTask
+	task.ID = ID
+	if err := t.db.Preload(clause.Associations).First(&task).Error; err != nil {
 		return nil, err
 	}
-	return inTask.toTask(), nil
+	task_ := task.toTask()
+	return &task_, nil
 }
 
-func (r InTaskRepository) Save(inTask *task.InTask) error {
-	inTask_ := toMySQLInTask(inTask)
-	result := r.db.Create(inTask_)
-	return result.Error
-}
+// Save 函数将任务保存到数据库中。
+// 如果保存失败，则返回一个错误。
+func (t *TaskRepository) Save(task *task.Task) error {
+	// 将任务转换为 MySQL 格式。
+	task_ := toMySQLTask(*task)
 
-type OutTaskRepository struct {
-	db *gorm.DB
-}
+	// 开始事务。
+	tx := t.db.Begin()
 
-func NewOutTaskRepository(db *gorm.DB) *OutTaskRepository {
-	db.AutoMigrate(&OutTask{})
-	db.AutoMigrate(&OutRecord{})
-	db.AutoMigrate(&OutItem{})
-	return &OutTaskRepository{
-		db: db,
+	// 检查任务是否已存在。
+	if _, err := t.GetByID(task_.ID); err != nil {
+		if err == gorm.ErrRecordNotFound {
+			// 如果任务不存在，则创建新任务。
+			if err := tx.Create(&task_).Error; err != nil {
+				tx.Rollback()
+				return err
+			}
+			return tx.Commit().Error
+		}
+		return err
 	}
-}
 
-func (r OutTaskRepository) GetAll() ([]*task.OutTask, error) {
-	var outTasks []OutTask
-	result := r.db.Preload("Records").Find(&outTasks)
-	if err := result.Error; err != nil {
-		return nil, err
+	// 更新现有任务。
+	if err := tx.Session(&gorm.Session{FullSaveAssociations: true}).Updates(&task_).Error; err != nil {
+		tx.Rollback()
+		return err
 	}
-	var outTaskList []*task.OutTask
-	for _, outTask := range outTasks {
-		outTaskList = append(outTaskList, outTask.toTask())
-	}
-	return outTaskList, nil
-}
-
-func (r OutTaskRepository) GetByID(ID string) (*task.OutTask, error) {
-	outTask := OutTask{
-		ID: ID,
-	}
-	result := r.db.First(&outTask)
-	if err := result.Error; err != nil {
-		return nil, err
-	}
-	return outTask.toTask(), nil
-}
-
-func (r OutTaskRepository) Save(outTask *task.OutTask) error {
-	outTask_ := toMySQLOutTask(outTask)
-	result := r.db.Create(outTask_)
-	return result.Error
+	return tx.Commit().Error
 }
