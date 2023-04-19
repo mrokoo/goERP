@@ -47,7 +47,7 @@ func TestTaskRepository_Save2(t *testing.T) {
 	}
 	repo := NewTaskRepository(db)
 
-	task_, err := repo.GetByID("71337aca-b9da-4476-9bb8-64cf9050e98c")
+	task_, err := repo.GetByID("bfeadef3-6bab-4518-b004-9da5cbed56ee")
 	if err != nil {
 		assert.Error(err)
 	}

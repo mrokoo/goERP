@@ -1,17 +1,47 @@
 package flowrecord
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type InventoryFlow struct {
 	ID          string
+	TaskID      *string
+	TakeID      *string
 	ProductID   string
 	WarehouseID string
-	FlowType    FlowType
+	Flow        FlowType
 	Previous    int // Previous Quantity
 	Change      int // Change Quantity
+	Present     int // Present Quantity
 	Date        time.Time
-	Basic
 }
+
+func NewInventoryFlow(basicID string, productID string, warehouseID string, flow FlowType, previous int, change int) InventoryFlow {
+	var taskID *string
+	var takeID *string
+	switch flow {
+	case FLOWTYPE_RUKU, FLOWTYPE_ZUOFEIRUKU, FLOWTYPE_CHUKU, FLOWTYPE_ZUOFEICHUKU, FLOWTYPE_DIAOBO:
+		taskID = &basicID
+	case FLOWTYPE_PANDIAN:
+		takeID = &basicID
+	}
+	return InventoryFlow{
+		ID:          uuid.New().String(),
+		TaskID:      taskID,
+		TakeID:      takeID,
+		ProductID:   productID,
+		WarehouseID: warehouseID,
+		Flow:        flow,
+		Previous:    previous,
+		Change:      change,
+		Present:     previous + change,
+		Date:        time.Now(),
+	}
+}
+
 type FlowType string
 
 const (
@@ -22,9 +52,3 @@ const (
 	FLOWTYPE_PANDIAN     FlowType = "盘点"
 	FLOWTYPE_DIAOBO      FlowType = "调拨"
 )
-
-type Basic struct {
-	InTaskID  *string
-	OutTaskID *string
-	// to do 盘点和调拨
-}

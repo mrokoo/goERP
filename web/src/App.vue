@@ -3,6 +3,8 @@ import { shallowRef, computed } from "vue";
 import Default from "./layouts/Default.vue";
 import { NConfigProvider, darkTheme, useOsTheme } from "naive-ui";
 import { useTheme } from "@/hooks/useTheme";
+import themeOverrides from "@/theme/naive-ui-theme-overrides.json";
+
 const layout = shallowRef(Default);
 const { theme, Theme } = useTheme();
 const themec = computed(() => {
@@ -18,7 +20,7 @@ const themec = computed(() => {
 </script>
 
 <template>
-  <n-config-provider :theme="themec">
+  <n-config-provider :theme="themec" :themeOverrides="themeOverrides">
     <component :is="layout">
       <router-view #default="{ Component }">
         <transition name="fade" mode="out-in" appear>

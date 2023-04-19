@@ -1,6 +1,8 @@
 package record
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 	"github.com/mrokoo/goERP/internal/inventory/domain/valueobj/state"
 )
@@ -11,6 +13,7 @@ type Record struct {
 	UserID      string
 	State       state.State
 	Items       []RecordItem
+	CreatedAt   time.Time
 }
 
 func NewRecord(warehouseID string, userID string, items []RecordItem) Record {
@@ -20,6 +23,7 @@ func NewRecord(warehouseID string, userID string, items []RecordItem) Record {
 		UserID:      userID,
 		State:       state.NORMAL,
 		Items:       items,
+		CreatedAt:   time.Now(),
 	}
 }
 

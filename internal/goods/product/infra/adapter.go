@@ -72,6 +72,8 @@ type Stock struct {
 	Amount      int
 }
 
+// 后期需要给Stock重新命名表名，明确其为开盘库存。
+
 func toMySQLStock(stocks []stock.Stock) []Stock {
 	var mysqlstock []Stock
 	for _, stock := range stocks {

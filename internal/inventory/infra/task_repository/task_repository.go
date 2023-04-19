@@ -20,7 +20,7 @@ func NewTaskRepository(db *gorm.DB) *TaskRepository {
 
 func (t *TaskRepository) GetAll() ([]*task.Task, error) {
 	var tasks []*MySQLTask
-	if err := t.db.Preload(clause.Associations).Find(&tasks).Error; err != nil {
+	if err := t.db.Preload(clause.Associations).Preload("Recrods.Items").Find(&tasks).Error; err != nil {
 		return nil, err
 	}
 	var tasks2 []*task.Task
@@ -34,7 +34,7 @@ func (t *TaskRepository) GetAll() ([]*task.Task, error) {
 func (t *TaskRepository) GetByID(ID string) (*task.Task, error) {
 	var task MySQLTask
 	task.ID = ID
-	if err := t.db.Preload(clause.Associations).First(&task).Error; err != nil {
+	if err := t.db.Preload(clause.Associations).Preload("Recrods.Items").First(&task).Error; err != nil {
 		return nil, err
 	}
 	task_ := task.toTask()

@@ -50,6 +50,7 @@ type MySQLRecord struct {
 	User        user.User           `gorm:"constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"` // 外键约束
 	State       state.State
 	Items       []MySQLRecordItem `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	CreatedAt   time.Time
 }
 
 type MySQLRecordItem struct {
@@ -118,6 +119,7 @@ func toMySQLRecords(MySQLTaskID string, records []record.Record) []MySQLRecord {
 			UserID:      r.UserID,
 			State:       r.State,
 			Items:       toMySQLRecordItems(r.ID, r.Items),
+			CreatedAt:   r.CreatedAt,
 		})
 	}
 	return records_
@@ -178,6 +180,7 @@ func (r *MySQLRecord) toRecord() record.Record {
 		UserID:      r.UserID,
 		State:       r.State,
 		Items:       toRecordItems(r.Items),
+		CreatedAt:   r.CreatedAt,
 	}
 }
 
