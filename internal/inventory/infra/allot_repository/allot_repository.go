@@ -11,28 +11,30 @@ type AllotRepository struct {
 
 func NewAllotRepository(db *gorm.DB) *AllotRepository {
 	db.AutoMigrate(&MySQLAllot{})
+	db.AutoMigrate(&MySQLItem{})
 	return &AllotRepository{
 		db: db,
 	}
 }
 
 func (r *AllotRepository) GetAll() ([]*allot.Allot, error) {
-	var allots []*allot.Allot
-	if err := r.db.Find(&allots).Error; err != nil {
+	var allots []*MySQLAllot
+	if err := r.db.Preload("Items").Find(&allots).Error; err != nil {
 		return nil, err
 	}
-	return allots, nil
+	return toAllots(allots), nil
 }
 
 func (r *AllotRepository) GetByID(ID string) (*allot.Allot, error) {
-	var allot allot.Allot
-	if err := r.db.First(&allot, ID).Error; err != nil {
+	var allot *MySQLAllot
+	if err := r.db.Preload("Items").First(&allot, ID).Error; err != nil {
 		return nil, err
 	}
-	return &allot, nil
+	allot_ := allot.ToAllot()
+	return allot_, nil
 }
 
 func (r *AllotRepository) Save(allot *allot.Allot) error {
 	allot_ := toMySQLAllot(allot)
-	return r.db.Save(allot_).Error
+	return r.db.Create(allot_).Error
 }

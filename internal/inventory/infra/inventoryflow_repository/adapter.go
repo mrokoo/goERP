@@ -5,14 +5,12 @@ import (
 
 	product "github.com/mrokoo/goERP/internal/goods/product/infra"
 	flowrecord "github.com/mrokoo/goERP/internal/inventory/domain/aggregate/flow"
-	"github.com/mrokoo/goERP/internal/inventory/domain/aggregate/task"
 	warehouse "github.com/mrokoo/goERP/internal/share/warehouse/domain"
 )
 
 type MySQLInventoryFlow struct {
 	ID          string              `gorm:"primaryKey;size:191;"`
 	TaskID      *string             `gorm:"size:191;"`
-	Task        task.Task           `gorm:"constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
 	TakeID      *string             `gorm:"size:191;"`
 	ProductID   string              `gorm:"size:191;"`
 	Product     product.Product     `gorm:"constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
@@ -23,6 +21,10 @@ type MySQLInventoryFlow struct {
 	Change      int // Change Quantity
 	Present     int // Present Quantity
 	Date        time.Time
+}
+
+func (f MySQLInventoryFlow) TableName() string {
+	return "inventory_flows"
 }
 
 func toMySQLInventoryFlow(flow flowrecord.InventoryFlow) *MySQLInventoryFlow {

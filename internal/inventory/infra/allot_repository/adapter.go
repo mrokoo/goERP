@@ -6,13 +6,15 @@ import (
 	"github.com/google/uuid"
 	product "github.com/mrokoo/goERP/internal/goods/product/infra"
 	"github.com/mrokoo/goERP/internal/inventory/domain/aggregate/allot"
+	user "github.com/mrokoo/goERP/internal/system/user/domain"
 )
 
 type MySQLAllot struct {
-	ID             string
+	ID             string `gorm:"primaryKey;"`
 	InWarehouseID  string
 	OutWarehouseID string
-	UserID         string
+	UserID         string    `gorm:"size:191;"`
+	User           user.User `gorm:"contraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
 	CreatedAt      time.Time
 	Items          []MySQLItem
 }
@@ -22,11 +24,11 @@ func (a *MySQLAllot) TableName() string {
 }
 
 type MySQLItem struct {
-	ID        string
-	AllotID   string
-	ProductID string
-	Product   product.Product `gorm:"constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
-	Quantity  int
+	ID           string          `gorm:"primaryKey;"`
+	MySQLAllotID string          `gorm:"size:191;"`
+	ProductID    string          `gorm:"size:191;"`
+	Product      product.Product `gorm:"contraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
+	Quantity     int
 }
 
 func (i *MySQLItem) TableName() string {
@@ -48,10 +50,10 @@ func toMySQLItems(allotID string, items []allot.Item) []MySQLItem {
 	var mysqlItems []MySQLItem
 	for _, item := range items {
 		mysqlItems = append(mysqlItems, MySQLItem{
-			ID:        uuid.New().String(),
-			AllotID:   allotID,
-			ProductID: item.ProductID,
-			Quantity:  item.Quantity,
+			ID:           uuid.New().String(),
+			MySQLAllotID: allotID,
+			ProductID:    item.ProductID,
+			Quantity:     item.Quantity,
 		})
 	}
 	return mysqlItems
@@ -66,6 +68,14 @@ func (a *MySQLAllot) ToAllot() *allot.Allot {
 		CreatedAt:      a.CreatedAt,
 		Items:          toAllotItems(a.Items),
 	}
+}
+
+func toAllots(allots []*MySQLAllot) []*allot.Allot {
+	var mysqlAllots []*allot.Allot
+	for _, allot := range allots {
+		mysqlAllots = append(mysqlAllots, allot.ToAllot())
+	}
+	return mysqlAllots
 }
 
 func (i *MySQLItem) ToItem() allot.Item {
