@@ -34,7 +34,7 @@ func (r *TakeRepository) GetByID(ID string) (*take.Take, error) {
 	return &take_, nil
 }
 
-func (r *TakeRepository) Save(take take.Take) error {
-	take_ := toMySQLTake(take)
+func (r *TakeRepository) Save(take *take.Take) error {
+	take_ := toMySQLTake(*take)
 	return r.db.Create(&take_).Error
 }

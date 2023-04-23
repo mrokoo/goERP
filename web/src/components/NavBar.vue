@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
-import { NAvatar, NDropdown, NIcon, NSwitch } from "naive-ui";
+import { NAvatar, NDropdown, NIcon, NButton } from "naive-ui";
 import {
   Sunny as SunnyIcon,
   Moon as MoonIcon,
-  PersonCircleOutline as UserIcon,
+  LogoGithub as GithubIcon,
+  HelpCircle as HelpIcon,
 } from "@vicons/ionicons5";
+// import { WeatherMoon24Filled as Moon, WeatherSunny24Filled as Sun } from "@vicons/fluent";
 import { useTheme } from "@/hooks/useTheme";
 const active = ref(false);
 const { toggleTheme } = useTheme();
@@ -27,16 +29,39 @@ const options = [
 
 <template>
   <div class="container">
-    <n-switch v-model:value="active" style="margin-right: 10px" size="medium">
+    <n-button text style="font-size: 28px; margin-right: 10px" @click="">
+      <n-icon>
+        <HelpIcon />
+      </n-icon>
+    </n-button>
+    <n-button text style="font-size: 24px; margin-right: 10px" @click="">
+      <n-icon>
+        <GithubIcon />
+      </n-icon>
+    </n-button>
+    <n-button text style="font-size: 24px; margin-right: 10px">
+      <n-icon v-if="!active" @click="active = true">
+        <SunnyIcon />
+      </n-icon>
+      <n-icon v-else @click="active = false">
+        <MoonIcon />
+      </n-icon>
+    </n-button>
+    <!-- <n-switch v-model:value="active"  size="small">
       <template #checked-icon>
         <n-icon :component="MoonIcon" />
       </template>
       <template #unchecked-icon>
         <n-icon :component="SunnyIcon" />
       </template>
-    </n-switch>
+    </n-switch> -->
     <n-dropdown :options="options" trigger="click">
-      <n-avatar round size="large"> 未登录 </n-avatar>
+      <n-avatar
+        round
+        size="large"
+        src="https://note-image-1302477034.cos.ap-chengdu.myqcloud.com/pic/202304201641061.png"
+      >
+      </n-avatar>
     </n-dropdown>
   </div>
 </template>

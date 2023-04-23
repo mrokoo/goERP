@@ -1,6 +1,5 @@
 export default {
   path: "/warehouse",
-  name: "warehouse",
   children: [
     // convert  (inStock outStock inventory allocation flow ) to {path:...,name:...,component:...}
     {

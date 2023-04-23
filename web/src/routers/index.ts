@@ -76,7 +76,7 @@ const routes = [
       {
         path: "warehouse",
         name: "warehousem",
-        component: () => import("@/views/basicData/Warehouse.vue"),
+        component: () => import("@/views/basicData/Warehouse/index.vue"),
       },
     ],
   },

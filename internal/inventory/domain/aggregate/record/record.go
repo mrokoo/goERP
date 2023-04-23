@@ -23,7 +23,7 @@ func NewRecord(warehouseID string, userID string, items []RecordItem) Record {
 		UserID:      userID,
 		State:       state.NORMAL,
 		Items:       items,
-		CreatedAt:   time.Now(),
+		CreatedAt:   time.Now(), 
 	}
 }
 

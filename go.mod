@@ -14,6 +14,7 @@ require (
 	github.com/casbin/mongodb-adapter/v3 v3.4.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/duke-git/lancet/v2 v2.1.18 // indirect
+	github.com/gin-contrib/cors v1.4.0 // indirect
 	github.com/go-sql-driver/mysql v1.7.0 // indirect
 	github.com/golang/mock v1.6.0 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect

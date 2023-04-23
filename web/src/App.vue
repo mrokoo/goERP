@@ -1,9 +1,16 @@
 <script setup lang="ts">
-import { shallowRef, computed } from "vue";
+import { shallowRef, computed, onMounted } from "vue";
 import Default from "./layouts/Default.vue";
-import { NConfigProvider, darkTheme, useOsTheme } from "naive-ui";
+import {
+  NConfigProvider,
+  darkTheme,
+  useOsTheme,
+  NMessageProvider,
+} from "naive-ui";
 import { useTheme } from "@/hooks/useTheme";
 import themeOverrides from "@/theme/naive-ui-theme-overrides.json";
+import { useBasic } from "./stores/useBasic";
+const basic = useBasic();
 
 const layout = shallowRef(Default);
 const { theme, Theme } = useTheme();
@@ -17,21 +24,27 @@ const themec = computed(() => {
       return useOsTheme().value === "dark" ? darkTheme : null;
   }
 });
+
+onMounted(async () => {
+  await basic.getWarehouse();
+});
 </script>
 
 <template>
   <n-config-provider :theme="themec" :themeOverrides="themeOverrides">
-    <component :is="layout">
-      <router-view #default="{ Component }">
-        <transition name="fade" mode="out-in" appear>
-          <Component
-            :is="Component"
-            :currentLayout="layout"
-            @update:currentLayout="(newLayout:any) => (layout = newLayout)"
-          />
-        </transition>
-      </router-view>
-    </component>
+    <n-message-provider>
+      <component :is="layout">
+        <router-view #default="{ Component }">
+          <transition name="fade" mode="out-in" appear>
+            <Component
+              :is="Component"
+              :currentLayout="layout"
+              @update:currentLayout="(newLayout:any) => (layout = newLayout)"
+            />
+          </transition>
+        </router-view>
+      </component>
+    </n-message-provider>
   </n-config-provider>
 </template>
 

@@ -332,7 +332,7 @@ const menuOptions: MenuOption[] = [
   },
   {
     label: "库存管理",
-    key: "warehouse",
+    key: "warehouses",
     icon: renderIcon(WarehouseIcon),
     children: [
       // please help me write InStock OutStock

@@ -1,12 +1,7 @@
 <script setup lang="ts">
 import { reactive } from "vue";
-import { NCard, NPagination, NDataTable } from "naive-ui";
-const page = 1;
-const center = {
-  display: "flex",
-  "align-items": "center",
-  "justify-content": "center",
-};
+import { NDataTable } from "naive-ui";
+import Container from "@/components/Container.vue";
 
 const columns = [
   {
@@ -38,15 +33,13 @@ const paginationReactive = reactive({
 });
 </script>
 <template>
-  <div class="container">
-    <n-card title="客户" :segmented="true" :footer-style="center">
-      <n-data-table
-        :columns="columns"
-        :data="data"
-        :pagination="paginationReactive"
-      ></n-data-table>
-    </n-card>
-  </div>
+  <container title="客户">
+    <n-data-table
+      :columns="columns"
+      :data="data"
+      :pagination="paginationReactive"
+    ></n-data-table>
+  </container>
 </template>
 <style scoped>
 .container {
