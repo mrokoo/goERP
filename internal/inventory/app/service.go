@@ -60,7 +60,7 @@ func (i InventoryServiceImpl) GetTaskList() ([]*task.Task, error) {
 	return list, nil
 }
 
-// 不直接暴露，需要在其他包中调用
+// CreateTask 不直接暴露，需要在其他包中调用
 func (i InventoryServiceImpl) CreateTask(warehouseID string, kind task.Kind, basic string, items []task.TaskItem) error {
 	t := task.NewTask(warehouseID, kind, basic, items)
 	err := i.TaskRepository.Save(&t)

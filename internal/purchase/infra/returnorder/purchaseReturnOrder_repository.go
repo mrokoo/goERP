@@ -49,7 +49,7 @@ func (r *PurchaseReturnOrderRepository) Save(purchaseOrder *domain.PurchaseRetur
 	return result.Error
 }
 
-func (r *PurchaseReturnOrderRepository) InValidate(purchaseOrderID string) error {
+func (r *PurchaseReturnOrderRepository) Invalidated(purchaseOrderID string) error {
 	result := r.db.Model(&PurchaseReturnOrder{}).Where("id", purchaseOrderID).Update("is_validated", true)
 	return result.Error
 }

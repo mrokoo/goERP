@@ -77,6 +77,6 @@ func TestPurchaseOrderRepository_InValidate(t *testing.T) {
 		panic(err)
 	}
 	r := NewPurchaseOrderRepository(db)
-	err = r.InValidate("PO001")
+	err = r.Invalidated("PO001")
 	assert.NoError(err)
 }
