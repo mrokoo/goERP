@@ -5,4 +5,9 @@ declare module "vue" {
   }
 }
 
+export interface ResponseType<T = any> {
+  message: string;
+  data: T;
+}
+
 type API = typeof API;

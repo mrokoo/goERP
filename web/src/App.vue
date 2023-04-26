@@ -27,6 +27,10 @@ const themec = computed(() => {
 
 onMounted(async () => {
   await basic.getWarehouse();
+  await basic.getAccount();
+  await basic.getSupplier();
+  await basic.getBudget();
+  await basic.getClient();
 });
 </script>
 

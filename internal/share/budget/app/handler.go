@@ -61,6 +61,7 @@ func (h *BudgetHandler) GetBudget(ctx *gin.Context) {
 
 func (h *BudgetHandler) AddBudget(ctx *gin.Context) {
 	var req struct {
+		Name string `json:"name" binding:"required"`
 		Type string `json:"type" binding:"oneof=out in"`
 		Note string `json:"note" binding:"-"`
 	}
@@ -79,6 +80,7 @@ func (h *BudgetHandler) AddBudget(ctx *gin.Context) {
 	}
 	budget := domain.Budget{
 		ID:   id,
+		Name: req.Name,
 		Type: domain.BudgetType(req.Type),
 		Note: req.Note,
 	}
@@ -97,6 +99,7 @@ func (h *BudgetHandler) AddBudget(ctx *gin.Context) {
 func (h *BudgetHandler) ReplaceBudget(ctx *gin.Context) {
 	id := ctx.Param("id")
 	var req struct {
+		Name string `json:"name" binding:"required"`
 		Type string `json:"type" binding:"oneof=out in"`
 		Note string `json:"note" binding:"-"`
 	}
@@ -108,6 +111,7 @@ func (h *BudgetHandler) ReplaceBudget(ctx *gin.Context) {
 	}
 	budget := domain.Budget{
 		ID:   uuid.MustParse(id),
+		Name: req.Name,
 		Type: domain.BudgetType(req.Type),
 		Note: req.Note,
 	}

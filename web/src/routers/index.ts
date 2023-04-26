@@ -55,23 +55,23 @@ const routes = [
       {
         path: "client",
         name: "client",
-        component: () => import("@/views/basicData/Client.vue"),
+        component: () => import("@/views/basicData/Client/index.vue"),
       },
       // 帮我写supplier、account、budget、warehouse的路
       {
         path: "supplier",
         name: "supplier",
-        component: () => import("@/views/basicData/Supplier.vue"),
+        component: () => import("@/views/basicData/Supplier/index.vue"),
       },
       {
         path: "account",
         name: "account",
-        component: () => import("@/views/basicData/Account.vue"),
+        component: () => import("@/views/basicData/Account/index.vue"),
       },
       {
         path: "budget",
         name: "budget",
-        component: () => import("@/views/basicData/Budget.vue"),
+        component: () => import("@/views/basicData/Budget/index.vue"),
       },
       {
         path: "warehouse",
