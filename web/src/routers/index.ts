@@ -87,17 +87,17 @@ const routes = [
       {
         path: "category",
         name: "category",
-        component: () => import("@/views/goods/Category.vue"),
+        component: () => import("@/views/goods/Category/index.vue"),
       },
       {
         path: "unit",
         name: "unit",
-        component: () => import("@/views/goods/Unit.vue"),
+        component: () => import("@/views/goods/Unit/index.vue"),
       },
       {
-        path: "information",
-        name: "information",
-        component: () => import("@/views/goods/Information.vue"),
+        path: "product",
+        name: "product",
+        component: () => import("@/views/goods/Product/index.vue"),
       },
     ],
   },

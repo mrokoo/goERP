@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"github.com/mrokoo/goERP/internal/goods/product/domain"
 	"github.com/mrokoo/goERP/internal/goods/product/domain/valueobj/info"
 	"github.com/mrokoo/goERP/internal/goods/product/domain/valueobj/price"
@@ -64,10 +63,10 @@ func (h *ProductHandler) GetProduct(ctx *gin.Context) {
 
 func (h *ProductHandler) AddProduct(ctx *gin.Context) {
 	var req struct {
-		ID           string    `json:"id" binding:"required"`
-		Name         string    `json:"name" binding:"required"`
-		CategoryID   uuid.UUID `json:"category_id" binding:"-"`
-		UnitID       uuid.UUID `json:"unit_id" binding:"-"`
+		ID           string `json:"id" binding:"required"`
+		Name         string `json:"name" binding:"required"`
+		CategoryID   string `json:"category_id" binding:"-"`
+		UnitID       string `json:"unit_id" binding:"-"`
 		OpeningStock []stock.Stock
 		State        state.State `json:"state" binding:"oneof=active freeze"`
 		Note         string      `json:"note" binding:"-"`
@@ -102,9 +101,9 @@ func (h *ProductHandler) AddProduct(ctx *gin.Context) {
 func (h *ProductHandler) ReplaceProduct(ctx *gin.Context) {
 	id := ctx.Param("id")
 	var req struct {
-		Name         string    `json:"name" binding:"required"`
-		CategoryID   uuid.UUID `json:"category_id" binding:"-"`
-		UnitID       uuid.UUID `json:"unit_id" binding:"-"`
+		Name         string `json:"name" binding:"required"`
+		CategoryID   string `json:"category_id" binding:"-"`
+		UnitID       string `json:"unit_id" binding:"-"`
 		OpeningStock []stock.Stock
 		State        state.State `json:"state" binding:"oneof=active freeze"`
 		Note         string      `json:"note" binding:"-"`

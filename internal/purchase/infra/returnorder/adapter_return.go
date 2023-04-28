@@ -67,9 +67,9 @@ func (p *PurchaseReturnOrder) toPurchaseReturnOrder() *domain.PurchaseReturnOrde
 }
 
 type PurchaseReturnOrderItem struct {
-	PurchaseReturnOrderID string          `gorm:"primaryKey;size:191"`
-	ProductID             string          `gorm:"primaryKey;size:191"`
-	Product               product.Product `gorm:"constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
+	PurchaseReturnOrderID string               `gorm:"primaryKey;size:191"`
+	ProductID             string               `gorm:"primaryKey;size:191"`
+	Product               product.MySQLProduct `gorm:"constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
 	Quantity              int
 	Price                 float64
 	TotalCollection       float64

@@ -24,10 +24,10 @@ func (a *MySQLAllot) TableName() string {
 }
 
 type MySQLItem struct {
-	ID           string          `gorm:"primaryKey;"`
-	MySQLAllotID string          `gorm:"size:191;"`
-	ProductID    string          `gorm:"size:191;"`
-	Product      product.Product `gorm:"contraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
+	ID           string               `gorm:"primaryKey;"`
+	MySQLAllotID string               `gorm:"size:191;"`
+	ProductID    string               `gorm:"size:191;"`
+	Product      product.MySQLProduct `gorm:"contraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
 	Quantity     int
 }
 

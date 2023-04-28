@@ -1,62 +1,56 @@
 package repository
 
 import (
-	"github.com/google/uuid"
 	"github.com/mrokoo/goERP/internal/goods/category/domain"
+	"github.com/mrokoo/goERP/internal/model"
 	"gorm.io/gorm"
 )
 
 var ErrNotFound = gorm.ErrRecordNotFound
-
-type Category = domain.Category
+var ErrDuplicateEntry = gorm.ErrInvalidDB
 
 type CategoryRepository struct {
 	db *gorm.DB
 }
 
 func NewCategoryRepository(db *gorm.DB) *CategoryRepository {
-	db.AutoMigrate(&Category{}) //自动迁移
 	return &CategoryRepository{
 		db: db,
 	}
 }
 
-func (r *CategoryRepository) GetAll() ([]*Category, error) {
-	var categorys []Category
-	result := r.db.Find(&categorys)
+func (r *CategoryRepository) GetAll() ([]*domain.Category, error) {
+	var list []*model.Category
+	result := r.db.Find(&list)
 	if err := result.Error; err != nil {
 		return nil, err
 	}
-	var categorysp []*Category
-	for i := range categorys {
-		categorysp = append(categorysp, &categorys[i])
+	var categories []*domain.Category
+	for _, category := range list {
+		categories = append(categories, toDomain(category))
 	}
-	return categorysp, nil
+	return categories, nil
 }
 
-func (r *CategoryRepository) GetByID(categoryID uuid.UUID) (*Category, error) {
-	category := Category{
-		ID: categoryID,
+func (r *CategoryRepository) GetByID(ID string) (*domain.Category, error) {
+	category := model.Category{
+		ID: ID,
 	}
 	result := r.db.First(&category)
 	if err := result.Error; err != nil {
 		return nil, err
 	}
-	return &category, nil
+	return toDomain(&category), nil
 }
 
 func (r *CategoryRepository) Save(category *domain.Category) error {
-	result := r.db.Create(category)
+	i := toModel(category)
+	result := r.db.Save(i)
 	return result.Error
 }
 
-func (r *CategoryRepository) Replace(category *domain.Category) error {
-	result := r.db.Save(category)
-	return result.Error
-}
-
-func (r *CategoryRepository) Delete(categoryID uuid.UUID) error {
-	result := r.db.Delete(&Category{
+func (r *CategoryRepository) Delete(categoryID string) error {
+	result := r.db.Delete(&model.Category{
 		ID: categoryID,
 	})
 	return result.Error

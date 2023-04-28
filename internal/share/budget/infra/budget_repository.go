@@ -1,63 +1,62 @@
 package repository
 
 import (
-	"github.com/google/uuid"
+	"github.com/mrokoo/goERP/internal/model"
 	"github.com/mrokoo/goERP/internal/share/budget/domain"
 	"gorm.io/gorm"
 )
 
 var ErrNotFound = gorm.ErrRecordNotFound
 
-type Budget = domain.Budget
-
 type BudgetRepository struct {
 	db *gorm.DB
 }
 
 func NewBudgetRepository(db *gorm.DB) *BudgetRepository {
-	db.AutoMigrate(&Budget{}) //自动迁移
 	return &BudgetRepository{
 		db: db,
 	}
 }
 
-func (r *BudgetRepository) GetAll() ([]*Budget, error) {
-	var budgets []Budget
-	result := r.db.Find(&budgets)
+func (r *BudgetRepository) GetAll() ([]*domain.Budget, error) {
+	var list []model.Budget
+	result := r.db.Find(&list)
 	if err := result.Error; err != nil {
 		return nil, err
 	}
-	var budgetsp []*Budget
-	for i := range budgets {
-		budgetsp = append(budgetsp, &budgets[i])
+	var budgets []*domain.Budget
+	for i := range list {
+		budgets = append(budgets, toDomain(&list[i]))
 	}
-	return budgetsp, nil
+	return budgets, nil
 }
 
-func (r *BudgetRepository) GetByID(budgetID uuid.UUID) (*Budget, error) {
-	budget := Budget{
-		ID: budgetID,
+func (r *BudgetRepository) GetByID(ID string) (*domain.Budget, error) {
+	i := model.Budget{
+		ID: ID,
 	}
-	result := r.db.First(&budget)
+	result := r.db.First(&i)
 	if err := result.Error; err != nil {
 		return nil, err
 	}
-	return &budget, nil
+	return toDomain(&i), nil
 }
 
 func (r *BudgetRepository) Save(budget *domain.Budget) error {
-	result := r.db.Create(budget)
+	i := toModel(budget)
+	result := r.db.Create(i)
 	return result.Error
 }
 
 func (r *BudgetRepository) Replace(budget *domain.Budget) error {
-	result := r.db.Save(budget)
+	i := toModel(budget)
+	result := r.db.Save(i)
 	return result.Error
 }
 
-func (r *BudgetRepository) Delete(budgetID uuid.UUID) error {
-	result := r.db.Delete(&Budget{
-		ID: budgetID,
+func (r *BudgetRepository) Delete(ID string) error {
+	result := r.db.Delete(&model.Budget{
+		ID: ID,
 	})
 	return result.Error
 }

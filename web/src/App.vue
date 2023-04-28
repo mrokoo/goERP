@@ -10,7 +10,9 @@ import {
 import { useTheme } from "@/hooks/useTheme";
 import themeOverrides from "@/theme/naive-ui-theme-overrides.json";
 import { useBasic } from "./stores/useBasic";
+import { useGoods } from "./stores/useGoods";
 const basic = useBasic();
+const goods = useGoods();
 
 const layout = shallowRef(Default);
 const { theme, Theme } = useTheme();
@@ -31,6 +33,10 @@ onMounted(async () => {
   await basic.getSupplier();
   await basic.getBudget();
   await basic.getClient();
+  await basic.getBudget();
+  await goods.getUnit();
+  await goods.getCategory();
+  await goods.getProduct();
 });
 </script>
 

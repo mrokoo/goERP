@@ -9,13 +9,13 @@ import (
 )
 
 type MySQLInventoryFlow struct {
-	ID          string              `gorm:"primaryKey;size:191;"`
-	TaskID      *string             `gorm:"size:191;"`
-	TakeID      *string             `gorm:"size:191;"`
-	ProductID   string              `gorm:"size:191;"`
-	Product     product.Product     `gorm:"constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
-	WarehouseID string              `gorm:"size:191;"`
-	Warehouse   warehouse.Warehouse `gorm:"constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
+	ID          string               `gorm:"primaryKey;size:191;"`
+	TaskID      *string              `gorm:"size:191;"`
+	TakeID      *string              `gorm:"size:191;"`
+	ProductID   string               `gorm:"size:191;"`
+	Product     product.MySQLProduct `gorm:"constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
+	WarehouseID string               `gorm:"size:191;"`
+	Warehouse   warehouse.Warehouse  `gorm:"constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
 	Flow        flowrecord.FlowType
 	Previous    int // Previous Quantity
 	Change      int // Change Quantity

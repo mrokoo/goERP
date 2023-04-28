@@ -37,8 +37,7 @@ func (h *BudgetHandler) GetBudgetList(ctx *gin.Context) {
 
 func (h *BudgetHandler) GetBudget(ctx *gin.Context) {
 	id := ctx.Param("id")
-	uid := uuid.MustParse(id)
-	budget, err := h.BudgetService.GetBudget(uid)
+	budget, err := h.BudgetService.GetBudget(id)
 	if err != nil {
 		if err == repository.ErrNotFound {
 			ctx.JSON(http.StatusNotFound, reponse.Reponse{
@@ -71,20 +70,13 @@ func (h *BudgetHandler) AddBudget(ctx *gin.Context) {
 		})
 		return
 	}
-	id, err := uuid.NewUUID()
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
-			Message: err.Error(),
-		})
-		return
-	}
 	budget := domain.Budget{
-		ID:   id,
+		ID:   uuid.New().String(),
 		Name: req.Name,
 		Type: domain.BudgetType(req.Type),
 		Note: req.Note,
 	}
-	err = h.BudgetService.AddBudget(&budget)
+	err := h.BudgetService.AddBudget(&budget)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
 			Message: err.Error(),
@@ -110,7 +102,7 @@ func (h *BudgetHandler) ReplaceBudget(ctx *gin.Context) {
 		return
 	}
 	budget := domain.Budget{
-		ID:   uuid.MustParse(id),
+		ID:   id,
 		Name: req.Name,
 		Type: domain.BudgetType(req.Type),
 		Note: req.Note,
@@ -134,8 +126,7 @@ func (h *BudgetHandler) ReplaceBudget(ctx *gin.Context) {
 
 func (h *BudgetHandler) DeleteBudget(ctx *gin.Context) {
 	id := ctx.Param("id")
-	uid := uuid.MustParse(id)
-	if err := h.BudgetService.DeleteBudget(uid); err != nil {
+	if err := h.BudgetService.DeleteBudget(id); err != nil {
 		if err == repository.ErrNotFound {
 			ctx.JSON(http.StatusNotFound, reponse.Reponse{
 				Message: "Budget not found with the given id",

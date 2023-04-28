@@ -39,8 +39,7 @@ type Budget = {
   id: string;
   name: string;
   type: string;
-  note: string;
-  state: string;
+  note?: string;
 };
 
 export { Account, Supplier, Client, Budget };

@@ -1,16 +1,15 @@
 package app
 
 import (
-	"github.com/google/uuid"
 	"github.com/mrokoo/goERP/internal/system/user/domain"
 )
 
 type UserService interface {
-	GetUser(userID uuid.UUID) (*domain.User, error)
+	GetUser(id string) (*domain.User, error)
 	GetUserList() ([]*domain.User, error)
 	AddUser(user *domain.User) error
 	ReplaceUser(user *domain.User) error
-	DeleteUser(userID uuid.UUID) error
+	DeleteUser(userID string) error
 }
 
 type UserServiceImpl struct {
@@ -23,7 +22,7 @@ func NewUserServiceImpl(repo domain.Repository) *UserServiceImpl {
 	}
 }
 
-func (s *UserServiceImpl) GetUser(userID uuid.UUID) (*domain.User, error) {
+func (s *UserServiceImpl) GetUser(userID string) (*domain.User, error) {
 	user, err := s.repo.GetByID(userID)
 	if err != nil {
 		return nil, err
@@ -54,7 +53,7 @@ func (s *UserServiceImpl) ReplaceUser(user *domain.User) error {
 	return nil
 }
 
-func (s *UserServiceImpl) DeleteUser(userID uuid.UUID) error {
+func (s *UserServiceImpl) DeleteUser(userID string) error {
 	if err := s.repo.Delete(userID); err != nil {
 		return err
 	}

@@ -2,6 +2,7 @@ package repository
 
 import (
 	"github.com/mrokoo/goERP/internal/goods/product/domain"
+	"github.com/mrokoo/goERP/internal/model"
 	"gorm.io/gorm"
 )
 
@@ -13,53 +14,49 @@ type ProductRepository struct {
 }
 
 func NewProductRepository(db *gorm.DB) *ProductRepository {
-	db.AutoMigrate(&Product{}) //自动迁移
-	db.AutoMigrate(&Stock{})
 	return &ProductRepository{
 		db: db,
 	}
 }
 
 func (r *ProductRepository) GetAll() ([]*domain.Product, error) {
-	var productms []Product
-	result := r.db.Preload("OpeningStock").Find(&productms)
+	var list []*model.Product
+	result := r.db.Preload("OpeningStock").Find(&list)
 	if err := result.Error; err != nil {
 		return nil, err
 	}
 	var products []*domain.Product
-	for _, pm := range productms {
-		products = append(products, pm.toProduct())
+	for i := range list {
+		products = append(products, toDomain(list[i]))
 	}
-
 	return products, nil
 }
 
 func (r *ProductRepository) GetByID(productID string) (*domain.Product, error) {
-	pm := Product{
+	product := model.Product{
 		ID: productID,
 	}
-	result := r.db.First(&pm)
+	result := r.db.Preload("OpeningStock").First(&product)
 	if err := result.Error; err != nil {
 		return nil, err
 	}
-	product := pm.toProduct()
-	return product, nil
+	return toDomain(&product), nil
 }
 
 func (r *ProductRepository) Save(product *domain.Product) error {
-	pm := toMySQLProduct(product)
-	result := r.db.Create(pm)
+	i := toModel(product)
+	result := r.db.Create(i)
 	return result.Error
 }
 
 func (r *ProductRepository) Replace(product *domain.Product) error {
-	pm := toMySQLProduct(product)
-	result := r.db.Session(&gorm.Session{FullSaveAssociations: true}).Updates(&pm)
+	i := toModel(product)
+	result := r.db.Session(&gorm.Session{FullSaveAssociations: true}).Updates(&i)
 	return result.Error
 }
 
 func (r *ProductRepository) Delete(productID string) error {
-	result := r.db.Delete(&Product{
+	result := r.db.Delete(&model.Product{
 		ID: productID,
 	})
 	return result.Error

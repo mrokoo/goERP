@@ -12,7 +12,18 @@ export const useBasic = defineStore("basic", {
     client: [] as Client[],
     budget: [] as any[],
   }),
-  getters: {},
+  getters: {
+    warehouseOptions: (state) => {
+      const option: any[] = [];
+      state.warehouse.map((item) => {
+        option.push({
+          label: item.name,
+          value: item.id,
+        });
+      });
+      return option;
+    },
+  },
 
   actions: {
     async getWarehouse() {

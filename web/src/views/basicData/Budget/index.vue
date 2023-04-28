@@ -15,7 +15,6 @@ import {
   FormInst,
   useMessage,
   DataTableColumns,
-  NTag,
 } from "naive-ui";
 
 type BudgetModel = Partial<Budget>;
@@ -72,10 +71,8 @@ function renderIcon(icon: Component) {
 type BudgetColumns = {
   id: string;
   name: string;
-  contact: string;
-  phone: string;
-  email: string;
-  state: string;
+  type: string;
+  note?: string;
 };
 
 const columns: DataTableColumns<BudgetColumns> = [
@@ -87,39 +84,14 @@ const columns: DataTableColumns<BudgetColumns> = [
     },
   },
   {
-    title: "供应商编号",
-    key: "id",
-  },
-  {
-    title: "供应商名称",
+    title: "收支项目",
     key: "name",
   },
   {
-    title: "联系人",
-    key: "contact",
-  },
-  {
-    title: "邮箱",
-    key: "email",
-  },
-  {
-    title: "状态",
-    key: "state",
-    render(row) {
-      let t: "success" | "error" = "success"; // tag类型
-      if (row.state != "active") {
-        t = "error";
-      }
-      return h(
-        NTag,
-        {
-          type: t,
-          round: true,
-        },
-        {
-          default: () => (row.state == "active" ? "激活" : "冻结"),
-        }
-      );
+    title: "类型",
+    key: "type",
+    render(row, rowIndex) {
+      return row.type === "in" ? "收入" : "支出";
     },
   },
   {
@@ -134,9 +106,7 @@ const columns: DataTableColumns<BudgetColumns> = [
             size: "small",
             // text: "编辑",
             onClick: () => {
-              const index = basic.budget.findIndex(
-                (item) => item.id == row.id
-              );
+              const index = basic.budget.findIndex((item) => item.id == row.id);
               const item = basic.budget[index];
               eModel.value = item;
               editModal.value = true;
@@ -178,10 +148,10 @@ const pagination = reactive({
 });
 </script>
 <template>
-  <container title="供应商">
+  <container title="收支项目">
     <div class="container" style="margin-bottom: 10px">
       <n-button type="primary" @click="showModal = true">
-        新增供应商
+        新增收支项目
         <template #icon>
           <n-icon>
             <Add />
@@ -193,7 +163,7 @@ const pagination = reactive({
       v-model:show="showModal"
       :mask-closable="false"
       style="width: 550px"
-      title="新增供应商"
+      title="新增收支项目"
       preset="card"
       size="huge"
       :segmented="true"
@@ -212,7 +182,7 @@ const pagination = reactive({
       v-model:show="editModal"
       :mask-closable="false"
       style="width: 550px"
-      title="编辑供应商"
+      title="编辑收支项目"
       preset="card"
       size="huge"
     >

@@ -1,9 +1,7 @@
 package domain
 
-import "github.com/google/uuid"
-
 type Unit struct {
-	ID   uuid.UUID `gorm:"primaryKey;<-:create"`
-	Name string    `gorm:"not null"`
-	Note string
+	ID   string `json:"id" gorm:"primaryKey;<-:create"`
+	Name string `json:"name" gorm:"not null"`
+	Note string `json:"note"`
 }

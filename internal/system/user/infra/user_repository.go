@@ -1,63 +1,62 @@
 package repository
 
 import (
-	"github.com/google/uuid"
+	"github.com/mrokoo/goERP/internal/model"
 	"github.com/mrokoo/goERP/internal/system/user/domain"
 	"gorm.io/gorm"
 )
 
 var ErrNotFound = gorm.ErrRecordNotFound
 
-type User = domain.User
-
 type UserRepository struct {
 	db *gorm.DB
 }
 
 func NewUserRepository(db *gorm.DB) *UserRepository {
-	db.AutoMigrate(&User{}) //自动迁移
 	return &UserRepository{
 		db: db,
 	}
 }
 
-func (r *UserRepository) GetAll() ([]*User, error) {
-	var users []User
-	result := r.db.Find(&users)
+func (r *UserRepository) GetAll() ([]*domain.User, error) {
+	var list []*model.User
+	result := r.db.Find(&list)
 	if err := result.Error; err != nil {
 		return nil, err
 	}
-	var usersp []*User
-	for i := range users {
-		usersp = append(usersp, &users[i])
+	var users []*domain.User
+	for i := range list {
+		users = append(users, toDomain(list[i]))
 	}
-	return usersp, nil
+	return users, nil
 }
 
-func (r *UserRepository) GetByID(userID uuid.UUID) (*User, error) {
-	user := User{
-		ID: userID,
+func (r *UserRepository) GetByID(ID string) (*domain.User, error) {
+	user := model.User{
+		ID: ID,
 	}
 	result := r.db.First(&user)
 	if err := result.Error; err != nil {
 		return nil, err
 	}
-	return &user, nil
+	return toDomain(&user), nil
 }
 
 func (r *UserRepository) Save(user *domain.User) error {
-	result := r.db.Create(user)
+	i := toModel(user)
+	result := r.db.Create(i)
 	return result.Error
 }
 
 func (r *UserRepository) Replace(user *domain.User) error {
-	result := r.db.Save(user)
+	i := toModel(user)
+	result := r.db.Save(i)
 	return result.Error
 }
 
-func (r *UserRepository) Delete(userID uuid.UUID) error {
-	result := r.db.Delete(&User{
-		ID: userID,
+func (r *UserRepository) Delete(ID string) error {
+	result := r.db.Delete(&model.User{
+		ID: ID,
 	})
 	return result.Error
 }

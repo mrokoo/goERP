@@ -1,16 +1,15 @@
 package app
 
 import (
-	"github.com/google/uuid"
 	"github.com/mrokoo/goERP/internal/goods/unit/domain"
 )
 
 type UnitService interface {
-	GetUnit(unitID uuid.UUID) (*domain.Unit, error)
+	GetUnit(unitID string) (*domain.Unit, error)
 	GetUnitList() ([]*domain.Unit, error)
 	AddUnit(unit *domain.Unit) error
 	ReplaceUnit(unit *domain.Unit) error
-	DeleteUnit(unitID uuid.UUID) error
+	DeleteUnit(unitID string) error
 }
 
 type UnitServiceImpl struct {
@@ -25,18 +24,12 @@ func NewUnitServiceImpl(unitRepository domain.Repository) *UnitServiceImpl {
 
 func (s *UnitServiceImpl) GetUnitList() ([]*domain.Unit, error) {
 	categories, err := s.unitRepository.GetAll()
-	if err != nil {
-		return nil, err
-	}
-	return categories, nil
+	return categories, err
 }
 
-func (s *UnitServiceImpl) GetUnit(unitID uuid.UUID) (*domain.Unit, error) {
+func (s *UnitServiceImpl) GetUnit(unitID string) (*domain.Unit, error) {
 	unit, err := s.unitRepository.GetByID(unitID)
-	if err != nil {
-		return nil, err
-	}
-	return unit, nil
+	return unit, err
 }
 
 func (s *UnitServiceImpl) AddUnit(unit *domain.Unit) error {
@@ -54,7 +47,7 @@ func (s *UnitServiceImpl) ReplaceUnit(unit *domain.Unit) error {
 	return nil
 }
 
-func (s *UnitServiceImpl) DeleteUnit(unitID uuid.UUID) error {
+func (s *UnitServiceImpl) DeleteUnit(unitID string) error {
 	if err := s.unitRepository.Delete(unitID); err != nil {
 		return err
 	}

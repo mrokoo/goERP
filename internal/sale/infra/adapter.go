@@ -28,10 +28,10 @@ func (s *MySQLSaleOrder) TableName() string {
 }
 
 type MySQLItem struct {
-	ID               string          `gorm:"primaryKey; size:191;"`
-	MySQLSaleOrderID string          `gorm:"size:191;"`
-	ProductID        string          `gorm:"size:191;"`
-	Product          product.Product `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	ID               string               `gorm:"primaryKey; size:191;"`
+	MySQLSaleOrderID string               `gorm:"size:191;"`
+	ProductID        string               `gorm:"size:191;"`
+	Product          product.MySQLProduct `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Amount           int
 	Price            float64
 }

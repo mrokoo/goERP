@@ -203,12 +203,12 @@ const menuOptions: MenuOption[] = [
             RouterLink,
             {
               to: {
-                name: "information",
+                name: "product",
               },
             },
             { default: () => "产品信息" }
           ),
-        key: "information",
+        key: "product",
       },
     ],
   },

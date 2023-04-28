@@ -6,14 +6,14 @@ import (
 )
 
 type Account struct {
-	ID      string      `json:"id" gorm:"primaryKey;<-:create"`
-	Name    string      `json:"name" gorm:"not null"`
-	Type    PayType     `json:"type" gorm:"default:other"`
+	ID      string      `json:"id"`
+	Name    string      `json:"name"`
+	Type    PayType     `json:"type"`
 	Holder  string      `json:"holder"`
 	Number  string      `json:"number"`
 	Note    string      `json:"note"`
-	State   state.State `json:"state" gorm:"default:active"`
-	Balance float64     `json:"balance" gorm:"default:0"`
+	State   state.State `json:"state"`
+	Balance float64     `json:"balance"`
 }
 
 type PayType string

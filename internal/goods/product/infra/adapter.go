@@ -1,94 +1,68 @@
 package repository
 
 import (
-	"github.com/google/uuid"
-	category "github.com/mrokoo/goERP/internal/goods/category/domain"
 	"github.com/mrokoo/goERP/internal/goods/product/domain"
-	"github.com/mrokoo/goERP/internal/goods/product/domain/valueobj/info"
-	"github.com/mrokoo/goERP/internal/goods/product/domain/valueobj/price"
 	"github.com/mrokoo/goERP/internal/goods/product/domain/valueobj/stock"
-	unit "github.com/mrokoo/goERP/internal/goods/unit/domain"
+	"github.com/mrokoo/goERP/internal/model"
 	"github.com/mrokoo/goERP/internal/share/valueobj/state"
-	warehouse "github.com/mrokoo/goERP/internal/share/warehouse/domain"
 )
 
-type Category = category.Category
-type Unit = unit.Unit
-type Warehouse = warehouse.Warehouse
-
-// mysql product模型
-type Product struct {
-	ID           string      `gorm:"primaryKey"`
-	Name         string      `gorm:"not null"`
-	CategoryID   uuid.UUID   `gorm:"default:null"`
-	Category     Category    `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	UnitID       uuid.UUID   `gorm:"default:null"`
-	Unit         Unit        `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	OpeningStock []Stock     `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	State        state.State `gorm:"default:active"`
-	Note         string
-	price.Price
-	info.Info
-}
-
-func toMySQLProduct(product *domain.Product) *Product {
-	openingStock := toMySQLStock(product.OpeningStock)
-	return &Product{
+func toModel(product *domain.Product) *model.Product {
+	var openingStock []model.OpeningStock
+	for i := range product.OpeningStock {
+		openingStock = append(openingStock, *toModelStock(&product.OpeningStock[i]))
+	}
+	return &model.Product{
 		ID:           product.ID,
 		Name:         product.Name,
 		CategoryID:   product.CategoryID,
 		UnitID:       product.UnitID,
 		OpeningStock: openingStock,
-		State:        product.State,
+		State:        string(product.State),
 		Note:         product.Note,
-		Price:        product.Price,
-		Info:         product.Info,
+		Img:          product.Img,
+		Intro:        product.Intro,
+		Purchase:     product.Purchase,
+		Retail:       product.Retail,
+		Grade1:       product.Grade1,
+		Grade2:       product.Grade2,
+		Grade3:       product.Grade3,
 	}
 }
 
-func (p *Product) toProduct() *domain.Product {
-	var openingstock []stock.Stock
-	for _, s := range p.OpeningStock {
-		openingstock = append(openingstock, s.toStock())
+func toDomain(product *model.Product) *domain.Product {
+	var openingStock []stock.Stock
+	for i := range product.OpeningStock {
+		openingStock = append(openingStock, *toDomainStock(&product.OpeningStock[i]))
 	}
 	return &domain.Product{
-		ID:           p.ID,
-		Name:         p.Name,
-		CategoryID:   p.CategoryID,
-		UnitID:       p.UnitID,
-		OpeningStock: openingstock,
-		State:        p.State,
-		Note:         p.Note,
-		Price:        p.Price,
-		Info:         p.Info,
+		ID:           product.ID,
+		Name:         product.Name,
+		CategoryID:   product.CategoryID,
+		UnitID:       product.UnitID,
+		OpeningStock: openingStock,
+		State:        state.State(product.State),
+		Note:         product.Note,
+		Img:          product.Img,
+		Intro:        product.Intro,
+		Purchase:     product.Purchase,
+		Retail:       product.Retail,
+		Grade1:       product.Grade1,
+		Grade2:       product.Grade2,
+		Grade3:       product.Grade3,
 	}
 }
 
-// mysql Stock模型
-type Stock struct {
-	ProductID   string    `gorm:"primaryKey"`
-	WarehouseID string    `gorm:"primaryKey"`
-	Warehouse   Warehouse `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;size:191"`
-	Amount      int
-}
-
-// 后期需要给Stock重新命名表名，明确其为开盘库存。
-
-func toMySQLStock(stocks []stock.Stock) []Stock {
-	var mysqlstock []Stock
-	for _, stock := range stocks {
-		s := Stock{
-			ProductID:   stock.ProductID,
-			WarehouseID: stock.WarehouseID,
-			Amount:      stock.Amount,
-		}
-		mysqlstock = append(mysqlstock, s)
+func toModelStock(stock *stock.Stock) *model.OpeningStock {
+	return &model.OpeningStock{
+		ProductID:   stock.ProductID,
+		WarehouseID: stock.WarehouseID,
+		Amount:      stock.Amount,
 	}
-	return mysqlstock
 }
 
-func (s *Stock) toStock() stock.Stock {
-	return stock.Stock{
+func toDomainStock(s *model.OpeningStock) *stock.Stock {
+	return &stock.Stock{
 		ProductID:   s.ProductID,
 		WarehouseID: s.WarehouseID,
 		Amount:      s.Amount,

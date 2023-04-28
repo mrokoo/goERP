@@ -1,14 +1,10 @@
 package domain
 
-import (
-	"github.com/google/uuid"
-)
-
 type Budget struct {
-	ID   uuid.UUID `gorm:"primaryKey;<-:create"`
-	Name string
-	Type BudgetType `gorm:"default:in"`
-	Note string
+	ID   string     `json:"id" gorm:"primaryKey;<-:create"`
+	Name string     `json:"name"`
+	Type BudgetType `json:"type" gorm:"default:in"`
+	Note string     `json:"note"`
 }
 
 type BudgetType string

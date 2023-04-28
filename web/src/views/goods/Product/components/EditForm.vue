@@ -1,3 +1,3 @@
 <script setup lang="ts"></script>
-<template><h1>产品单位</h1></template>
+<template></template>
 <style scoped></style>

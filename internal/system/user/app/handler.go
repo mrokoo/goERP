@@ -37,8 +37,7 @@ func (h *UserHandler) GetUserList(ctx *gin.Context) {
 
 func (h *UserHandler) GetUser(ctx *gin.Context) {
 	id := ctx.Param("id")
-	uid := uuid.MustParse(id)
-	user, err := h.UserService.GetUser(uid)
+	user, err := h.UserService.GetUser(id)
 	if err != nil {
 		if err == repository.ErrNotFound {
 			ctx.JSON(http.StatusNotFound, reponse.Reponse{
@@ -74,21 +73,14 @@ func (h *UserHandler) AddUser(ctx *gin.Context) {
 		return
 	}
 
-	id, err := uuid.NewUUID()
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
-			Message: err.Error(),
-		})
-		return
-	}
 	user := domain.User{
-		ID:     id,
+		ID:     uuid.New().String(),
 		Name:   req.Name,
 		Phone:  req.Phone,
 		Email:  req.Email,
 		Gender: req.Gender,
 	}
-	err = h.UserService.AddUser(&user)
+	err := h.UserService.AddUser(&user)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
 			Message: err.Error(),
@@ -118,7 +110,7 @@ func (h *UserHandler) ReplaceUser(ctx *gin.Context) {
 	}
 	id := ctx.Param("id")
 	user := domain.User{
-		ID:     uuid.MustParse(id),
+		ID:     id,
 		Name:   req.Name,
 		Phone:  req.Phone,
 		Email:  req.Email,
@@ -143,8 +135,7 @@ func (h *UserHandler) ReplaceUser(ctx *gin.Context) {
 
 func (h *UserHandler) DeleteUser(ctx *gin.Context) {
 	id := ctx.Param("id")
-	uid := uuid.MustParse(id)
-	if err := h.UserService.DeleteUser(uid); err != nil {
+	if err := h.UserService.DeleteUser(id); err != nil {
 		if err == repository.ErrNotFound {
 			ctx.JSON(http.StatusNotFound, reponse.Reponse{
 				Message: "User not found with the given id",

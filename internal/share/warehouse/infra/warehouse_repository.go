@@ -1,62 +1,62 @@
 package repository
 
 import (
+	"github.com/mrokoo/goERP/internal/model"
 	"github.com/mrokoo/goERP/internal/share/warehouse/domain"
 	"gorm.io/gorm"
 )
 
 var ErrNotFound = gorm.ErrRecordNotFound
 
-type Warehouse = domain.Warehouse
-
 type WarehouseRepository struct {
 	db *gorm.DB
 }
 
 func NewWarehouseRepository(db *gorm.DB) *WarehouseRepository {
-	db.AutoMigrate(&Warehouse{}) //自动迁移
 	return &WarehouseRepository{
 		db: db,
 	}
 }
 
-func (r *WarehouseRepository) GetAll() ([]*Warehouse, error) {
-	var warehouses []Warehouse
-	result := r.db.Find(&warehouses)
+func (r *WarehouseRepository) GetAll() ([]*domain.Warehouse, error) {
+	var list []*model.Warehouse
+	result := r.db.Find(&list)
 	if err := result.Error; err != nil {
 		return nil, err
 	}
-	var warehousesp []*Warehouse
-	for i := range warehouses {
-		warehousesp = append(warehousesp, &warehouses[i])
+	var warehouses []*domain.Warehouse
+	for i := range list {
+		warehouses = append(warehouses, toDomain(list[i]))
 	}
-	return warehousesp, nil
+	return warehouses, nil
 }
 
-func (r *WarehouseRepository) GetByID(warehouseID string) (*Warehouse, error) {
-	warehouse := Warehouse{
-		ID: warehouseID,
+func (r *WarehouseRepository) GetByID(ID string) (*domain.Warehouse, error) {
+	warehouse := model.Warehouse{
+		ID: ID,
 	}
 	result := r.db.First(&warehouse)
 	if err := result.Error; err != nil {
 		return nil, err
 	}
-	return &warehouse, nil
+	return toDomain(&warehouse), nil
 }
 
 func (r *WarehouseRepository) Save(warehouse *domain.Warehouse) error {
-	result := r.db.Create(warehouse)
+	i := toModel(warehouse)
+	result := r.db.Create(i)
 	return result.Error
 }
 
 func (r *WarehouseRepository) Replace(warehouse *domain.Warehouse) error {
-	result := r.db.Save(warehouse)
+	i := toModel(warehouse)
+	result := r.db.Save(i)
 	return result.Error
 }
 
-func (r *WarehouseRepository) Delete(warehouseID string) error {
-	result := r.db.Delete(&Warehouse{
-		ID: warehouseID,
+func (r *WarehouseRepository) Delete(ID string) error {
+	result := r.db.Delete(&model.Warehouse{
+		ID: ID,
 	})
 	return result.Error
 }

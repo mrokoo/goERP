@@ -1,61 +1,62 @@
 package repository
 
 import (
+	"github.com/mrokoo/goERP/internal/model"
 	"github.com/mrokoo/goERP/internal/share/account/domain"
 	"gorm.io/gorm"
 )
 
 var ErrNotFound = gorm.ErrRecordNotFound
 
-type Account = domain.Account
-
 type AccountRepository struct {
 	db *gorm.DB
 }
 
 func NewAccountRepository(db *gorm.DB) *AccountRepository {
-	db.AutoMigrate(&Account{}) //自动迁移
 	return &AccountRepository{
 		db: db,
 	}
 }
 
-func (r *AccountRepository) GetAll() ([]*Account, error) {
-	var accounts []Account
-	result := r.db.Find(&accounts)
+func (r *AccountRepository) GetAll() ([]*domain.Account, error) {
+	var list []*model.Account
+	result := r.db.Find(&list)
 	if err := result.Error; err != nil {
 		return nil, err
 	}
-	var accountsp []*Account
-	for i := range accounts {
-		accountsp = append(accountsp, &accounts[i])
+	var accounts []*domain.Account
+	for i := range list {
+		accounts = append(accounts, toDmain(list[i]))
 	}
-	return accountsp, nil
+	return accounts, nil
 }
 
-func (r *AccountRepository) GetByID(accountID string) (*Account, error) {
-	account := Account{
-		ID: accountID,
+func (r *AccountRepository) GetByID(ID string) (*domain.Account, error) {
+	i := model.Account{
+		ID: ID,
 	}
-	result := r.db.First(&account)
+	result := r.db.First(&i)
 	if err := result.Error; err != nil {
 		return nil, err
 	}
-	return &account, nil
+	account := toDmain(&i)
+	return account, nil
 }
 
 func (r *AccountRepository) Save(account *domain.Account) error {
-	result := r.db.Create(account)
+	a := toModel(account)
+	result := r.db.Create(a)
 	return result.Error
 }
 
 func (r *AccountRepository) Replace(account *domain.Account) error {
-	result := r.db.Save(account)
+	a := toModel(account)
+	result := r.db.Save(a)
 	return result.Error
 }
 
 func (r *AccountRepository) Delete(accountID string) error {
-	result := r.db.Delete(&Account{
+	result := r.db.Delete(&model.Account{
 		ID: accountID,
 	})
 	return result.Error

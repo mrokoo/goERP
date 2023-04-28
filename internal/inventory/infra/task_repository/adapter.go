@@ -33,10 +33,10 @@ type MySQLTask struct {
 }
 
 type MySQLTaskItem struct {
-	ID          string          `gorm:"size:191;primaryKey"`
-	MySQLTaskID string          `gorm:"size:191;primaryKey"` // 外键约束
-	ProductID   string          `gorm:"size:191;primaryKey"`
-	Product     product.Product `gorm:"constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
+	ID          string               `gorm:"size:191;primaryKey"`
+	MySQLTaskID string               `gorm:"size:191;primaryKey"` // 外键约束
+	ProductID   string               `gorm:"size:191;primaryKey"`
+	Product     product.MySQLProduct `gorm:"constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
 	Total       int
 	Quantity    int
 }
@@ -54,10 +54,10 @@ type MySQLRecord struct {
 }
 
 type MySQLRecordItem struct {
-	ID            string          `gorm:"size:191;primaryKey"`
-	MySQLRecordID string          `gorm:"size:191;primaryKey"` // 外键约束
-	ProductID     string          `gorm:"size:191;primaryKey"`
-	Product       product.Product `gorm:"constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"` // 外键约束
+	ID            string               `gorm:"size:191;primaryKey"`
+	MySQLRecordID string               `gorm:"size:191;primaryKey"` // 外键约束
+	ProductID     string               `gorm:"size:191;primaryKey"`
+	Product       product.MySQLProduct `gorm:"constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"` // 外键约束
 	Quantity      int
 }
 

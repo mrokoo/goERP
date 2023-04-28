@@ -47,7 +47,7 @@ type MySQLItem struct {
 	ID          string          `gorm:"primaryKey"`
 	MySQLTakeID string          `gorm:"size:191;"`
 	ProductID   string          `gorm:"size:191;"`
-	Product     product.Product `gorm:"constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
+	Product     product.MySQLProduct `gorm:"constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
 	Quantity    int
 }
 

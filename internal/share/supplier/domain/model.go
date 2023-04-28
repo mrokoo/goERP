@@ -5,14 +5,14 @@ import (
 )
 
 type Supplier struct {
-	ID      string      `json:"id" gorm:"primaryKey;<-:create"`
-	Name    string      `json:"name" gorm:"not null"`
+	ID      string      `json:"id"`
+	Name    string      `json:"name"`
 	Contact string      `json:"contact"`
 	Email   string      `json:"email"`
 	Address string      `json:"address"`
 	Account string      `json:"account"`
 	Bank    string      `json:"bank"`
 	Note    string      `json:"note"`
-	State   state.State `json:"state" gorm:"default:active"`
+	State   state.State `json:"state"`
 	Debt    float64     `json:"debt"`
 }
