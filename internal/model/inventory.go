@@ -38,7 +38,6 @@ type Task struct {
 }
 
 type TaskItem struct {
-	ID        string  `gorm:"size:191;primaryKey"`
 	TaskID    string  `gorm:"size:191;primaryKey"` // 外键约束
 	ProductID string  `gorm:"size:191;primaryKey"`
 	Product   Product `gorm:"constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
@@ -59,7 +58,6 @@ type TaskRecord struct {
 }
 
 type TaskRecordItem struct {
-	ID           string  `gorm:"size:191;primaryKey"`
 	TaskRecordID string  `gorm:"size:191;primaryKey"` // 外键约束
 	ProductID    string  `gorm:"size:191;primaryKey"`
 	Product      Product `gorm:"constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"` // 外键约束
@@ -77,9 +75,8 @@ type Allot struct {
 }
 
 type AllotItem struct {
-	ID        string  `gorm:"primaryKey;"`
-	AllotID   string  `gorm:"size:191;"`
-	ProductID string  `gorm:"size:191;"`
+	AllotID   string  `gorm:"size:191;primaryKey"`
+	ProductID string  `gorm:"size:191;primaryKey"`
 	Product   Product `gorm:"contraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
 	Quantity  int
 }
@@ -95,9 +92,8 @@ type Take struct {
 }
 
 type TakeItem struct {
-	ID        string  `gorm:"primaryKey"`
-	TakeID    string  `gorm:"size:191;"`
-	ProductID string  `gorm:"size:191;"`
+	TakeID    string  `gorm:"size:191;primaryKey;"`
+	ProductID string  `gorm:"size:191;primaryKey;"`
 	Product   Product `gorm:"constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
 	Quantity  int
 }

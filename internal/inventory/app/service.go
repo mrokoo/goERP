@@ -43,7 +43,7 @@ type InventoryServiceImpl struct {
 	TakeRepository          domain.TakeRepository
 }
 
-func NewInventoryServiceImpl(inventoryFlowRepository domain.InventoryFlowRepository, taskRepository domain.TaskRepository, allotRepository domain.AllotRepository, takeRepository domain.TakeRepository) InventoryService {
+func NewInventoryServiceImpl(inventoryFlowRepository domain.InventoryFlowRepository, taskRepository domain.TaskRepository, allotRepository domain.AllotRepository, takeRepository domain.TakeRepository) InventoryServiceImpl {
 	return InventoryServiceImpl{
 		InventoryFlowRepository: inventoryFlowRepository,
 		TaskRepository:          taskRepository,
@@ -67,8 +67,8 @@ func (i InventoryServiceImpl) CreateTask(warehouseID string, kind task.Kind, bas
 	return err
 }
 
-func (i InventoryServiceImpl) CreateTaskItem(productID string, total int) task.TaskItem {
-	item := task.NewTaskItem(productID, total)
+func (i InventoryServiceImpl) CreateTaskItem(total int) task.TaskItem {
+	item := task.NewTaskItem(total)
 	return item
 }
 
@@ -200,7 +200,7 @@ func (i InventoryServiceImpl) CreateAllot(in string, out string, userID string, 
 	a := allot.NewAllot(in, out, userID, items)
 	var taskItems []task.TaskItem
 	for _, i3 := range items {
-		taskItems = append(taskItems, task.NewTaskItem(i3.ProductID, i3.Quantity))
+		taskItems = append(taskItems, task.NewTaskItem(i3.Quantity))
 	}
 	i.CreateTask(a.InWarehouseID, task.IN_ALLOCATION, a.ID, taskItems)
 	i.CreateTask(a.OutWarehouseID, task.OUT_ALLOCATION, a.ID, taskItems)

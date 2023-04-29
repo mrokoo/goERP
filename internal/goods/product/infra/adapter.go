@@ -55,7 +55,6 @@ func toDomain(product *model.Product) *domain.Product {
 
 func toModelStock(stock *stock.Stock) *model.OpeningStock {
 	return &model.OpeningStock{
-		ProductID:   stock.ProductID,
 		WarehouseID: stock.WarehouseID,
 		Amount:      stock.Amount,
 	}
@@ -63,7 +62,6 @@ func toModelStock(stock *stock.Stock) *model.OpeningStock {
 
 func toDomainStock(s *model.OpeningStock) *stock.Stock {
 	return &stock.Stock{
-		ProductID:   s.ProductID,
 		WarehouseID: s.WarehouseID,
 		Amount:      s.Amount,
 	}

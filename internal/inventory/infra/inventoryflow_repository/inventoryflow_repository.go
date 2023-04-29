@@ -2,6 +2,7 @@ package inventoryflow_repository
 
 import (
 	flowrecord "github.com/mrokoo/goERP/internal/inventory/domain/aggregate/flow"
+	"github.com/mrokoo/goERP/internal/model"
 	"gorm.io/gorm"
 )
 
@@ -10,48 +11,45 @@ type InventoryFlowRepository struct {
 }
 
 func NewInventoryFlowRepository(db *gorm.DB) *InventoryFlowRepository {
-	db.AutoMigrate(&MySQLInventoryFlow{})
 	return &InventoryFlowRepository{
 		db: db,
 	}
 }
 
 func (r InventoryFlowRepository) GetAll() ([]*flowrecord.InventoryFlow, error) {
-	var flows []MySQLInventoryFlow
-	result := r.db.Find(&flows)
+	var list []*model.InventoryFlow
+	result := r.db.Find(&list)
 	if err := result.Error; err != nil {
 		return nil, err
 	}
-	flows_ := make([]*flowrecord.InventoryFlow, len(flows))
-	for i, flow := range flows {
-		p := flow.toInventoryFlow()
-		flows_[i] = &p
+	var flows []*flowrecord.InventoryFlow
+	for i := range list {
+		flows = append(flows, toDomain(list[i]))
 	}
-	return flows_, nil
+	return flows, nil
 }
 
 func (r InventoryFlowRepository) GetByID(ID string) (*flowrecord.InventoryFlow, error) {
-	var flow MySQLInventoryFlow
+	var flow model.InventoryFlow
 	result := r.db.First(&flow, ID)
 	if err := result.Error; err != nil {
 		return nil, err
 	}
-	flow_ := flow.toInventoryFlow()
-	return &flow_, nil
+	return toDomain(&flow), nil
 }
 
 func (r InventoryFlowRepository) Save(flowRecord *flowrecord.InventoryFlow) error {
-	flow := toMySQLInventoryFlow(*flowRecord)
+	flow := toModel(flowRecord)
 	result := r.db.Create(flow)
 	return result.Error
 }
 
 func (r InventoryFlowRepository) GetByProductIDAndWarehouseID(productID string, warehouseID string) (*flowrecord.InventoryFlow, error) {
-	var flow MySQLInventoryFlow
-	result := r.db.Where("product_id = ? AND warehouse_id = ?", productID, warehouseID).Order("date desc").First(&flow)
+	var flow model.InventoryFlow
+	result := r.db.Where("product_id = ? AND warehouse_id = ?", productID, warehouseID).Order("created_at desc").First(&flow)
 	if err := result.Error; err != nil {
 		return nil, err
 	}
-	flow_ := flow.toInventoryFlow()
-	return &flow_, nil
+
+	return toDomain(&flow), nil
 }

@@ -23,19 +23,17 @@ func NewRecord(warehouseID string, userID string, items []RecordItem) Record {
 		UserID:      userID,
 		State:       state.NORMAL,
 		Items:       items,
-		CreatedAt:   time.Now(), 
+		CreatedAt:   time.Now(),
 	}
 }
 
 type RecordItem struct {
-	ID        string
 	ProductID string
 	Quantity  int
 }
 
 func NewRecordItem(productID string, quantity int) RecordItem {
 	return RecordItem{
-		ID:        uuid.New().String(),
 		ProductID: productID,
 		Quantity:  quantity,
 	}

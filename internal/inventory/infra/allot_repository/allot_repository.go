@@ -2,6 +2,7 @@ package allot_repository
 
 import (
 	"github.com/mrokoo/goERP/internal/inventory/domain/aggregate/allot"
+	"github.com/mrokoo/goERP/internal/model"
 	"gorm.io/gorm"
 )
 
@@ -10,31 +11,33 @@ type AllotRepository struct {
 }
 
 func NewAllotRepository(db *gorm.DB) *AllotRepository {
-	db.AutoMigrate(&MySQLAllot{})
-	db.AutoMigrate(&MySQLItem{})
 	return &AllotRepository{
 		db: db,
 	}
 }
 
 func (r *AllotRepository) GetAll() ([]*allot.Allot, error) {
-	var allots []*MySQLAllot
-	if err := r.db.Preload("Items").Find(&allots).Error; err != nil {
+	var list []*model.Allot
+	if err := r.db.Preload("Items").Find(&list).Error; err != nil {
 		return nil, err
 	}
-	return toAllots(allots), nil
+	var allots []*allot.Allot
+	for i := range list {
+		allots = append(allots, toDomain(list[i]))
+	}
+	return allots, nil
 }
 
 func (r *AllotRepository) GetByID(ID string) (*allot.Allot, error) {
-	var allot *MySQLAllot
+	var allot *model.Allot
 	if err := r.db.Preload("Items").First(&allot, ID).Error; err != nil {
 		return nil, err
 	}
-	allot_ := allot.ToAllot()
+	allot_ := toDomain(allot)
 	return allot_, nil
 }
 
 func (r *AllotRepository) Save(allot *allot.Allot) error {
-	allot_ := toMySQLAllot(allot)
+	allot_ := toModel(allot)
 	return r.db.Create(allot_).Error
 }

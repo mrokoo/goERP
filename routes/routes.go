@@ -15,6 +15,6 @@ func Setup(db *gorm.DB, gin *gin.Engine) {
 	NewUnitRouter(db, publicRouter)
 	NewCategoryRouter(db, publicRouter)
 	NewProductRouter(db, publicRouter)
-	NewInventoryRouter(db, publicRouter)
-	NewPurchaseRouter(db, publicRouter)
+	// NewInventoryRouter(db, publicRouter)
+	// NewPurchaseRouter(db, publicRouter)
 }

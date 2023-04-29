@@ -1,58 +1,36 @@
 package inventoryflow_repository
 
 import (
-	"time"
-
-	product "github.com/mrokoo/goERP/internal/goods/product/infra"
 	flowrecord "github.com/mrokoo/goERP/internal/inventory/domain/aggregate/flow"
-	warehouse "github.com/mrokoo/goERP/internal/share/warehouse/domain"
+	"github.com/mrokoo/goERP/internal/model"
 )
 
-type MySQLInventoryFlow struct {
-	ID          string               `gorm:"primaryKey;size:191;"`
-	TaskID      *string              `gorm:"size:191;"`
-	TakeID      *string              `gorm:"size:191;"`
-	ProductID   string               `gorm:"size:191;"`
-	Product     product.MySQLProduct `gorm:"constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
-	WarehouseID string               `gorm:"size:191;"`
-	Warehouse   warehouse.Warehouse  `gorm:"constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
-	Flow        flowrecord.FlowType
-	Previous    int // Previous Quantity
-	Change      int // Change Quantity
-	Present     int // Present Quantity
-	Date        time.Time
-}
-
-func (f MySQLInventoryFlow) TableName() string {
-	return "inventory_flows"
-}
-
-func toMySQLInventoryFlow(flow flowrecord.InventoryFlow) *MySQLInventoryFlow {
-	return &MySQLInventoryFlow{
+func toModel(flow *flowrecord.InventoryFlow) *model.InventoryFlow {
+	return &model.InventoryFlow{
 		ID:          flow.ID,
 		TaskID:      flow.TaskID,
 		TakeID:      flow.TakeID,
 		ProductID:   flow.ProductID,
 		WarehouseID: flow.WarehouseID,
-		Flow:        flow.Flow,
+		Flow:        string(flow.Flow),
 		Previous:    flow.Previous,
 		Change:      flow.Change,
 		Present:     flow.Present,
-		Date:        flow.Date,
+		CreatedAt:   flow.CreateAt,
 	}
 }
 
-func (f MySQLInventoryFlow) toInventoryFlow() flowrecord.InventoryFlow {
-	return flowrecord.InventoryFlow{
-		ID:          f.ID,
-		TaskID:      f.TaskID,
-		TakeID:      f.TakeID,
-		ProductID:   f.ProductID,
-		WarehouseID: f.WarehouseID,
-		Flow:        f.Flow,
-		Previous:    f.Previous,
-		Change:      f.Change,
-		Present:     f.Present,
-		Date:        f.Date,
+func toDomain(flow *model.InventoryFlow) *flowrecord.InventoryFlow {
+	return &flowrecord.InventoryFlow{
+		ID:          flow.ID,
+		TaskID:      flow.TaskID,
+		TakeID:      flow.TakeID,
+		ProductID:   flow.ProductID,
+		WarehouseID: flow.WarehouseID,
+		Flow:        flowrecord.FlowType(flow.Flow),
+		Previous:    flow.Previous,
+		Change:      flow.Change,
+		Present:     flow.Present,
+		CreateAt:    flow.CreatedAt,
 	}
 }

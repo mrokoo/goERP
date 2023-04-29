@@ -2,6 +2,7 @@ package task_repository
 
 import (
 	"github.com/mrokoo/goERP/internal/inventory/domain/aggregate/task"
+	"github.com/mrokoo/goERP/internal/model"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
@@ -11,41 +12,35 @@ type TaskRepository struct {
 }
 
 func NewTaskRepository(db *gorm.DB) *TaskRepository {
-	db.AutoMigrate(&MySQLTask{})
-	db.AutoMigrate(&MySQLTaskItem{})
-	db.AutoMigrate(&MySQLRecord{})
-	db.AutoMigrate(&MySQLRecordItem{})
 	return &TaskRepository{db: db}
 }
 
 func (t *TaskRepository) GetAll() ([]*task.Task, error) {
-	var tasks []*MySQLTask
-	if err := t.db.Preload(clause.Associations).Preload("Recrods.Items").Find(&tasks).Error; err != nil {
+	var list []*model.Task
+	if err := t.db.Preload(clause.Associations).Preload("Recrods.Items").Find(&list).Error; err != nil {
 		return nil, err
 	}
-	var tasks2 []*task.Task
-	for _, ms := range tasks {
-		task_ := ms.toTask()
-		tasks2 = append(tasks2, &task_)
+	var tasks []*task.Task
+	for _, task := range list {
+		tasks = append(tasks, toDomain(task))
 	}
-	return tasks2, nil
+	return tasks, nil
 }
 
 func (t *TaskRepository) GetByID(ID string) (*task.Task, error) {
-	var task MySQLTask
+	var task model.Task
 	task.ID = ID
 	if err := t.db.Preload(clause.Associations).Preload("Recrods.Items").First(&task).Error; err != nil {
 		return nil, err
 	}
-	task_ := task.toTask()
-	return &task_, nil
+	return toDomain(&task), nil
 }
 
 // Save 函数将任务保存到数据库中。
 // 如果保存失败，则返回一个错误。
 func (t *TaskRepository) Save(task *task.Task) error {
 	// 将任务转换为 MySQL 格式。
-	task_ := toMySQLTask(*task)
+	task_ := toModel(task)
 
 	// 开始事务。
 	tx := t.db.Begin()

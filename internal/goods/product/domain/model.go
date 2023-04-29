@@ -12,8 +12,8 @@ type Unit = unit.Unit
 type Product struct {
 	ID           string        `json:"id"`
 	Name         string        `json:"name"`
-	CategoryID   string        `json:"category_id"`
-	UnitID       string        `json:"unit_id"`
+	CategoryID   *string       `json:"category_id"`
+	UnitID       *string       `json:"unit_id"`
 	OpeningStock []stock.Stock `json:"openStock"`
 	State        state.State   `json:"state"`
 	Note         string        `json:"note"`

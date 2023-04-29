@@ -16,7 +16,7 @@ type InventoryFlow struct {
 	Previous    int // Previous Quantity
 	Change      int // Change Quantity
 	Present     int // Present Quantity
-	Date        time.Time
+	CreateAt    time.Time
 }
 
 func NewInventoryFlow(basicID string, productID string, warehouseID string, flow FlowType, previous int, change int) InventoryFlow {
@@ -38,7 +38,7 @@ func NewInventoryFlow(basicID string, productID string, warehouseID string, flow
 		Previous:    previous,
 		Change:      change,
 		Present:     previous + change,
-		Date:        time.Now(),
+		CreateAt:    time.Now(),
 	}
 }
 

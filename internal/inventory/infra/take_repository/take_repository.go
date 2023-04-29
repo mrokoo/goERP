@@ -2,6 +2,7 @@ package take_repository
 
 import (
 	"github.com/mrokoo/goERP/internal/inventory/domain/aggregate/take"
+	"github.com/mrokoo/goERP/internal/model"
 	"gorm.io/gorm"
 )
 
@@ -10,31 +11,32 @@ type TakeRepository struct {
 }
 
 func NewTakeRepository(db *gorm.DB) *TakeRepository {
-	db.AutoMigrate(&MySQLTake{})
-	db.AutoMigrate(&MySQLItem{})
 	return &TakeRepository{
 		db: db,
 	}
 }
 
 func (r *TakeRepository) GetAll() ([]*take.Take, error) {
-	var takes []*MySQLTake
-	if err := r.db.Preload("Items").Find(&takes).Error; err != nil {
+	var list []*model.Take
+	if err := r.db.Preload("Items").Find(&list).Error; err != nil {
 		return nil, err
 	}
-	return toTakes(takes), nil
+	var takes []*take.Take
+	for _, take := range list {
+		takes = append(takes, toDomain(take))
+	}
+	return takes, nil
 }
 
 func (r *TakeRepository) GetByID(ID string) (*take.Take, error) {
-	var take *MySQLTake
+	var take *model.Take
 	if err := r.db.Preload("Items").First(&take, ID).Error; err != nil {
 		return nil, err
 	}
-	take_ := take.toTake()
-	return &take_, nil
+	return toDomain(take), nil
 }
 
 func (r *TakeRepository) Save(take *take.Take) error {
-	take_ := toMySQLTake(*take)
-	return r.db.Create(&take_).Error
+	i := toModel(take)
+	return r.db.Create(i).Error
 }

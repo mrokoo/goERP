@@ -5,8 +5,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/mrokoo/goERP/internal/goods/product/domain"
-	"github.com/mrokoo/goERP/internal/goods/product/domain/valueobj/info"
-	"github.com/mrokoo/goERP/internal/goods/product/domain/valueobj/price"
 	"github.com/mrokoo/goERP/internal/goods/product/domain/valueobj/stock"
 	repository "github.com/mrokoo/goERP/internal/goods/product/infra"
 	"github.com/mrokoo/goERP/internal/share/valueobj/state"
@@ -63,16 +61,22 @@ func (h *ProductHandler) GetProduct(ctx *gin.Context) {
 
 func (h *ProductHandler) AddProduct(ctx *gin.Context) {
 	var req struct {
-		ID           string `json:"id" binding:"required"`
-		Name         string `json:"name" binding:"required"`
-		CategoryID   string `json:"category_id" binding:"-"`
-		UnitID       string `json:"unit_id" binding:"-"`
+		ID           string  `json:"id" binding:"required"`
+		Name         string  `json:"name" binding:"required"`
+		CategoryID   *string `json:"category_id" binding:"-"`
+		UnitID       *string `json:"unit_id" binding:"-"`
 		OpeningStock []stock.Stock
 		State        state.State `json:"state" binding:"oneof=active freeze"`
 		Note         string      `json:"note" binding:"-"`
-		price.Price
-		info.Info
+		Img          string      `json:"img" binding:"-"`
+		Intro        string      `json:"intro" binding:"-"`
+		Purchase     float64     `json:"purchase" binding:"-"`
+		Retail       float64     `json:"retail" binding:"-"`
+		Grade1       float64     `json:"grade1" binding:"-"`
+		Grade2       float64     `json:"grade2" binding:"-"`
+		Grade3       float64     `json:"grade3" binding:"-"`
 	}
+
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, reponse.Reponse{
 			Message: "Request parameter verification failed",
@@ -101,14 +105,19 @@ func (h *ProductHandler) AddProduct(ctx *gin.Context) {
 func (h *ProductHandler) ReplaceProduct(ctx *gin.Context) {
 	id := ctx.Param("id")
 	var req struct {
-		Name         string `json:"name" binding:"required"`
-		CategoryID   string `json:"category_id" binding:"-"`
-		UnitID       string `json:"unit_id" binding:"-"`
+		Name         string  `json:"name" binding:"required"`
+		CategoryID   *string `json:"category_id" binding:"-"`
+		UnitID       *string `json:"unit_id" binding:"-"`
 		OpeningStock []stock.Stock
 		State        state.State `json:"state" binding:"oneof=active freeze"`
 		Note         string      `json:"note" binding:"-"`
-		price.Price
-		info.Info
+		Img          string      `json:"img" binding:"-"`
+		Intro        string      `json:"intro" binding:"-"`
+		Purchase     float64     `json:"purchase" binding:"-"`
+		Retail       float64     `json:"retail" binding:"-"`
+		Grade1       float64     `json:"grade1" binding:"-"`
+		Grade2       float64     `json:"grade2" binding:"-"`
+		Grade3       float64     `json:"grade3" binding:"-"`
 	}
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, reponse.Reponse{
@@ -124,8 +133,13 @@ func (h *ProductHandler) ReplaceProduct(ctx *gin.Context) {
 		OpeningStock: req.OpeningStock,
 		State:        req.State,
 		Note:         req.Note,
-		Price:        req.Price,
-		Info:         req.Info,
+		Img:          req.Img,
+		Intro:        req.Intro,
+		Purchase:     req.Purchase,
+		Retail:       req.Retail,
+		Grade1:       req.Grade1,
+		Grade2:       req.Grade2,
+		Grade3:       req.Grade3,
 	}
 
 	err := h.productService.ReplaceProduct(&product)

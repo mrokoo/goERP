@@ -21,7 +21,7 @@ type Task struct {
 	PurchaseReturnOrderID *string
 	SaleOrderID           *string
 	SaleReturnOrderID     *string
-	AllocationOrderID     *string
+	AllotID               *string
 	CreatedAt             time.Time
 }
 
@@ -60,24 +60,21 @@ func NewTask(warehouseID string, kind Kind, basic string, items []TaskItem) Task
 		PurchaseReturnOrderID: PurchaseReturnOrderID,
 		SaleOrderID:           SaleOrderID,
 		SaleReturnOrderID:     SaleReturnOrderID,
-		AllocationOrderID:     AllocationOrderID,
+		AllotID:               AllocationOrderID,
 		CreatedAt:             time.Now(),
 	}
 }
 
 type TaskItem struct {
-	ID        string
 	ProductID string
 	Total     int
 	Quantity  int
 }
 
-func NewTaskItem(productID string, total int) TaskItem {
+func NewTaskItem(total int) TaskItem {
 	return TaskItem{
-		ID:        uuid.New().String(),
-		ProductID: productID,
-		Total:     total,
-		Quantity:  0,
+		Total:    total,
+		Quantity: 0,
 	}
 }
 

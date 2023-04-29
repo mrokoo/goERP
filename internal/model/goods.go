@@ -15,9 +15,9 @@ type Category struct {
 type Product struct {
 	ID           string         `gorm:"primaryKey"`
 	Name         string         `gorm:"not null"`
-	CategoryID   string         `gorm:"default:null"`
+	CategoryID   *string        `gorm:"default:null"`
 	Category     Category       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	UnitID       string         `gorm:"default:null"`
+	UnitID       *string        `gorm:"default:null"`
 	Unit         Unit           `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	OpeningStock []OpeningStock `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	State        string         `gorm:"default:active"`
@@ -32,8 +32,7 @@ type Product struct {
 }
 
 type OpeningStock struct {
-	ProductID   string    `gorm:"not null; size:191;primaryKey"`
-	Product     Product   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	ProductID string `gorm:"size:191;primaryKey"`
 	WarehouseID string    `gorm:"not null; size:191;primaryKey"`
 	Warehouse   Warehouse `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Amount      int
