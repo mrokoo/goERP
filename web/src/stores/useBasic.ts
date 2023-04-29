@@ -96,7 +96,6 @@ export const useBasic = defineStore("basic", {
         message.error("编号验证无效");
       }
     },
-
     async deleteAccount(id: string) {
       try {
         const res = await api.account.deleteAccount(id);
@@ -112,7 +111,7 @@ export const useBasic = defineStore("basic", {
       api.supplier
         .getSupplierList()
         .then((res: any) => {
-          this.supplier = res.data.data;
+          this.supplier.push(...res.data.data);
         })
         .catch((err: any) => {
           throw err;
@@ -155,7 +154,7 @@ export const useBasic = defineStore("basic", {
       api.client
         .getClientList()
         .then((res: any) => {
-          this.client = res.data.data;
+          this.client.push(...res.data.data);
         })
         .catch((err: any) => {
           throw err;
@@ -198,7 +197,7 @@ export const useBasic = defineStore("basic", {
       api.budget
         .getBudgetList()
         .then((res: any) => {
-          this.budget = res.data.data;
+          this.budget.push(...res.data.data);
         })
         .catch((err: any) => {
           throw err;

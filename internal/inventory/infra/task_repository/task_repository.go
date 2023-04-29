@@ -65,3 +65,18 @@ func (t *TaskRepository) Save(task *task.Task) error {
 	}
 	return tx.Commit().Error
 }
+
+func (t *TaskRepository) GetTaskByPurchaseID(ID string, kind task.Kind) (*task.Task, error) {
+	var task_ model.Task
+	switch kind {
+	case task.IN_PURCHASE:
+		if err := t.db.Preload(clause.Associations).Preload("Recrods.Items").First(&task_, "purchase_order_id = ?", ID).Error; err != nil {
+			return nil, err
+		}
+	case task.OUT_PURCHASE:
+		if err := t.db.Preload(clause.Associations).Preload("Recrods.Items").First(&task_, "purchase_return_order_id = ?", ID).Error; err != nil {
+			return nil, err
+		}
+	}
+	return toDomain(&task_), nil
+}

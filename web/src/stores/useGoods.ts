@@ -17,7 +17,7 @@ export const useGoods = defineStore("goods", {
       api.product
         .getProductList()
         .then((res: any) => {
-          this.product = res.data.data;
+          this.product.push(...res.data.data);
         })
         .catch((err: any) => {
           throw err;
@@ -57,7 +57,7 @@ export const useGoods = defineStore("goods", {
       api.unit
         .getUnitList()
         .then((res: any) => {
-          this.unit = res.data.data;
+          this.unit.push(...res.data.data);
         })
         .catch((err: any) => {
           throw err;
@@ -100,7 +100,7 @@ export const useGoods = defineStore("goods", {
       api.category
         .getCategoryList()
         .then((res: any) => {
-          this.category = res.data.data;
+          this.category.push(...res.data.data);
         })
         .catch((err: any) => {
           throw err;

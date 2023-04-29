@@ -78,6 +78,9 @@ func toDomainItem(i *model.TaskItem) *task.TaskItem {
 
 func toModelRecord(r *record.Record) *model.TaskRecord {
 	var items []model.TaskRecordItem
+	for _, item := range r.Items {
+		items = append(items, *toModelRecordItem(&item))
+	}
 	return &model.TaskRecord{
 		ID:          r.ID,
 		WarehouseID: r.WarehouseID,

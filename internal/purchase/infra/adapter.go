@@ -1,4 +1,4 @@
-package repository
+package purchaseorder_repository
 
 import (
 	"github.com/mrokoo/goERP/internal/model"

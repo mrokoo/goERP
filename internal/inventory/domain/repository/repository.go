@@ -16,6 +16,7 @@ type InventoryFlowRepository interface {
 
 type TaskRepository interface {
 	GetAll() ([]*task.Task, error)
+	GetTaskByPurchaseID(ID string, kind task.Kind) (*task.Task, error)
 	GetByID(ID string) (*task.Task, error)
 	Save(task *task.Task) error
 }

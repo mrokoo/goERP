@@ -12,6 +12,7 @@ import (
 type InventoryService interface {
 	// task api
 	GetTaskList() ([]*task.Task, error)
+	GetTaskByPurchaseID(purchaseID string, kind task.Kind) (*task.Task, error)
 	CreateTask(warehouseID string, kind task.Kind, basic string, items []task.TaskItem) error
 	CreateTaskItem(productID string, total int) task.TaskItem
 	InvalidateTask(taskID string) error
@@ -57,6 +58,14 @@ func (i InventoryServiceImpl) GetTaskList() ([]*task.Task, error) {
 		return nil, err
 	}
 	return list, nil
+}
+
+func (i InventoryServiceImpl) GetTaskByPurchaseID(purchaseID string, kind task.Kind) (*task.Task, error) {
+	t, err := i.TaskRepository.GetTaskByPurchaseID(purchaseID, kind)
+	if err != nil {
+		return nil, err
+	}
+	return t, nil
 }
 
 // CreateTask 不直接暴露，需要在其他包中调用

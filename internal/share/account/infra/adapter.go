@@ -3,6 +3,7 @@ package repository
 import (
 	"github.com/mrokoo/goERP/internal/model"
 	"github.com/mrokoo/goERP/internal/share/account/domain"
+	"github.com/mrokoo/goERP/internal/share/valueobj/state"
 )
 
 func toDmain(a *model.Account) *domain.Account {
@@ -12,6 +13,7 @@ func toDmain(a *model.Account) *domain.Account {
 		Type:    domain.PayType(a.Type),
 		Holder:  a.Holder,
 		Number:  a.Number,
+		State:   state.State(a.State),
 		Note:    a.Note,
 		Balance: a.Balance,
 	}
@@ -24,6 +26,7 @@ func toModel(a *domain.Account) *model.Account {
 		Type:    string(a.Type),
 		Holder:  a.Holder,
 		Number:  a.Number,
+		State:   string(a.State),
 		Note:    a.Note,
 		Balance: a.Balance,
 	}
