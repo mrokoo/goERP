@@ -2,12 +2,9 @@ package app
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/mrokoo/goERP/internal/purchase/domain"
-	"github.com/mrokoo/goERP/internal/purchase/domain/valueobj/biling"
-	"github.com/mrokoo/goERP/internal/purchase/domain/valueobj/item"
 	"github.com/mrokoo/goERP/pkg/reponse"
 )
 
@@ -38,15 +35,16 @@ func (h *PurchaseHandler) GetPurchaseOrderList(ctx *gin.Context) {
 
 func (h *PurchaseHandler) AddPurchaseOrder(ctx *gin.Context) {
 	var req struct {
-		ID          string `json:"id" binding:"required"`
-		SupplierID  string `json:"supplier_id" binding:"required"`
-		WarehouseID string `json:"warehouse_id" binding:"required"`
-		UserID      string `json:"user_id" binding:"required"`
-		Items       []item.OrderItem
-		biling.Biling
-		IsValidated bool
-		Note        string
-		Date        string
+		ID           string        `json:"id" binding:"required"`
+		SupplierID   string        `json:"supplier_id" binding:"required"`
+		WarehouseID  string        `json:"warehouse_id" binding:"required"`
+		UserID       string        `json:"user_id" binding:"required"`
+		Items        []domain.Item `json:"items" binding:"required"`
+		AccountID    string        `json:"account_id" binding:"required"`
+		OtherCost    float64       `json:"other_cost" binding:"required"`
+		ActalPayment float64       `json:"actal_payment" binding:"required"`
+		Basic        string        `json:"basic"`
+		Kind         string        `json:"kind" binding:"required;oneof=Order ReturnOrder"`
 	}
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -57,27 +55,8 @@ func (h *PurchaseHandler) AddPurchaseOrder(ctx *gin.Context) {
 		return
 	}
 
-	date, err := time.Parse("RFC3339Nano", req.Date)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, reponse.Reponse{
-			Message: err.Error(),
-			Data:    nil,
-		})
-		return
-	}
-
-	order := domain.PurchaseOrder{
-		ID:          req.ID,
-		SupplierID:  req.SupplierID,
-		WarehouseID: req.WarehouseID,
-		UserID:      req.UserID,
-		Items:       req.Items,
-		Biling:      req.Biling,
-		IsValidated: req.IsValidated,
-		Note:        req.Note,
-		Date:        date,
-	}
-	err = h.PurchaseService.AddPurchaseOrder(&order)
+	order := domain.NewPurchaseOrder(req.ID, req.WarehouseID, req.SupplierID, req.UserID, req.AccountID, req.OtherCost, req.ActalPayment, req.Basic, req.Items, domain.Kind(req.Kind))
+	err := h.PurchaseService.AddPurchaseOrder(&order)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
 			Message: err.Error(),
@@ -91,105 +70,18 @@ func (h *PurchaseHandler) AddPurchaseOrder(ctx *gin.Context) {
 	})
 }
 
-func (h *PurchaseHandler) InvalidatePurchaseOrder(ctx *gin.Context) {
-	id := ctx.Param("id")
-	err := h.PurchaseService.InvalidatePurchaseOrder(id)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
-			Message: err.Error(),
-			Data:    nil,
-		})
-		return
-	}
-	ctx.JSON(http.StatusOK, reponse.Reponse{
-		Message: "",
-		Data:    nil,
-	})
-}
-
-func (h *PurchaseHandler) GetPurchaseReturnOrderList(ctx *gin.Context) {
-	purchaseReturnOrders, err := h.PurchaseService.GetPurchaseReturnOrderList()
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
-			Message: err.Error(),
-			Data:    nil,
-		})
-		return
-	}
-	ctx.JSON(http.StatusOK, reponse.Reponse{
-		Message: "",
-		Data:    purchaseReturnOrders,
-	})
-}
-
-func (h *PurchaseHandler) AddPurchaseReturnOrder(ctx *gin.Context) {
-	var req struct {
-		ID          string `json:"id" binding:"required"`
-		PurchaseID  string `json:"purchase_id" binding:"required"`
-		SupplierID  string `json:"supplier_id" binding:"required"`
-		WarehouseID string `json:"warehouse_id" binding:"required"`
-		UserID      string `json:"user_id" binding:"required"`
-		Items       []item.ReturnOrderItem
-		biling.Biling
-		IsValidated bool
-		Note        string
-		Date        string
-	}
-
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, reponse.Reponse{
-			Message: err.Error(),
-			Data:    nil,
-		})
-		return
-	}
-
-	date, err := time.Parse("RFC3339Nano", req.Date)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, reponse.Reponse{
-			Message: err.Error(),
-			Data:    nil,
-		})
-		return
-	}
-
-	order := domain.PurchaseReturnOrder{
-		ID:              req.ID,
-		PurchaseOrderID: req.PurchaseID,
-		SupplierID:      req.SupplierID,
-		WarehouseID:     req.WarehouseID,
-		UserID:          req.UserID,
-		Items:           req.Items,
-		Biling:          req.Biling,
-		IsValidated:     req.IsValidated,
-		Note:            req.Note,
-		Date:            date,
-	}
-	err = h.PurchaseService.AddPurchaseReturnOrder(&order)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
-			Message: err.Error(),
-			Data:    nil,
-		})
-		return
-	}
-	ctx.JSON(http.StatusOK, reponse.Reponse{
-		Message: "",
-		Data:    nil,
-	})
-}
-
-func (h *PurchaseHandler) InvalidatePurchaseReturnOrder(ctx *gin.Context) {
-	err := h.PurchaseService.InvalidatePurchaseReturnOrder(ctx.Param("id"))
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
-			Message: err.Error(),
-			Data:    nil,
-		})
-		return
-	}
-	ctx.JSON(http.StatusOK, reponse.Reponse{
-		Message: "",
-		Data:    nil,
-	})
-}
+// func (h *PurchaseHandler) InvalidatePurchaseOrder(ctx *gin.Context) {
+// 	id := ctx.Param("id")
+// 	err := h.PurchaseService.InvalidatePurchaseOrder(id)
+// 	if err != nil {
+// 		ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
+// 			Message: err.Error(),
+// 			Data:    nil,
+// 		})
+// 		return
+// 	}
+// 	ctx.JSON(http.StatusOK, reponse.Reponse{
+// 		Message: "",
+// 		Data:    nil,
+// 	})
+// }

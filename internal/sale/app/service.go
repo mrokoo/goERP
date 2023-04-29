@@ -40,7 +40,7 @@ func (s SaleServiceImpl) CreateSaleOrder(order *domain.SaleOrder) error {
 	}
 	var taskItems []task.TaskItem
 	for _, item := range order.Items {
-		taskItem := task.NewTaskItem(item.ProductID, item.Amount)
+		taskItem := task.NewTaskItem(item.ProductID, item.Quantity)
 		taskItems = append(taskItems, taskItem)
 	}
 	switch order.Kind {

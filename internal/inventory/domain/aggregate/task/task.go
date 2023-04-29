@@ -71,27 +71,24 @@ type TaskItem struct {
 	Quantity  int
 }
 
-func NewTaskItem(total int) TaskItem {
+func NewTaskItem(productID string, total int) TaskItem {
 	return TaskItem{
-		Total:    total,
-		Quantity: 0,
+		ProductID: productID,
+		Total:     total,
+		Quantity:  0,
 	}
 }
 
 type Kind string
 
 const (
-	IN_PURCHASE    Kind = "in_purchase"
-	OUT_PURCHASE   Kind = "out_purchase"
-	IN_SALE        Kind = "in_sale"
-	OUT_SALE       Kind = "out_sale"
-	IN_ALLOCATION  Kind = "in_allocation"
-	OUT_ALLOCATION Kind = "out_allocation"
+	IN_PURCHASE    Kind = "in_purchase"    // 采购
+	OUT_PURCHASE   Kind = "out_purchase"   // 采购退货
+	IN_SALE        Kind = "in_sale"        // 销售退货
+	OUT_SALE       Kind = "out_sale"       // 销售
+	IN_ALLOCATION  Kind = "in_allocation"  // 调拨入库
+	OUT_ALLOCATION Kind = "out_allocation" // 调拨出库
 )
-
-func (t *Task) GetID() string {
-	return t.ID
-}
 
 func (t *Task) InvalidateTask() error {
 	if len(t.Recrods) != 0 {
@@ -101,10 +98,11 @@ func (t *Task) InvalidateTask() error {
 	return nil
 }
 
-func (t *Task) InvalidateRecord(id string) error {
-	for i, r := range t.Recrods {
-		if r.ID == id {
-			t.Recrods[i].State = state.INVALID
+// InvalidateRecord:使指定Task记录(record)无效，内部会自动更新TaskItem状态
+func (t *Task) InvalidateRecord(recordID string) error {
+	for index, record := range t.Recrods {
+		if record.ID == recordID {
+			t.Recrods[index].State = state.INVALID
 			t.UpdateTaskItems()
 			return nil
 		}
@@ -112,6 +110,7 @@ func (t *Task) InvalidateRecord(id string) error {
 	return errors.New("record not found")
 }
 
+// AddRecord:添加Task记录(record)，内部会自动更新TaskItem状态
 func (t *Task) AddRecord(r record.Record) error {
 	if err := t.CheckTaskRecordItems(r.Items); err != nil {
 		return err
@@ -121,27 +120,33 @@ func (t *Task) AddRecord(r record.Record) error {
 	return nil
 }
 
+// UpdateTaskItems更新TaskItem状态(遍历所有Record中的Item)
 func (t *Task) UpdateTaskItems() {
-	for i := range t.Items {
-		q := 0
-		for _, r := range t.Recrods {
-			for _, ri := range r.Items {
-				if ri.ProductID == t.Items[i].ProductID {
-					q += ri.Quantity
+	for index := range t.Items {
+		quantity := 0
+		for _, record := range t.Recrods {
+			// 无效Task记录会跳过
+			if record.State == state.INVALID {
+				continue
+			}
+			for _, recordItem := range record.Items {
+				if recordItem.ProductID == t.Items[index].ProductID {
+					quantity += recordItem.Quantity
 				}
 			}
 		}
-		t.Items[i].Quantity = q
+		t.Items[index].Quantity = quantity
 	}
 }
 
+// CheckTaskRecordItems: 保证记录中不会出现TaskItem中不存在的产品项
 func (t *Task) CheckTaskRecordItems(items []record.RecordItem) error {
 	set := make(map[string]struct{}, len(t.Items))
-	for _, v := range t.Items {
-		set[v.ProductID] = struct{}{}
+	for _, item := range t.Items {
+		set[item.ProductID] = struct{}{}
 	}
-	for _, ri := range items {
-		if _, ok := set[ri.ProductID]; !ok {
+	for _, item := range items {
+		if _, ok := set[item.ProductID]; !ok {
 			return errors.New("item not found")
 		}
 	}

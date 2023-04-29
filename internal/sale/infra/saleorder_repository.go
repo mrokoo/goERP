@@ -1,6 +1,7 @@
 package infra
 
 import (
+	"github.com/mrokoo/goERP/internal/model"
 	"github.com/mrokoo/goERP/internal/sale/domain"
 	"gorm.io/gorm"
 )
@@ -10,37 +11,35 @@ type SaleOrderRepository struct {
 }
 
 func NewSaleOrderRepository(db *gorm.DB) *SaleOrderRepository {
-	db.AutoMigrate(&MySQLSaleOrder{})
-	db.AutoMigrate(&MySQLItem{})
 	return &SaleOrderRepository{
 		db: db,
 	}
 }
 
 func (r *SaleOrderRepository) Save(saleOrder *domain.SaleOrder) error {
-	order_ := toMySQLSaleOrder(saleOrder)
-	return r.db.Create(order_).Error
+	order := toModel(saleOrder)
+	return r.db.Create(order).Error
 }
 
 func (r *SaleOrderRepository) GetAll() ([]*domain.SaleOrder, error) {
-	var orders []*MySQLSaleOrder
+	var orders []*model.SaleOrder
 	err := r.db.Preload("Items").Find(&orders).Error
 	if err != nil {
 		return nil, err
 	}
 	var saleOrders []*domain.SaleOrder
 	for _, order := range orders {
-		saleOrders = append(saleOrders, order.toSaleOrder())
+		saleOrders = append(saleOrders, toDomain(order))
 	}
 	return saleOrders, nil
 }
 
 func (r *SaleOrderRepository) GetByID(id string) (*domain.SaleOrder, error) {
-	var order MySQLSaleOrder
+	var order *model.SaleOrder
 	order.ID = id
 	err := r.db.Preload("Items").First(&order).Error
 	if err != nil {
 		return nil, err
 	}
-	return order.toSaleOrder(), nil
+	return toDomain(order), nil
 }

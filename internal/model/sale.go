@@ -15,9 +15,8 @@ type SaleOrder struct {
 }
 
 type SaleOrderItem struct {
-	ID          string  `gorm:"primaryKey; size:191;"`
-	SaleOrderID string  `gorm:"size:191;"`
-	ProductID   string  `gorm:"size:191;"`
+	SaleOrderID string  `gorm:"size:191;primaryKey"`
+	ProductID   string  `gorm:"size:191;primaryKey"`
 	Product     Product `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Quantity    int
 	Price       float64

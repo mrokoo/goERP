@@ -70,7 +70,7 @@ export const useBasic = defineStore("basic", {
       api.account
         .getAccountList()
         .then((res: any) => {
-          this.account = res.data.data;
+          this.account.push(...res.data.data);
         })
         .catch((err: any) => {
           throw err;

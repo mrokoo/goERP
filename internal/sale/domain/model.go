@@ -26,7 +26,7 @@ func NewSaleOrder(ID string, warehouse string, customer string, user string, cre
 
 type Item struct {
 	ProductID string
-	Amount    int
+	Quantity  int
 	Price     float64
 }
 
@@ -37,10 +37,10 @@ const (
 	ReturnOrder Kind = "ReturnOrder"
 )
 
-func NewItem(productID string, amount int, price float64) Item {
+func NewItem(productID string, quantity int, price float64) Item {
 	return Item{
 		ProductID: productID,
-		Amount:    amount,
+		Quantity:  quantity,
 		Price:     price,
 	}
 }

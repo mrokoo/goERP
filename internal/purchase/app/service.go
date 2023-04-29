@@ -9,23 +9,17 @@ import (
 type PurchaseService interface {
 	GetPurchaseOrderList() ([]*domain.PurchaseOrder, error)
 	AddPurchaseOrder(purchaseOrder *domain.PurchaseOrder) error
-	InvalidatePurchaseOrder(purchaseOrderID string) error
-
-	GetPurchaseReturnOrderList() ([]*domain.PurchaseReturnOrder, error)
-	AddPurchaseReturnOrder(purchaseReturnOrder *domain.PurchaseReturnOrder) error
-	InvalidatePurchaseReturnOrder(id string) error
+	// InvalidatePurchaseOrder(purchaseOrderID string) error
 }
 
 type PurchaseServiceImpl struct {
 	orderRepository  domain.PurchaseOrderRepository
-	returnRepository domain.PurchaseReturnOrderRepository
 	inventoryService inventory.InventoryService
 }
 
-func NewPurchaseServiceImpl(orderRepository domain.PurchaseOrderRepository, returnRepository domain.PurchaseReturnOrderRepository, inventoryService inventory.InventoryService) *PurchaseServiceImpl {
+func NewPurchaseServiceImpl(orderRepository domain.PurchaseOrderRepository, inventoryService inventory.InventoryService) *PurchaseServiceImpl {
 	return &PurchaseServiceImpl{
 		orderRepository:  orderRepository,
-		returnRepository: returnRepository,
 		inventoryService: inventoryService,
 	}
 }
@@ -50,30 +44,6 @@ func (s *PurchaseServiceImpl) AddPurchaseOrder(purchaseOrder *domain.PurchaseOrd
 	return nil
 }
 
-func (s *PurchaseServiceImpl) InvalidatePurchaseOrder(purchaseOrderID string) error {
-	return s.orderRepository.Invalidated(purchaseOrderID)
-}
-
-func (s *PurchaseServiceImpl) GetPurchaseReturnOrderList() ([]*domain.PurchaseReturnOrder, error) {
-	return s.returnRepository.GetAll()
-}
-
-func (s *PurchaseServiceImpl) AddPurchaseReturnOrder(purchaseReturnOrder *domain.PurchaseReturnOrder) error {
-	if err := s.returnRepository.Save(purchaseReturnOrder); err != nil {
-		return err
-	}
-	p := purchaseReturnOrder
-	var taskItems []task.TaskItem
-	for _, item := range p.Items {
-		taskItem := task.NewTaskItem(item.ProductID, item.Quantity)
-		taskItems = append(taskItems, taskItem)
-	}
-	if err := s.inventoryService.CreateTask(p.WarehouseID, task.OUT_PURCHASE, p.ID, taskItems); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *PurchaseServiceImpl) InvalidatePurchaseReturnOrder(purchaseReturnOrderID string) error {
-	return s.returnRepository.Invalidated(purchaseReturnOrderID)
-}
+// func (s *PurchaseServiceImpl) InvalidatePurchaseOrder(purchaseOrderID string) error {
+// 	return s.orderRepository.Invalidated(purchaseOrderID)
+// }

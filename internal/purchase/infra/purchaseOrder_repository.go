@@ -1,6 +1,7 @@
-package order
+package repository
 
 import (
+	"github.com/mrokoo/goERP/internal/model"
 	"github.com/mrokoo/goERP/internal/purchase/domain"
 	"gorm.io/gorm"
 )
@@ -12,47 +13,43 @@ type PurchaseOrderRepository struct {
 }
 
 func NewPurchaseOrderRepository(db *gorm.DB) *PurchaseOrderRepository {
-	db.AutoMigrate(&PurchaseOrder{}) //自动迁移
-	db.AutoMigrate(&PurchaseOrderItem{})
 	return &PurchaseOrderRepository{
 		db: db,
 	}
 }
 
 func (r *PurchaseOrderRepository) GetAll() ([]*domain.PurchaseOrder, error) {
-	var pom []PurchaseOrder
-	result := r.db.Preload("Items").Find(&pom)
+	var list []*model.PurchaseOrder
+	result := r.db.Preload("Items").Find(&list)
 	if err := result.Error; err != nil {
 		return nil, err
 	}
 	// 转换成领域层的模型
-	var po []*domain.PurchaseOrder
-	for _, po2 := range pom {
-		po = append(po, po2.toPurchaseOrder())
+	var orders []*domain.PurchaseOrder
+	for _, order := range list {
+		orders = append(orders, toDomain(order))
 	}
-	return po, nil
+	return orders, nil
 }
 
 func (r *PurchaseOrderRepository) GetByID(purchaseOrderID string) (*domain.PurchaseOrder, error) {
-	po := PurchaseOrder{
+	order := model.PurchaseOrder{
 		ID: purchaseOrderID,
 	}
-
-	result := r.db.First(&po)
+	result := r.db.Preload("Items").First(&order)
 	if err := result.Error; err != nil {
 		return nil, err
 	}
-	purchaseOrder := po.toPurchaseOrder()
-	return purchaseOrder, nil
+	return toDomain(&order), nil
 }
 
 func (r *PurchaseOrderRepository) Save(purchaseOrder *domain.PurchaseOrder) error {
-	po := toMySQLPurchaseOrder(purchaseOrder)
-	result := r.db.Create(&po)
+	o := toModel(purchaseOrder)
+	result := r.db.Create(o)
 	return result.Error
 }
 
 func (r *PurchaseOrderRepository) Invalidated(purchaseOrderID string) error {
-	result := r.db.Model(&PurchaseOrder{}).Where("id", purchaseOrderID).Update("is_validated", true)
+	result := r.db.Model(&model.PurchaseOrder{}).Where("id", purchaseOrderID).Update("is_validated", true)
 	return result.Error
 }

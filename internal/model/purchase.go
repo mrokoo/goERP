@@ -18,7 +18,6 @@ type PurchaseOrder struct {
 	TotalCost    float64
 	ActalPayment float64
 	Debt         float64
-	Note         string
 	CreatedAt    time.Time
 	Basic        string // 用于退货单
 }
@@ -29,5 +28,4 @@ type PurchaseOrderItem struct {
 	Product         Product `gorm:"constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
 	Quantity        int
 	Price           float64
-	TotalPayment    float64
 }

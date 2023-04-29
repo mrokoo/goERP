@@ -1,8 +1,6 @@
 package app
 
 import (
-	"errors"
-
 	"github.com/mrokoo/goERP/internal/inventory/domain/aggregate/allot"
 	flowrecord "github.com/mrokoo/goERP/internal/inventory/domain/aggregate/flow"
 	"github.com/mrokoo/goERP/internal/inventory/domain/aggregate/record"
@@ -52,6 +50,7 @@ func NewInventoryServiceImpl(inventoryFlowRepository domain.InventoryFlowReposit
 	}
 }
 
+// Taskapi
 func (i InventoryServiceImpl) GetTaskList() ([]*task.Task, error) {
 	list, err := i.TaskRepository.GetAll()
 	if err != nil {
@@ -67,19 +66,17 @@ func (i InventoryServiceImpl) CreateTask(warehouseID string, kind task.Kind, bas
 	return err
 }
 
-func (i InventoryServiceImpl) CreateTaskItem(total int) task.TaskItem {
-	item := task.NewTaskItem(total)
+func (i InventoryServiceImpl) CreateTaskItem(productID string, total int) task.TaskItem {
+	item := task.NewTaskItem(productID, total)
 	return item
 }
 
+// 不直接暴露，需要给其他包使用
 func (i InventoryServiceImpl) InvalidateTask(taskID string) error {
 	ID := taskID
 	t, err := i.TaskRepository.GetByID(ID)
 	if err != nil {
 		return err
-	}
-	if len(t.Recrods) > 0 {
-		return errors.New("task has records, cannot be invalidated")
 	}
 	if err := t.InvalidateTask(); err != nil {
 		return err
@@ -99,14 +96,23 @@ func (i InventoryServiceImpl) AddRecord(taskID string, record record.Record) err
 		return err
 	}
 	signal := 1
+	var kind flowrecord.FlowType
 	switch t.Kind {
-	case task.IN_PURCHASE, task.IN_SALE, task.IN_ALLOCATION:
+	case task.IN_PURCHASE, task.IN_SALE:
+		kind = flowrecord.FLOWTYPE_RUKU
 		signal = 1
-	case task.OUT_PURCHASE, task.OUT_SALE, task.OUT_ALLOCATION:
+	case task.OUT_PURCHASE, task.OUT_SALE:
+		kind = flowrecord.FLOWTYPE_CHUKU
+		signal = -1
+	case task.IN_ALLOCATION:
+		kind = flowrecord.FLOWTYPE_DIAOBO
+		signal = 1
+	case task.OUT_ALLOCATION:
+		kind = flowrecord.FLOWTYPE_DIAOBO
 		signal = -1
 	}
 	for _, ri := range record.Items {
-		if err := i.CreateFlow(taskID, ri.ProductID, t.WarehouseID, flowrecord.FLOWTYPE_RUKU, signal*ri.Quantity); err != nil {
+		if err := i.CreateFlow(taskID, ri.ProductID, t.WarehouseID, kind, signal*ri.Quantity); err != nil {
 			return err
 		}
 	}
@@ -136,16 +142,25 @@ func (i InventoryServiceImpl) InvalidateRecord(taskID string, recordID string) e
 		return err
 	}
 	signal := 1
+	var kind flowrecord.FlowType
 	switch t.Kind {
-	case task.IN_PURCHASE, task.IN_SALE, task.IN_ALLOCATION:
+	case task.IN_PURCHASE, task.IN_SALE:
+		kind = flowrecord.FLOWTYPE_ZUOFEIRUKU
 		signal = -1
-	case task.OUT_PURCHASE, task.OUT_SALE, task.OUT_ALLOCATION:
+	case task.OUT_PURCHASE, task.OUT_SALE:
+		kind = flowrecord.FLOWTYPE_ZUOFEICHUKU
+		signal = 1
+	case task.IN_ALLOCATION:
+		kind = flowrecord.FLOWTYPE_ZUOFEIDIAOBO
+		signal = -1
+	case task.OUT_ALLOCATION:
+		kind = flowrecord.FLOWTYPE_ZUOFEIDIAOBO
 		signal = 1
 	}
 	for _, r := range t.Recrods {
 		if r.ID == recordID {
 			for _, ri := range r.Items {
-				if err := i.CreateFlow(taskID, ri.ProductID, t.WarehouseID, flowrecord.FLOWTYPE_ZUOFEIRUKU, signal*ri.Quantity); err != nil {
+				if err := i.CreateFlow(taskID, ri.ProductID, t.WarehouseID, kind, signal*ri.Quantity); err != nil {
 					return err
 				}
 			}
@@ -199,11 +214,15 @@ func (i InventoryServiceImpl) GetAllotList() ([]*allot.Allot, error) {
 func (i InventoryServiceImpl) CreateAllot(in string, out string, userID string, items []allot.Item) error {
 	a := allot.NewAllot(in, out, userID, items)
 	var taskItems []task.TaskItem
-	for _, i3 := range items {
-		taskItems = append(taskItems, task.NewTaskItem(i3.Quantity))
+	for _, item := range items {
+		taskItems = append(taskItems, task.NewTaskItem(item.ProductID, item.Quantity))
 	}
-	i.CreateTask(a.InWarehouseID, task.IN_ALLOCATION, a.ID, taskItems)
-	i.CreateTask(a.OutWarehouseID, task.OUT_ALLOCATION, a.ID, taskItems)
+	if err := i.CreateTask(a.InWarehouseID, task.IN_ALLOCATION, a.ID, taskItems); err != nil {
+		return err
+	}
+	if err := i.CreateTask(a.OutWarehouseID, task.OUT_ALLOCATION, a.ID, taskItems); err != nil {
+		return err
+	}
 	if err := i.AllotRepository.Save(a); err != nil {
 		return err
 	}

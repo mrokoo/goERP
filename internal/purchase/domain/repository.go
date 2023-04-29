@@ -6,10 +6,3 @@ type PurchaseOrderRepository interface {
 	Save(purchaseOrder *PurchaseOrder) error
 	Invalidated(orderID string) error
 }
-
-type PurchaseReturnOrderRepository interface {
-	GetByID(orderID string) (*PurchaseReturnOrder, error)
-	GetAll() ([]*PurchaseReturnOrder, error)
-	Save(purchaseReturnOrder *PurchaseReturnOrder) error
-	Invalidated(orderID string) error
-}
