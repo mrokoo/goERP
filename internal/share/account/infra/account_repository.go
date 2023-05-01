@@ -1,70 +1,63 @@
 package repository
 
 import (
-	"context"
-
+	"github.com/mrokoo/goERP/internal/model"
 	"github.com/mrokoo/goERP/internal/share/account/domain"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
+	"gorm.io/gorm"
 )
 
-type MongoRepository struct {
-	accounts *mongo.Collection
+var ErrNotFound = gorm.ErrRecordNotFound
+
+type AccountRepository struct {
+	db *gorm.DB
 }
 
-func NewMongoRepository(db *mongo.Database, collection string) *MongoRepository {
-	accounts := db.Collection(collection)
-	return &MongoRepository{
-		accounts: accounts,
+func NewAccountRepository(db *gorm.DB) *AccountRepository {
+	return &AccountRepository{
+		db: db,
 	}
 }
 
-func (r *MongoRepository) GetAll() ([]*domain.Account, error) {
-	cursor, err := r.accounts.Find(context.Background(), bson.D{})
-	if err != nil {
+func (r *AccountRepository) GetAll() ([]*domain.Account, error) {
+	var list []*model.Account
+	result := r.db.Find(&list)
+	if err := result.Error; err != nil {
 		return nil, err
 	}
-	var results []*domain.Account
-	if err = cursor.All(context.Background(), &results); err != nil {
+	var accounts []*domain.Account
+	for i := range list {
+		accounts = append(accounts, toDmain(list[i]))
+	}
+	return accounts, nil
+}
+
+func (r *AccountRepository) GetByID(ID string) (*domain.Account, error) {
+	i := model.Account{
+		ID: ID,
+	}
+	result := r.db.First(&i)
+	if err := result.Error; err != nil {
 		return nil, err
 	}
-	return results, nil
+	account := toDmain(&i)
+	return account, nil
 }
 
-func (r *MongoRepository) GetByID(accountID string) (*domain.Account, error) {
-	filter := bson.D{{Key: "id", Value: accountID}}
-	var account domain.Account
-	err := r.accounts.FindOne(context.Background(), filter).Decode(&account)
-	if err != nil {
-		return nil, err
-	}
-	return &account, nil
+func (r *AccountRepository) Save(account *domain.Account) error {
+	a := toModel(account)
+	result := r.db.Create(a)
+	return result.Error
 }
 
-func (r *MongoRepository) Save(account *domain.Account) error {
-	_, err := r.accounts.InsertOne(context.Background(), account)
-	if err != nil {
-		return err
-	}
-	return nil
+func (r *AccountRepository) Replace(account *domain.Account) error {
+	a := toModel(account)
+	result := r.db.Save(a)
+	return result.Error
 }
 
-func (r *MongoRepository) Replace(account *domain.Account) error {
-	filter := bson.D{{Key: "id", Value: account.ID}}
-	var a domain.Account
-	err := r.accounts.FindOneAndReplace(context.Background(), filter, account).Decode(&a)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (r *MongoRepository) Delete(accountID string) error {
-	filter := bson.D{{Key: "id", Value: accountID}}
-	var a domain.Account
-	err := r.accounts.FindOneAndDelete(context.Background(), filter).Decode(&a)
-	if err != nil {
-		return err
-	}
-	return nil
+func (r *AccountRepository) Delete(accountID string) error {
+	result := r.db.Delete(&model.Account{
+		ID: accountID,
+	})
+	return result.Error
 }

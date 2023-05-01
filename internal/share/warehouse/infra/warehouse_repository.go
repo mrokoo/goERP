@@ -1,70 +1,62 @@
 package repository
 
 import (
-	"context"
-
+	"github.com/mrokoo/goERP/internal/model"
 	"github.com/mrokoo/goERP/internal/share/warehouse/domain"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
+	"gorm.io/gorm"
 )
 
-type MongoRepository struct {
-	warehouses *mongo.Collection
+var ErrNotFound = gorm.ErrRecordNotFound
+
+type WarehouseRepository struct {
+	db *gorm.DB
 }
 
-func NewMongoRepository(db *mongo.Database, collection string) *MongoRepository {
-	warehouses := db.Collection(collection)
-	return &MongoRepository{
-		warehouses: warehouses,
+func NewWarehouseRepository(db *gorm.DB) *WarehouseRepository {
+	return &WarehouseRepository{
+		db: db,
 	}
 }
 
-func (r *MongoRepository) GetAll() ([]*domain.Warehouse, error) {
-	cursor, err := r.warehouses.Find(context.Background(), bson.D{})
-	if err != nil {
+func (r *WarehouseRepository) GetAll() ([]*domain.Warehouse, error) {
+	var list []*model.Warehouse
+	result := r.db.Find(&list)
+	if err := result.Error; err != nil {
 		return nil, err
 	}
-	var results []*domain.Warehouse
-	if err = cursor.All(context.Background(), &results); err != nil {
+	var warehouses []*domain.Warehouse
+	for i := range list {
+		warehouses = append(warehouses, toDomain(list[i]))
+	}
+	return warehouses, nil
+}
+
+func (r *WarehouseRepository) GetByID(ID string) (*domain.Warehouse, error) {
+	warehouse := model.Warehouse{
+		ID: ID,
+	}
+	result := r.db.First(&warehouse)
+	if err := result.Error; err != nil {
 		return nil, err
 	}
-	return results, nil
+	return toDomain(&warehouse), nil
 }
 
-func (r *MongoRepository) GetByID(warehouseID string) (*domain.Warehouse, error) {
-	filter := bson.D{{Key: "id", Value: warehouseID}}
-	var warehouse domain.Warehouse
-	err := r.warehouses.FindOne(context.Background(), filter).Decode(&warehouse)
-	if err != nil {
-		return nil, err
-	}
-	return &warehouse, nil
+func (r *WarehouseRepository) Save(warehouse *domain.Warehouse) error {
+	i := toModel(warehouse)
+	result := r.db.Create(i)
+	return result.Error
 }
 
-func (r *MongoRepository) Save(warehouse *domain.Warehouse) error {
-	_, err := r.warehouses.InsertOne(context.Background(), warehouse)
-	if err != nil {
-		return err
-	}
-	return nil
+func (r *WarehouseRepository) Replace(warehouse *domain.Warehouse) error {
+	i := toModel(warehouse)
+	result := r.db.Save(i)
+	return result.Error
 }
 
-func (r *MongoRepository) Replace(warehouse *domain.Warehouse) error {
-	filter := bson.D{{Key: "id", Value: warehouse.ID}}
-	var w domain.Warehouse
-	err := r.warehouses.FindOneAndReplace(context.Background(), filter, warehouse).Decode(&w)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (r *MongoRepository) Delete(warehouseID string) error {
-	filter := bson.D{{Key: "id", Value: warehouseID}}
-	var w domain.Warehouse
-	err := r.warehouses.FindOneAndDelete(context.Background(), filter).Decode(&w)
-	if err != nil {
-		return err
-	}
-	return nil
+func (r *WarehouseRepository) Delete(ID string) error {
+	result := r.db.Delete(&model.Warehouse{
+		ID: ID,
+	})
+	return result.Error
 }

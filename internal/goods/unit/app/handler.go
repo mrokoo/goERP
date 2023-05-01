@@ -6,8 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/mrokoo/goERP/internal/goods/unit/domain"
+	repository "github.com/mrokoo/goERP/internal/goods/unit/infra"
 	"github.com/mrokoo/goERP/pkg/reponse"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type UnitHandler struct {
@@ -37,10 +37,10 @@ func (h *UnitHandler) GetUnitList(ctx *gin.Context) {
 
 func (h *UnitHandler) GetUnit(ctx *gin.Context) {
 	id := ctx.Param("id")
-	uid := uuid.MustParse(id)
-	unit, err := h.UnitService.GetUnit(uid)
+
+	unit, err := h.UnitService.GetUnit(id)
 	if err != nil {
-		if err == mongo.ErrNoDocuments {
+		if err == repository.ErrNotFound {
 			ctx.JSON(http.StatusNotFound, reponse.Reponse{
 				Message: "Unit not found with the given id",
 				Data:    nil,
@@ -70,19 +70,13 @@ func (h *UnitHandler) AddUnit(ctx *gin.Context) {
 		})
 		return
 	}
-	id, err := uuid.NewUUID()
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
-			Message: err.Error(),
-		})
-		return
-	}
+
 	unit := domain.Unit{
-		ID:   id,
+		ID:   uuid.New().String(),
 		Name: req.Name,
 		Note: req.Note,
 	}
-	err = h.UnitService.AddUnit(&unit)
+	err := h.UnitService.AddUnit(&unit)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
 			Message: err.Error(),
@@ -107,13 +101,13 @@ func (h *UnitHandler) ReplaceUnit(ctx *gin.Context) {
 		return
 	}
 	unit := domain.Unit{
-		ID:   uuid.MustParse(id),
+		ID:   id,
 		Name: req.Name,
 		Note: req.Note,
 	}
 	err := h.UnitService.ReplaceUnit(&unit)
 	if err != nil {
-		if err == mongo.ErrNoDocuments {
+		if err == repository.ErrNotFound {
 			ctx.JSON(http.StatusBadRequest, reponse.Reponse{
 				Message: "Budget not found with the given id",
 			})
@@ -129,9 +123,8 @@ func (h *UnitHandler) ReplaceUnit(ctx *gin.Context) {
 
 func (h *UnitHandler) DeleteUnit(ctx *gin.Context) {
 	id := ctx.Param("id")
-	uid := uuid.MustParse(id)
-	if err := h.UnitService.DeleteUnit(uid); err != nil {
-		if err == mongo.ErrNoDocuments {
+	if err := h.UnitService.DeleteUnit(id); err != nil {
+		if err == repository.ErrNotFound {
 			ctx.JSON(http.StatusNotFound, reponse.Reponse{
 				Message: "Unit not found with the given id",
 				Data:    nil,

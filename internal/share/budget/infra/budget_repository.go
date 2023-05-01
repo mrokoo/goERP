@@ -1,71 +1,62 @@
 package repository
 
 import (
-	"context"
-
-	"github.com/google/uuid"
+	"github.com/mrokoo/goERP/internal/model"
 	"github.com/mrokoo/goERP/internal/share/budget/domain"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
+	"gorm.io/gorm"
 )
 
-type MongoRepository struct {
-	budgets *mongo.Collection
+var ErrNotFound = gorm.ErrRecordNotFound
+
+type BudgetRepository struct {
+	db *gorm.DB
 }
 
-func NewMongoRepository(db *mongo.Database, collection string) *MongoRepository {
-	budgets := db.Collection(collection)
-	return &MongoRepository{
-		budgets: budgets,
+func NewBudgetRepository(db *gorm.DB) *BudgetRepository {
+	return &BudgetRepository{
+		db: db,
 	}
 }
 
-func (r *MongoRepository) GetAll() ([]*domain.Budget, error) {
-	cursor, err := r.budgets.Find(context.Background(), bson.D{})
-	if err != nil {
+func (r *BudgetRepository) GetAll() ([]*domain.Budget, error) {
+	var list []model.Budget
+	result := r.db.Find(&list)
+	if err := result.Error; err != nil {
 		return nil, err
 	}
-	var results []*domain.Budget
-	if err = cursor.All(context.Background(), &results); err != nil {
+	var budgets []*domain.Budget
+	for i := range list {
+		budgets = append(budgets, toDomain(&list[i]))
+	}
+	return budgets, nil
+}
+
+func (r *BudgetRepository) GetByID(ID string) (*domain.Budget, error) {
+	i := model.Budget{
+		ID: ID,
+	}
+	result := r.db.First(&i)
+	if err := result.Error; err != nil {
 		return nil, err
 	}
-	return results, nil
+	return toDomain(&i), nil
 }
 
-func (r *MongoRepository) GetByID(budgetID uuid.UUID) (*domain.Budget, error) {
-	filter := bson.D{{Key: "id", Value: budgetID}}
-	var budget domain.Budget
-	err := r.budgets.FindOne(context.Background(), filter).Decode(&budget)
-	if err != nil {
-		return nil, err
-	}
-	return &budget, nil
+func (r *BudgetRepository) Save(budget *domain.Budget) error {
+	i := toModel(budget)
+	result := r.db.Create(i)
+	return result.Error
 }
 
-func (r *MongoRepository) Save(budget *domain.Budget) error {
-	_, err := r.budgets.InsertOne(context.Background(), budget)
-	if err != nil {
-		return err
-	}
-	return nil
+func (r *BudgetRepository) Replace(budget *domain.Budget) error {
+	i := toModel(budget)
+	result := r.db.Save(i)
+	return result.Error
 }
 
-func (r *MongoRepository) Replace(budget *domain.Budget) error {
-	filter := bson.D{{Key: "id", Value: budget.ID}}
-	var b domain.Budget
-	err := r.budgets.FindOneAndReplace(context.Background(), filter, budget).Decode(&b)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (r *MongoRepository) Delete(budgetID uuid.UUID) error {
-	filter := bson.D{{Key: "id", Value: budgetID}}
-	var b domain.Budget
-	err := r.budgets.FindOneAndDelete(context.Background(), filter).Decode(&b)
-	if err != nil {
-		return err
-	}
-	return nil
+func (r *BudgetRepository) Delete(ID string) error {
+	result := r.db.Delete(&model.Budget{
+		ID: ID,
+	})
+	return result.Error
 }

@@ -6,8 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/mrokoo/goERP/internal/goods/category/domain"
+	repository "github.com/mrokoo/goERP/internal/goods/category/infra"
 	"github.com/mrokoo/goERP/pkg/reponse"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type CategoryHandler struct {
@@ -21,6 +21,7 @@ func NewCategoryHandler(categoryService CategoryService) *CategoryHandler {
 }
 
 func (h *CategoryHandler) GetCategoryList(ctx *gin.Context) {
+	var categories []*domain.Category
 	categories, err := h.CategoryService.GetCategoryList()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
@@ -37,10 +38,9 @@ func (h *CategoryHandler) GetCategoryList(ctx *gin.Context) {
 
 func (h *CategoryHandler) GetCategory(ctx *gin.Context) {
 	id := ctx.Param("id")
-	uid := uuid.MustParse(id)
-	category, err := h.CategoryService.GetCategory(uid)
+	category, err := h.CategoryService.GetCategory(id)
 	if err != nil {
-		if err == mongo.ErrNoDocuments {
+		if err == repository.ErrNotFound {
 			ctx.JSON(http.StatusNotFound, reponse.Reponse{
 				Message: "Category not found with the given id",
 				Data:    nil,
@@ -70,19 +70,13 @@ func (h *CategoryHandler) AddCategory(ctx *gin.Context) {
 		})
 		return
 	}
-	id, err := uuid.NewUUID()
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
-			Message: err.Error(),
-		})
-		return
-	}
+
 	category := domain.Category{
-		ID:   id,
+		ID:   uuid.New().String(),
 		Name: req.Name,
 		Note: req.Note,
 	}
-	err = h.CategoryService.AddCategory(&category)
+	err := h.CategoryService.AddCategory(&category)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
 			Message: err.Error(),
@@ -107,13 +101,13 @@ func (h *CategoryHandler) ReplaceCategory(ctx *gin.Context) {
 		return
 	}
 	category := domain.Category{
-		ID:   uuid.MustParse(id),
+		ID:   id,
 		Name: req.Name,
 		Note: req.Note,
 	}
 	err := h.CategoryService.ReplaceCategory(&category)
 	if err != nil {
-		if err == mongo.ErrNoDocuments {
+		if err == repository.ErrNotFound {
 			ctx.JSON(http.StatusBadRequest, reponse.Reponse{
 				Message: "Budget not found with the given id",
 			})
@@ -129,9 +123,8 @@ func (h *CategoryHandler) ReplaceCategory(ctx *gin.Context) {
 
 func (h *CategoryHandler) DeleteCategory(ctx *gin.Context) {
 	id := ctx.Param("id")
-	uid := uuid.MustParse(id)
-	if err := h.CategoryService.DeleteCategory(uid); err != nil {
-		if err == mongo.ErrNoDocuments {
+	if err := h.CategoryService.DeleteCategory(id); err != nil {
+		if err == repository.ErrNotFound {
 			ctx.JSON(http.StatusNotFound, reponse.Reponse{
 				Message: "Category not found with the given id",
 				Data:    nil,

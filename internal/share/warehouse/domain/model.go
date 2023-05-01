@@ -13,5 +13,3 @@ type Warehouse struct {
 	Note    string      `json:"note"`
 	State   state.State `json:"state"`
 }
-
-

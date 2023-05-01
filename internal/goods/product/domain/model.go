@@ -1,25 +1,27 @@
 package domain
 
 import (
-	"errors"
-
-	"github.com/google/uuid"
-	"github.com/mrokoo/goERP/internal/goods/product/domain/valueobj/info"
-	"github.com/mrokoo/goERP/internal/goods/product/domain/valueobj/price"
+	category "github.com/mrokoo/goERP/internal/goods/category/domain"
 	"github.com/mrokoo/goERP/internal/goods/product/domain/valueobj/stock"
+	unit "github.com/mrokoo/goERP/internal/goods/unit/domain"
 	"github.com/mrokoo/goERP/internal/share/valueobj/state"
 )
 
-var ErrInvalidDate = errors.New("the date is invalid")
-
+type Category = category.Category
+type Unit = unit.Unit
 type Product struct {
-	ID         string      `json:"id" binding:"required"`
-	Name       string      `json:"name" binding:"required"`
-	CategoryID uuid.UUID   `json:"categoryId"`
-	UnitID     uuid.UUID   `json:"unitId"`
-	State      state.State `json:"state" binding:"oneof=active freeze"`
-	Note       string      `json:"note"`
-	price.Price
-	info.Info
-	OpeningStock []stock.Stock `json:"openingStock" bson:"opening_stock"`
+	ID           string        `json:"id"`
+	Name         string        `json:"name"`
+	CategoryID   *string       `json:"category_id"`
+	UnitID       *string       `json:"unit_id"`
+	OpeningStock []stock.Stock `json:"openStock"`
+	State        state.State   `json:"state"`
+	Note         string        `json:"note"`
+	Img          string        `json:"img"`
+	Intro        string        `json:"intro"`
+	Purchase     float64       `json:"purchase"`
+	Retail       float64       `json:"retail"`
+	Grade1       float64       `json:"grade1"`
+	Grade2       float64       `json:"grade2"`
+	Grade3       float64       `json:"grade3"`
 }

@@ -5,11 +5,11 @@ import (
 	app "github.com/mrokoo/goERP/internal/share/customer/app"
 	domain "github.com/mrokoo/goERP/internal/share/customer/domain"
 	repository "github.com/mrokoo/goERP/internal/share/customer/infra"
-	"go.mongodb.org/mongo-driver/mongo"
+	"gorm.io/gorm"
 )
 
-func NewCustomerRouter(db *mongo.Database, group *gin.RouterGroup) {
-	m := repository.NewMongoRepository(db, domain.CollectionCustomer)
+func NewCustomerRouter(db *gorm.DB, group *gin.RouterGroup) {
+	m := repository.NewCustomerRepository(db)
 	ds := domain.NewCheckingCustomerValidityService(m)
 	s := app.NewCustomerServiceImpl(ds, m)
 	h := app.NewCustomerHandler(s)

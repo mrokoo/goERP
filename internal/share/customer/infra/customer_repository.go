@@ -1,70 +1,62 @@
 package repository
 
 import (
-	"context"
-
+	"github.com/mrokoo/goERP/internal/model"
 	"github.com/mrokoo/goERP/internal/share/customer/domain"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
+	"gorm.io/gorm"
 )
 
-type MongoRepository struct {
-	customers *mongo.Collection
+var ErrNotFound = gorm.ErrRecordNotFound
+
+type CustomerRepository struct {
+	db *gorm.DB
 }
 
-func NewMongoRepository(db *mongo.Database, collection string) *MongoRepository {
-	customers := db.Collection(collection)
-	return &MongoRepository{
-		customers: customers,
+func NewCustomerRepository(db *gorm.DB) *CustomerRepository {
+	return &CustomerRepository{
+		db: db,
 	}
 }
 
-func (r *MongoRepository) GetAll() ([]*domain.Customer, error) {
-	cursor, err := r.customers.Find(context.Background(), bson.D{})
-	if err != nil {
+func (r *CustomerRepository) GetAll() ([]*domain.Customer, error) {
+	var list []model.Customer
+	result := r.db.Find(&list)
+	if err := result.Error; err != nil {
 		return nil, err
 	}
-	var results []*domain.Customer
-	if err = cursor.All(context.Background(), &results); err != nil {
+	var customers []*domain.Customer
+	for i := range list {
+		customers = append(customers, toDomain(&list[i]))
+	}
+	return customers, nil
+}
+
+func (r *CustomerRepository) GetByID(ID string) (*domain.Customer, error) {
+	customer := model.Customer{
+		ID: ID,
+	}
+	result := r.db.First(&customer)
+	if err := result.Error; err != nil {
 		return nil, err
 	}
-	return results, nil
+	return toDomain(&customer), nil
 }
 
-func (r *MongoRepository) GetByID(customerID string) (*domain.Customer, error) {
-	filter := bson.D{{Key: "id", Value: customerID}}
-	var customer domain.Customer
-	err := r.customers.FindOne(context.Background(), filter).Decode(&customer)
-	if err != nil {
-		return nil, err
-	}
-	return &customer, nil
+func (r *CustomerRepository) Save(customer *domain.Customer) error {
+	i := toModel(customer)
+	result := r.db.Create(i)
+	return result.Error
 }
 
-func (r *MongoRepository) Save(customer *domain.Customer) error {
-	_, err := r.customers.InsertOne(context.Background(), customer)
-	if err != nil {
-		return err
-	}
-	return nil
+func (r *CustomerRepository) Replace(customer *domain.Customer) error {
+	i := toModel(customer)
+	result := r.db.Save(i)
+	return result.Error
 }
 
-func (r *MongoRepository) Replace(customer *domain.Customer) error {
-	filter := bson.D{{Key: "id", Value: customer.ID}}
-	var c domain.Customer
-	err := r.customers.FindOneAndReplace(context.Background(), filter, customer).Decode(&c)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (r *MongoRepository) Delete(customerID string) error {
-	filter := bson.D{{Key: "id", Value: customerID}}
-	var c domain.Customer
-	err := r.customers.FindOneAndDelete(context.Background(), filter).Decode(&c)
-	if err != nil {
-		return err
-	}
-	return nil
+func (r *CustomerRepository) Delete(ID string) error {
+	result := r.db.Delete(&model.Customer{
+		ID: ID,
+	})
+	return result.Error
 }

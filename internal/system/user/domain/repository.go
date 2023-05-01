@@ -1,13 +1,9 @@
 package domain
 
-import (
-	"github.com/google/uuid"
-)
-
 type Repository interface {
-	Get(userID uuid.UUID) (*User, error)
-	GetAll() ([]User, error)
-	Update(user User) error
-	Save(user User) error
-	Delete(userID uuid.UUID) error
+	GetAll() ([]*User, error)
+	GetByID(userID string) (*User, error)
+	Save(user *User) error
+	Replace(user *User) error
+	Delete(userID string) error
 }

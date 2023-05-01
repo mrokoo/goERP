@@ -1,71 +1,57 @@
 package repository
 
 import (
-	"context"
-
-	"github.com/google/uuid"
 	"github.com/mrokoo/goERP/internal/goods/category/domain"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
+	"github.com/mrokoo/goERP/internal/model"
+	"gorm.io/gorm"
 )
 
-type MongoRepository struct {
-	categorys *mongo.Collection
+var ErrNotFound = gorm.ErrRecordNotFound
+var ErrDuplicateEntry = gorm.ErrInvalidDB
+
+type CategoryRepository struct {
+	db *gorm.DB
 }
 
-func NewMongoRepository(db *mongo.Database, collection string) *MongoRepository {
-	categorys := db.Collection(collection)
-	return &MongoRepository{
-		categorys: categorys,
+func NewCategoryRepository(db *gorm.DB) *CategoryRepository {
+	return &CategoryRepository{
+		db: db,
 	}
 }
 
-func (r *MongoRepository) GetAll() ([]*domain.Category, error) {
-	cursor, err := r.categorys.Find(context.Background(), bson.D{})
-	if err != nil {
+func (r *CategoryRepository) GetAll() ([]*domain.Category, error) {
+	var list []*model.Category
+	result := r.db.Find(&list)
+	if err := result.Error; err != nil {
 		return nil, err
 	}
-	var results []*domain.Category
-	if err = cursor.All(context.Background(), &results); err != nil {
+	var categories []*domain.Category
+	for _, category := range list {
+		categories = append(categories, toDomain(category))
+	}
+	return categories, nil
+}
+
+func (r *CategoryRepository) GetByID(ID string) (*domain.Category, error) {
+	category := model.Category{
+		ID: ID,
+	}
+	result := r.db.First(&category)
+	if err := result.Error; err != nil {
 		return nil, err
 	}
-	return results, nil
+	return toDomain(&category), nil
 }
 
-func (r *MongoRepository) GetByID(categoryID uuid.UUID) (*domain.Category, error) {
-	filter := bson.D{{Key: "id", Value: categoryID}}
-	var category domain.Category
-	err := r.categorys.FindOne(context.Background(), filter).Decode(&category)
-	if err != nil {
-		return nil, err
-	}
-	return &category, nil
+func (r *CategoryRepository) Save(category *domain.Category) error {
+	i := toModel(category)
+	result := r.db.Save(i)
+	return result.Error
 }
 
-func (r *MongoRepository) Save(category *domain.Category) error {
-	_, err := r.categorys.InsertOne(context.Background(), category)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (r *MongoRepository) Replace(category *domain.Category) error {
-	filter := bson.D{{Key: "id", Value: category.ID}}
-	var b domain.Category
-	err := r.categorys.FindOneAndReplace(context.Background(), filter, category).Decode(&b)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (r *MongoRepository) Delete(categoryID uuid.UUID) error {
-	filter := bson.D{{Key: "id", Value: categoryID}}
-	var b domain.Category
-	err := r.categorys.FindOneAndDelete(context.Background(), filter).Decode(&b)
-	if err != nil {
-		return err
-	}
-	return nil
+func (r *CategoryRepository) Delete(categoryID string) error {
+	result := r.db.Delete(&model.Category{
+		ID: categoryID,
+	})
+	return result.Error
 }

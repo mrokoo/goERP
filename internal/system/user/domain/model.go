@@ -1,14 +1,10 @@
 package domain
 
-import (
-	"github.com/google/uuid"
-)
-
 type User struct {
-	ID       uuid.UUID
-	UserName string
-	Name     string
-	Phone    string
-	Email    string
-	Gender   string
+	ID       string `json:"id"`
+	Name     string `json:"name"`
+	Phone    string `json:"phone"`
+	Email    string `json:"email"`
+	Gender   string `json:"gender"`
+	Password string `json:"password"`
 }

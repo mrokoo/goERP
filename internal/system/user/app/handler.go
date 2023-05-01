@@ -1,130 +1,154 @@
 package app
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/mrokoo/goERP/internal/system/user/domain"
+	repository "github.com/mrokoo/goERP/internal/system/user/infra"
+	"github.com/mrokoo/goERP/pkg/reponse"
 )
 
 type UserHandler struct {
 	UserService UserService
 }
 
-func NewUserHandler(accountService UserService) *UserHandler {
+func NewUserHandler(userService UserService) *UserHandler {
 	return &UserHandler{
-		UserService: accountService,
+		UserService: userService,
 	}
 }
 
 func (h *UserHandler) GetUserList(ctx *gin.Context) {
-	accounts, err := h.UserService.GetUserList()
+	users, err := h.UserService.GetUserList()
 	if err != nil {
-		ctx.JSON(400, gin.H{
-			"code":     -1,
-			"showMsg":  "failure",
-			"errorMsg": err.Error(),
-			"data":     nil,
+		ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
+			Message: err.Error(),
+			Data:    nil,
 		})
 		return
 	}
-	ctx.JSON(200, gin.H{
-		"code":     1,
-		"showMsg":  "success",
-		"errorMsg": "",
-		"data":     accounts,
+	ctx.JSON(http.StatusOK, reponse.Reponse{
+		Message: "",
+		Data:    users,
+	})
+}
+
+func (h *UserHandler) GetUser(ctx *gin.Context) {
+	id := ctx.Param("id")
+	user, err := h.UserService.GetUser(id)
+	if err != nil {
+		if err == repository.ErrNotFound {
+			ctx.JSON(http.StatusNotFound, reponse.Reponse{
+				Message: "User not found with the given id",
+				Data:    nil,
+			})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
+			Message: err.Error(),
+			Data:    nil,
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, reponse.Reponse{
+		Message: "",
+		Data:    user,
 	})
 }
 
 func (h *UserHandler) AddUser(ctx *gin.Context) {
-	var req domain.User
+	var req struct {
+		// ID     string `json:"id" binding:"required"`
+		Name   string `json:"name" binding:"required"`
+		Phone  string `json:"phone" binding:"-"`
+		Email  string `json:"email" binding:"-"`
+		Gender string `json:"gender" binding:"-"`
+	}
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(400, gin.H{
-			"code":     -1,
-			"showMsg":  "failure",
-			"errorMsg": err.Error(),
-			"data":     nil,
+		ctx.JSON(http.StatusBadRequest, reponse.Reponse{
+			Message: "Request parameter verification failed",
 		})
 		return
 	}
 
-	err := h.UserService.AddUser(req)
+	user := domain.User{
+		ID:     uuid.New().String(),
+		Name:   req.Name,
+		Phone:  req.Phone,
+		Email:  req.Email,
+		Gender: req.Gender,
+	}
+	err := h.UserService.AddUser(&user)
 	if err != nil {
-		ctx.JSON(400, gin.H{
-			"code":     -1,
-			"showMsg":  "failure",
-			"errorMsg": err.Error(),
-			"data":     nil,
+		ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
+			Message: err.Error(),
 		})
 		return
 	}
-
-	ctx.JSON(200, gin.H{
-		"code":     1,
-		"showMsg":  "success",
-		"errorMsg": "",
-		"data":     nil,
+	ctx.JSON(http.StatusCreated, reponse.Reponse{
+		Data: user,
 	})
 }
 
-func (h *UserHandler) UpdateUser(ctx *gin.Context) {
-	var req domain.User
-	if err := ctx.ShouldBindJSON(req); err != nil {
-		ctx.JSON(400, gin.H{
-			"code":     -1,
-			"showMsg":  "failure",
-			"errorMsg": err.Error(),
-			"data":     nil,
+func (h *UserHandler) ReplaceUser(ctx *gin.Context) {
+
+	var req struct {
+		// ID     string `json:"id" binding:"required"`
+		Name   string `json:"name" binding:"required"`
+		Phone  string `json:"phone" binding:"-"`
+		Email  string `json:"email" binding:"-"`
+		Gender string `json:"gender" binding:"-"`
+	}
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, reponse.Reponse{
+			Message: "Request parameter verification failed",
 		})
 		return
 	}
-
-	err := h.UserService.UpdateUser(req)
+	id := ctx.Param("id")
+	user := domain.User{
+		ID:     id,
+		Name:   req.Name,
+		Phone:  req.Phone,
+		Email:  req.Email,
+		Gender: req.Gender,
+	}
+	err := h.UserService.ReplaceUser(&user)
 	if err != nil {
-		ctx.JSON(400, gin.H{
-			"code":     -1,
-			"showMsg":  "failure",
-			"errorMsg": err.Error(),
-			"data":     nil,
+		if err == repository.ErrNotFound {
+			ctx.JSON(http.StatusBadRequest, reponse.Reponse{
+				Message: "User not found with the given id",
+			})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
+			Message: err.Error(),
 		})
 		return
 	}
 
-	ctx.JSON(200, gin.H{
-		"code":     1,
-		"showMsg":  "success",
-		"errorMsg": "",
-		"data":     nil,
-	})
+	ctx.JSON(http.StatusCreated, reponse.Reponse{})
 }
 
 func (h *UserHandler) DeleteUser(ctx *gin.Context) {
-	var req struct {
-		ID string `json:"id"`
-	}
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(400, gin.H{
-			"code":     -1,
-			"showMsg":  "failure",
-			"errorMsg": err.Error(),
-			"data":     nil,
-		})
-		return
-	}
-	id := uuid.MustParse(req.ID)
+	id := ctx.Param("id")
 	if err := h.UserService.DeleteUser(id); err != nil {
-		ctx.JSON(400, gin.H{
-			"code":     -1,
-			"showMsg":  "failure",
-			"errorMsg": err.Error(),
-			"data":     nil,
+		if err == repository.ErrNotFound {
+			ctx.JSON(http.StatusNotFound, reponse.Reponse{
+				Message: "User not found with the given id",
+				Data:    nil,
+			})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
+			Message: err.Error(),
+			Data:    nil,
 		})
 		return
 	}
 
-	ctx.JSON(200, gin.H{
-		"code":     1,
-		"showMsg":  "success",
-		"errorMsg": "",
-		"data":     nil,
-	})
+	ctx.JSON(http.StatusNoContent, reponse.Reponse{})
 }

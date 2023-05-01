@@ -3,20 +3,18 @@ package domain
 
 import (
 	"github.com/mrokoo/goERP/internal/share/valueobj/state"
-	"github.com/shopspring/decimal"
 )
 
 type Account struct {
-	ID      string
-	Name    string
-	Type    PayType
-	Holder  string
-	Number  string
-	Note    string
-	State   state.State
-	Balance decimal.Decimal
+	ID      string      `json:"id"`
+	Name    string      `json:"name"`
+	Type    PayType     `json:"type"`
+	Holder  string      `json:"holder"`
+	Number  string      `json:"number"`
+	Note    string      `json:"note"`
+	State   state.State `json:"state"`
+	Balance float64     `json:"balance"`
 }
-
 
 type PayType string
 

@@ -1,20 +1,15 @@
 package app
 
 import (
-	"errors"
-
-	"github.com/google/uuid"
 	"github.com/mrokoo/goERP/internal/system/user/domain"
 )
 
-var ErrNotFound = errors.New("the docment is not found")
-
 type UserService interface {
-	GetUser(userId uuid.UUID) (*domain.User, error)
-	GetUserList() ([]domain.User, error)
-	AddUser(user domain.User) error
-	UpdateUser(user domain.User) error
-	DeleteUser(userId uuid.UUID) error
+	GetUser(id string) (*domain.User, error)
+	GetUserList() ([]*domain.User, error)
+	AddUser(user *domain.User) error
+	ReplaceUser(user *domain.User) error
+	DeleteUser(userID string) error
 }
 
 type UserServiceImpl struct {
@@ -27,15 +22,15 @@ func NewUserServiceImpl(repo domain.Repository) *UserServiceImpl {
 	}
 }
 
-func (s *UserServiceImpl) GetUser(userId uuid.UUID) (*domain.User, error) {
-	user, err := s.repo.Get(userId)
+func (s *UserServiceImpl) GetUser(userID string) (*domain.User, error) {
+	user, err := s.repo.GetByID(userID)
 	if err != nil {
 		return nil, err
 	}
 	return user, nil
 }
 
-func (s *UserServiceImpl) GetUserList() ([]domain.User, error) {
+func (s *UserServiceImpl) GetUserList() ([]*domain.User, error) {
 	users, err := s.repo.GetAll()
 	if err != nil {
 		return nil, err
@@ -43,7 +38,7 @@ func (s *UserServiceImpl) GetUserList() ([]domain.User, error) {
 	return users, nil
 }
 
-func (s *UserServiceImpl) AddUser(user domain.User) error {
+func (s *UserServiceImpl) AddUser(user *domain.User) error {
 	err := s.repo.Save(user)
 	if err != nil {
 		return err
@@ -51,15 +46,15 @@ func (s *UserServiceImpl) AddUser(user domain.User) error {
 	return nil
 }
 
-func (s *UserServiceImpl) UpdateUser(user domain.User) error {
-	if err := s.repo.Update(user); err != nil {
+func (s *UserServiceImpl) ReplaceUser(user *domain.User) error {
+	if err := s.repo.Replace(user); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (s *UserServiceImpl) DeleteUser(userId uuid.UUID) error {
-	if err := s.repo.Delete(userId); err != nil {
+func (s *UserServiceImpl) DeleteUser(userID string) error {
+	if err := s.repo.Delete(userID); err != nil {
 		return err
 	}
 	return nil

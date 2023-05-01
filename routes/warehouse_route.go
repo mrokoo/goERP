@@ -5,11 +5,11 @@ import (
 	app "github.com/mrokoo/goERP/internal/share/warehouse/app"
 	domain "github.com/mrokoo/goERP/internal/share/warehouse/domain"
 	repository "github.com/mrokoo/goERP/internal/share/warehouse/infra"
-	"go.mongodb.org/mongo-driver/mongo"
+	"gorm.io/gorm"
 )
 
-func NewWarehouseRouter(db *mongo.Database, group *gin.RouterGroup) {
-	m := repository.NewMongoRepository(db, domain.CollectionWarehouse)
+func NewWarehouseRouter(db *gorm.DB, group *gin.RouterGroup) {
+	m := repository.NewWarehouseRepository(db)
 	ds := domain.NewCheckingWarehouseValidityService(m)
 	s := app.NewWarehouseServiceImpl(ds, m)
 	h := app.NewWarehouseHandler(s)
@@ -20,4 +20,3 @@ func NewWarehouseRouter(db *mongo.Database, group *gin.RouterGroup) {
 	group.PATCH("/warehouses/:id", h.ReplaceWarehouse)
 	group.DELETE("/warehouses/:id", h.DeleteWarehouse)
 }
-

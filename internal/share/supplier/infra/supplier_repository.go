@@ -1,70 +1,62 @@
 package repository
 
 import (
-	"context"
-
+	"github.com/mrokoo/goERP/internal/model"
 	"github.com/mrokoo/goERP/internal/share/supplier/domain"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
+	"gorm.io/gorm"
 )
 
-type MongoRepository struct {
-	suppliers *mongo.Collection
+var ErrNotFound = gorm.ErrRecordNotFound
+
+type SupplierRepository struct {
+	db *gorm.DB
 }
 
-func NewMongoRepository(db *mongo.Database, collection string) *MongoRepository {
-	suppliers := db.Collection(collection)
-	return &MongoRepository{
-		suppliers: suppliers,
+func NewSupplierRepository(db *gorm.DB) *SupplierRepository {
+	return &SupplierRepository{
+		db: db,
 	}
 }
 
-func (r *MongoRepository) GetAll() ([]*domain.Supplier, error) {
-	cursor, err := r.suppliers.Find(context.Background(), bson.D{})
-	if err != nil {
+func (r *SupplierRepository) GetAll() ([]*domain.Supplier, error) {
+	var list []*model.Supplier
+	result := r.db.Find(&list)
+	if err := result.Error; err != nil {
 		return nil, err
 	}
-	var results []*domain.Supplier
-	if err = cursor.All(context.Background(), &results); err != nil {
+	var suppliers []*domain.Supplier
+	for i := range list {
+		suppliers = append(suppliers, toDomain(list[i]))
+	}
+	return suppliers, nil
+}
+
+func (r *SupplierRepository) GetByID(ID string) (*domain.Supplier, error) {
+	supplier := model.Supplier{
+		ID: ID,
+	}
+	result := r.db.First(&supplier)
+	if err := result.Error; err != nil {
 		return nil, err
 	}
-	return results, nil
+	return toDomain(&supplier), nil
 }
 
-func (r *MongoRepository) GetByID(supplierID string) (*domain.Supplier, error) {
-	filter := bson.D{{Key: "id", Value: supplierID}}
-	var supplier domain.Supplier
-	err := r.suppliers.FindOne(context.Background(), filter).Decode(&supplier)
-	if err != nil {
-		return nil, err
-	}
-	return &supplier, nil
+func (r *SupplierRepository) Save(supplier *domain.Supplier) error {
+	i := toModel(supplier)
+	result := r.db.Create(i)
+	return result.Error
 }
 
-func (r *MongoRepository) Save(supplier *domain.Supplier) error {
-	_, err := r.suppliers.InsertOne(context.Background(), supplier)
-	if err != nil {
-		return err
-	}
-	return nil
+func (r *SupplierRepository) Replace(supplier *domain.Supplier) error {
+	i := toModel(supplier)
+	result := r.db.Save(i)
+	return result.Error
 }
 
-func (r *MongoRepository) Replace(supplier *domain.Supplier) error {
-	filter := bson.D{{Key: "id", Value: supplier.ID}}
-	var s domain.Supplier
-	err := r.suppliers.FindOneAndReplace(context.Background(), filter, supplier).Decode(&s)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (r *MongoRepository) Delete(supplierID string) error {
-	filter := bson.D{{Key: "id", Value: supplierID}}
-	var s domain.Supplier
-	err := r.suppliers.FindOneAndDelete(context.Background(), filter).Decode(&s)
-	if err != nil {
-		return err
-	}
-	return nil
+func (r *SupplierRepository) Delete(ID string) error {
+	result := r.db.Delete(&model.Supplier{
+		ID: ID,
+	})
+	return result.Error
 }

@@ -6,8 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/mrokoo/goERP/internal/share/budget/domain"
+	repository "github.com/mrokoo/goERP/internal/share/budget/infra"
 	"github.com/mrokoo/goERP/pkg/reponse"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type BudgetHandler struct {
@@ -37,10 +37,9 @@ func (h *BudgetHandler) GetBudgetList(ctx *gin.Context) {
 
 func (h *BudgetHandler) GetBudget(ctx *gin.Context) {
 	id := ctx.Param("id")
-	uid := uuid.MustParse(id)
-	budget, err := h.BudgetService.GetBudget(uid)
+	budget, err := h.BudgetService.GetBudget(id)
 	if err != nil {
-		if err == mongo.ErrNoDocuments {
+		if err == repository.ErrNotFound {
 			ctx.JSON(http.StatusNotFound, reponse.Reponse{
 				Message: "Budget not found with the given id",
 				Data:    nil,
@@ -61,6 +60,7 @@ func (h *BudgetHandler) GetBudget(ctx *gin.Context) {
 
 func (h *BudgetHandler) AddBudget(ctx *gin.Context) {
 	var req struct {
+		Name string `json:"name" binding:"required"`
 		Type string `json:"type" binding:"oneof=out in"`
 		Note string `json:"note" binding:"-"`
 	}
@@ -70,19 +70,13 @@ func (h *BudgetHandler) AddBudget(ctx *gin.Context) {
 		})
 		return
 	}
-	id, err := uuid.NewUUID()
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
-			Message: err.Error(),
-		})
-		return
-	}
 	budget := domain.Budget{
-		ID:   id,
+		ID:   uuid.New().String(),
+		Name: req.Name,
 		Type: domain.BudgetType(req.Type),
 		Note: req.Note,
 	}
-	err = h.BudgetService.AddBudget(&budget)
+	err := h.BudgetService.AddBudget(&budget)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
 			Message: err.Error(),
@@ -97,6 +91,7 @@ func (h *BudgetHandler) AddBudget(ctx *gin.Context) {
 func (h *BudgetHandler) ReplaceBudget(ctx *gin.Context) {
 	id := ctx.Param("id")
 	var req struct {
+		Name string `json:"name" binding:"required"`
 		Type string `json:"type" binding:"oneof=out in"`
 		Note string `json:"note" binding:"-"`
 	}
@@ -107,13 +102,14 @@ func (h *BudgetHandler) ReplaceBudget(ctx *gin.Context) {
 		return
 	}
 	budget := domain.Budget{
-		ID:   uuid.MustParse(id),
+		ID:   id,
+		Name: req.Name,
 		Type: domain.BudgetType(req.Type),
 		Note: req.Note,
 	}
 	err := h.BudgetService.ReplaceBudget(&budget)
 	if err != nil {
-		if err == mongo.ErrNoDocuments {
+		if err == repository.ErrNotFound {
 			ctx.JSON(http.StatusBadRequest, reponse.Reponse{
 				Message: "Budget not found with the given id",
 			})
@@ -130,9 +126,8 @@ func (h *BudgetHandler) ReplaceBudget(ctx *gin.Context) {
 
 func (h *BudgetHandler) DeleteBudget(ctx *gin.Context) {
 	id := ctx.Param("id")
-	uid := uuid.MustParse(id)
-	if err := h.BudgetService.DeleteBudget(uid); err != nil {
-		if err == mongo.ErrNoDocuments {
+	if err := h.BudgetService.DeleteBudget(id); err != nil {
+		if err == repository.ErrNotFound {
 			ctx.JSON(http.StatusNotFound, reponse.Reponse{
 				Message: "Budget not found with the given id",
 				Data:    nil,

@@ -1,16 +1,15 @@
 package app
 
 import (
-	"github.com/google/uuid"
 	"github.com/mrokoo/goERP/internal/goods/category/domain"
 )
 
 type CategoryService interface {
-	GetCategory(categoryID uuid.UUID) (*domain.Category, error)
+	GetCategory(categoryID string) (*domain.Category, error)
 	GetCategoryList() ([]*domain.Category, error)
 	AddCategory(category *domain.Category) error
 	ReplaceCategory(category *domain.Category) error
-	DeleteCategory(categoryID uuid.UUID) error
+	DeleteCategory(categoryID string) error
 }
 
 type CategoryServiceImpl struct {
@@ -24,6 +23,7 @@ func NewCategoryServiceImpl(categoryRepository domain.Repository) *CategoryServi
 }
 
 func (s *CategoryServiceImpl) GetCategoryList() ([]*domain.Category, error) {
+	var categories []*domain.Category
 	categories, err := s.categoryRepository.GetAll()
 	if err != nil {
 		return nil, err
@@ -31,7 +31,7 @@ func (s *CategoryServiceImpl) GetCategoryList() ([]*domain.Category, error) {
 	return categories, nil
 }
 
-func (s *CategoryServiceImpl) GetCategory(categoryID uuid.UUID) (*domain.Category, error) {
+func (s *CategoryServiceImpl) GetCategory(categoryID string) (*domain.Category, error) {
 	category, err := s.categoryRepository.GetByID(categoryID)
 	if err != nil {
 		return nil, err
@@ -47,14 +47,11 @@ func (s *CategoryServiceImpl) AddCategory(category *domain.Category) error {
 }
 
 func (s *CategoryServiceImpl) ReplaceCategory(category *domain.Category) error {
-	err := s.categoryRepository.Replace(category)
-	if err != nil {
-		return err
-	}
-	return nil
+	err := s.categoryRepository.Save(category)
+	return err
 }
 
-func (s *CategoryServiceImpl) DeleteCategory(categoryID uuid.UUID) error {
+func (s *CategoryServiceImpl) DeleteCategory(categoryID string) error {
 	if err := s.categoryRepository.Delete(categoryID); err != nil {
 		return err
 	}

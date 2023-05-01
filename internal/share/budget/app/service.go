@@ -1,16 +1,15 @@
 package app
 
 import (
-	"github.com/google/uuid"
 	"github.com/mrokoo/goERP/internal/share/budget/domain"
 )
 
 type BudgetService interface {
-	GetBudget(budgetID uuid.UUID) (*domain.Budget, error)
+	GetBudget(budgetID string) (*domain.Budget, error)
 	GetBudgetList() ([]*domain.Budget, error)
 	AddBudget(budget *domain.Budget) error
 	ReplaceBudget(budget *domain.Budget) error
-	DeleteBudget(budgetID uuid.UUID) error
+	DeleteBudget(budgetID string) error
 }
 
 type BudgetServiceImpl struct {
@@ -23,7 +22,7 @@ func NewBudgetServiceImpl(repo domain.Repository) *BudgetServiceImpl {
 	}
 }
 
-func (s *BudgetServiceImpl) GetBudget(budgetID uuid.UUID) (*domain.Budget, error) {
+func (s *BudgetServiceImpl) GetBudget(budgetID string) (*domain.Budget, error) {
 	budget, err := s.repo.GetByID(budgetID)
 	if err != nil {
 		return nil, err
@@ -54,7 +53,7 @@ func (s *BudgetServiceImpl) ReplaceBudget(budget *domain.Budget) error {
 	return nil
 }
 
-func (s *BudgetServiceImpl) DeleteBudget(budgetID uuid.UUID) error {
+func (s *BudgetServiceImpl) DeleteBudget(budgetID string) error {
 	if err := s.repo.Delete(budgetID); err != nil {
 		return err
 	}
