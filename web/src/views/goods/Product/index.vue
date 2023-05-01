@@ -74,11 +74,11 @@ function renderIcon(icon: Component) {
 }
 
 type ProductColumns = {
+  index: string;
   id: string;
   name: string;
-  type: string;
+  category_id: string;
   state: string;
-  balance: number;
 };
 
 const columns: DataTableColumns<ProductColumns> = [
@@ -100,7 +100,12 @@ const columns: DataTableColumns<ProductColumns> = [
   },
   {
     title: "分类",
-    key: "category",
+    key: "category_id",
+    render(rowData, rowIndex) {
+      return goods.categoryOptions.find(
+        (item) => item.value == rowData.category_id
+      )?.label;
+    },
   },
   {
     title: "采购价",

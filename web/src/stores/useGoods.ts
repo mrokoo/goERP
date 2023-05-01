@@ -10,7 +10,24 @@ export const useGoods = defineStore("goods", {
     unit: [] as Unit[],
     category: [] as Category[],
   }),
-  getters: {},
+  getters: {
+    categoryOptions(state) {
+      return state.category.map((item) => {
+        return {
+          label: item.name,
+          value: item.id,
+        };
+      });
+    },
+    unitOptions(state) {
+      return state.unit.map((item) => {
+        return {
+          label: item.name,
+          value: item.id,
+        };
+      });
+    },
+  },
 
   actions: {
     async getProduct() {

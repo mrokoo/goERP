@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { inject } from "vue";
-import StockTable from "./StockTable.vue";
+import { useGoods } from "@/stores/useGoods";
+// import StockTable from "./StockTable.vue";
+const goods = useGoods();
 import {
   NForm,
   NFormItem,
@@ -60,10 +62,20 @@ const { model, formRef } = inject("form") as any;
       <n-input type="text" v-model:value="model.name" placeholder="" />
     </n-form-item>
     <n-form-item path="category" label="分类">
-      <n-input type="text" v-model:value="model.category_id" placeholder="" />
+      <!-- <n-input type="text" v-model:value="model.category_id" placeholder="" /> -->
+      <NSelect
+        v-model:value="model.category_id"
+        :options="goods.categoryOptions"
+        placeholder=""
+      />
     </n-form-item>
     <n-form-item path="unit" label="单位">
-      <n-input type="text" v-model:value="model.unit_id" placeholder="" />
+      <!-- <n-input type="text" v-model:value="model.unit_id" placeholder="" /> -->
+      <NSelect
+        v-model:value="model.unit_id"
+        :options="goods.unitOptions"
+        placeholder=""
+      />
     </n-form-item>
     <n-form-item path="state" label="状态">
       <n-select v-model:value="model.state" :options="options" placeholder="" />
@@ -132,10 +144,10 @@ const { model, formRef } = inject("form") as any;
         placeholder="关于产品的详细描述..."
       />
     </n-form-item>
-    <n-divider title-placement="left" style="margin-top: 0">
-      期初库存
+    <n-divider title-placement="left" style="margin-top: 0; color: #ff0000">
+      注：期初库存功能(已废弃，迁移使用库存模块盘点 功能)
     </n-divider>
-    <StockTable />
+    <!-- <StockTable /> -->
   </n-form>
 </template>
 <style scoped></style>

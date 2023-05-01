@@ -6,6 +6,7 @@ import budget from "@/api/budget";
 import product from "@/api/product";
 import unit from "@/api/unit";
 import category from "@/api/category";
+import user from "@/api/user";
 
 const api = {
   warehouse,
@@ -16,6 +17,7 @@ const api = {
   product,
   unit,
   category,
+  user,
 };
 
 // 导出使用

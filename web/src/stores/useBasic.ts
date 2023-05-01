@@ -23,6 +23,16 @@ export const useBasic = defineStore("basic", {
       });
       return option;
     },
+    supplierOptions: (state) => {
+      const option: any[] = [];
+      state.supplier.map((item) => {
+        option.push({
+          label: item.name,
+          value: item.id,
+        });
+      });
+      return option;
+    },
   },
 
   actions: {
