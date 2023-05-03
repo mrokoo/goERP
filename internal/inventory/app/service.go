@@ -7,6 +7,7 @@ import (
 	"github.com/mrokoo/goERP/internal/inventory/domain/aggregate/take"
 	"github.com/mrokoo/goERP/internal/inventory/domain/aggregate/task"
 	domain "github.com/mrokoo/goERP/internal/inventory/domain/repository"
+	"gorm.io/gorm"
 )
 
 type InventoryService interface {
@@ -194,7 +195,11 @@ func (i InventoryServiceImpl) GetFlowList() ([]*flowrecord.InventoryFlow, error)
 func (i InventoryServiceImpl) CreateFlow(basicID string, productID string, warehouseID string, flow flowrecord.FlowType, change int) error {
 	previous, err := i.GetPreviousProductQuantity(productID, warehouseID)
 	if err != nil {
-		return err
+		if err == gorm.ErrRecordNotFound {
+			previous = 0
+		} else {
+			return err
+		}
 	}
 	f := flowrecord.NewInventoryFlow(basicID, productID, warehouseID, flow, previous, change)
 	if err := i.InventoryFlowRepository.Save(&f); err != nil {

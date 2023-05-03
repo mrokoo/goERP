@@ -15,7 +15,7 @@ type Product struct {
 	CategoryID   *string       `json:"category_id"`
 	UnitID       *string       `json:"unit_id"`
 	OpeningStock []stock.Stock `json:"openStock"`
-	State        state.State   `json:"state"`
+	State        state.State   `json:"state"`	
 	Note         string        `json:"note"`
 	Img          string        `json:"img"`
 	Intro        string        `json:"intro"`

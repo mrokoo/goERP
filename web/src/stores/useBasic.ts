@@ -33,6 +33,16 @@ export const useBasic = defineStore("basic", {
       });
       return option;
     },
+    accountOptions: (state) => {
+      const option: any[] = [];
+      state.account.map((item) => {
+        option.push({
+          label: item.name,
+          value: item.id,
+        });
+      });
+      return option;
+    },
   },
 
   actions: {

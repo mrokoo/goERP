@@ -8,12 +8,12 @@ import (
 )
 
 type Record struct {
-	ID          string
-	WarehouseID string
-	UserID      string
-	State       state.State
-	Items       []RecordItem
-	CreatedAt   time.Time
+	ID          string       `json:"id"`
+	WarehouseID string       `json:"warehouse_id"`
+	UserID      string       `json:"user_id"`
+	State       state.State  `json:"state"`
+	Items       []RecordItem `json:"items"`
+	CreatedAt   time.Time    `json:"created_at"`
 }
 
 func NewRecord(warehouseID string, userID string, items []RecordItem) Record {
@@ -28,8 +28,8 @@ func NewRecord(warehouseID string, userID string, items []RecordItem) Record {
 }
 
 type RecordItem struct {
-	ProductID string
-	Quantity  int
+	ProductID string `json:"product_id"`
+	Quantity  int    `json:"quantity"`
 }
 
 func NewRecordItem(productID string, quantity int) RecordItem {

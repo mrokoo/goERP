@@ -20,6 +20,7 @@ type PurchaseOrder struct {
 	Debt         float64
 	CreatedAt    time.Time
 	Basic        string // 用于退货单
+	Kind         string
 }
 
 type PurchaseOrderItem struct {

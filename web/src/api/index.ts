@@ -7,6 +7,8 @@ import product from "@/api/product";
 import unit from "@/api/unit";
 import category from "@/api/category";
 import user from "@/api/user";
+import purchaseOrder from "./purchaseOrder";
+import inventory from "./inventory";
 
 const api = {
   warehouse,
@@ -18,6 +20,8 @@ const api = {
   unit,
   category,
   user,
+  purchaseOrder,
+  inventory,
 };
 
 // 导出使用

@@ -24,6 +24,7 @@ func toModel(order *domain.PurchaseOrder) *model.PurchaseOrder {
 		Debt:         order.Debt,
 		CreatedAt:    order.CreatedAt,
 		Basic:        order.Basic,
+		Kind:         string(order.Kind),
 	}
 }
 
@@ -46,6 +47,7 @@ func toDomain(order *model.PurchaseOrder) *domain.PurchaseOrder {
 		Debt:         order.Debt,
 		CreatedAt:    order.CreatedAt,
 		Basic:        order.Basic,
+		Kind:         domain.Kind(order.Kind),
 	}
 }
 

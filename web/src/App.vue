@@ -6,15 +6,21 @@ import {
   darkTheme,
   useOsTheme,
   NMessageProvider,
+  zhCN,
+  dateZhCN,
 } from "naive-ui";
 import { useTheme } from "@/hooks/useTheme";
 import themeOverrides from "@/theme/naive-ui-theme-overrides.json";
 import { useBasic } from "./stores/useBasic";
 import { useGoods } from "./stores/useGoods";
 import { useSystem } from "./stores/useSystem";
+import { usePurchaseOrder } from "./stores/usePurchaseOrder";
+import { useInventory } from "./stores/useInventory";
 const basic = useBasic();
 const goods = useGoods();
 const system = useSystem();
+const purchase = usePurchaseOrder();
+const inventory = useInventory();
 
 const layout = shallowRef(Default);
 const { theme, Theme } = useTheme();
@@ -40,11 +46,18 @@ onMounted(async () => {
   await goods.getCategory();
   await goods.getProduct();
   await system.getUser();
+  await purchase.getPurchaseOrder();
+  await inventory.getTaskList();
 });
 </script>
 
 <template>
-  <n-config-provider :theme="themec" :themeOverrides="themeOverrides">
+  <n-config-provider
+    :theme="themec"
+    :themeOverrides="themeOverrides"
+    :locale="zhCN"
+    :date-locale="dateZhCN"
+  >
     <n-message-provider>
       <component :is="layout">
         <router-view #default="{ Component }">

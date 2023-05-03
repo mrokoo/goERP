@@ -80,15 +80,18 @@ const menuOptions: MenuOption[] = [
         key: "stock-report",
       },
       {
+        disabled: true,
         label: () =>
           h(
-            RouterLink,
-            {
-              to: {
-                name: "income_report",
-              },
-            },
-            { default: () => "收支统计" }
+            // RouterLink,
+            // {
+            //   to: {
+            //     name: "income_report",
+            //   },
+            // },
+            // { default: () => "收支统计" }
+            "span",
+            "收支统计"
           ),
         key: "income",
       },
@@ -406,6 +409,7 @@ const menuOptions: MenuOption[] = [
   {
     label: "财务管理",
     key: "finance",
+    disabled: true,
     icon: renderIcon(FinanceIcon),
     children: [
       // please help me write InStock OutStock

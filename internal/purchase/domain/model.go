@@ -5,20 +5,20 @@ import (
 )
 
 type PurchaseOrder struct {
-	ID           string
-	WarehouseID  string
-	SupplierID   string
-	UserID       string
-	AccountID    string
-	OtherCost    float64
-	TotalCost    float64
-	ActalPayment float64
-	Debt         float64
-	CreatedAt    time.Time
-	IsValidated  bool
-	Basic        string
-	Items        []Item
-	Kind         Kind
+	ID           string    `json:"id"`
+	WarehouseID  string    `json:"warehouse_id"`
+	SupplierID   string    `json:"supplier_id"`
+	UserID       string    `json:"user_id"`
+	AccountID    string    `json:"account_id"`
+	OtherCost    float64   `json:"other_cost"`
+	TotalCost    float64   `json:"total_cost"`
+	ActalPayment float64   `json:"actal_payment"`
+	Debt         float64   `json:"debt"`
+	CreatedAt    time.Time `json:"created_at"`
+	IsValidated  bool      `json:"is_validated"`
+	Basic        string    `json:"basic"`
+	Items        []Item    `json:"items"`
+	Kind         Kind      `json:"kind"`
 }
 
 func NewPurchaseOrder(ID string, warehouse string, supplier string, user string, account string, otherCost float64, actalPayment float64, basic string, items []Item, kind Kind) PurchaseOrder {
@@ -58,9 +58,9 @@ func (p *PurchaseOrder) GetDebt() float64 {
 }
 
 type Item struct {
-	ProductID string
-	Quantity  int
-	Price     float64
+	ProductID string  `json:"product_id"`
+	Quantity  int     `json:"quantity"`
+	Price     float64 `json:"price"`
 }
 
 type Kind string

@@ -9,6 +9,7 @@ import (
 type PurchaseService interface {
 	GetPurchaseOrderList() ([]*domain.PurchaseOrder, error)
 	AddPurchaseOrder(purchaseOrder *domain.PurchaseOrder) error
+	AddPurchaseReturnOrder(purchaseOrder *domain.PurchaseOrder) error
 	InvalidatePurchaseOrder(purchaseOrderID string) error
 	InvalidatePurchaseReturnOrder(purchaseOrderID string) error
 }

@@ -27,6 +27,14 @@ export const useGoods = defineStore("goods", {
         };
       });
     },
+    productOptions(state) {
+      return state.product.map((item) => {
+        return {
+          label: item.name,
+          value: item.id,
+        };
+      });
+    },
   },
 
   actions: {

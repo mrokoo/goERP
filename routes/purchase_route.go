@@ -13,7 +13,6 @@ import (
 )
 
 func NewPurchaseRouter(db *gorm.DB, group *gin.RouterGroup) {
-
 	m1 := order.NewPurchaseOrderRepository(db)
 	take := takeRepo.NewTakeRepository(db)
 	task := taskRepo.NewTaskRepository(db)
@@ -26,5 +25,7 @@ func NewPurchaseRouter(db *gorm.DB, group *gin.RouterGroup) {
 	h := app.NewPurchaseHandler(s)
 	group.GET("/purchaseOrders", h.GetPurchaseOrderList)
 	group.POST("/purchaseOrders", h.AddPurchaseOrder)
-	// group.PUT("/purchaseOrders/:id", h.InvalidatePurchaseOrder)
+	group.PUT("/purchaseOrders/:id", h.InvalidatePurchaseOrder)
+	group.POST("/purchaseReturnOrders", h.AddPurchaseReturnOrder)
+	group.PUT("/purchaseReturnOrders/:id", h.InvalidatePurchaseReturnOrder)
 }

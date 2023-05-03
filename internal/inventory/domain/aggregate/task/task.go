@@ -10,19 +10,19 @@ import (
 )
 
 type Task struct {
-	ID                    string
-	WarehouseID           string
-	Kind                  Kind
-	State                 state.State
-	Items                 []TaskItem
-	Recrods               []record.Record
-	IO                    bool
-	PurchaseOrderID       *string
-	PurchaseReturnOrderID *string
-	SaleOrderID           *string
-	SaleReturnOrderID     *string
-	AllotID               *string
-	CreatedAt             time.Time
+	ID                    string          `json:"id"`
+	WarehouseID           string          `json:"warehouse_id"`
+	Kind                  Kind            `json:"kind"`
+	State                 state.State     `json:"state"`
+	Items                 []TaskItem      `json:"items"`
+	Recrods               []record.Record `json:"records"`
+	IO                    bool            `json:"io"`
+	PurchaseOrderID       *string         `json:"purchase_order_id"`
+	PurchaseReturnOrderID *string         `json:"purchase_return_order_id"`
+	SaleOrderID           *string         `json:"sale_order_id"`
+	SaleReturnOrderID     *string         `json:"sale_return_order_id"`
+	AllotID               *string         `json:"allot_id"`
+	CreatedAt             time.Time       `json:"created_at"`
 }
 
 func NewTask(warehouseID string, kind Kind, basic string, items []TaskItem) Task {
@@ -66,9 +66,9 @@ func NewTask(warehouseID string, kind Kind, basic string, items []TaskItem) Task
 }
 
 type TaskItem struct {
-	ProductID string
-	Total     int
-	Quantity  int
+	ProductID string `json:"product_id"`
+	Total     int    `json:"total"`
+	Quantity  int    `json:"quantity"`
 }
 
 func NewTaskItem(productID string, total int) TaskItem {
