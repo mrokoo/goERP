@@ -1,0 +1,1328 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>infra: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/mrokoo/goERP/internal/goods/product/infra/adapter.go (100.0%)</option>
+				
+				<option value="file1">github.com/mrokoo/goERP/internal/goods/product/infra/product_repository.go (50.0%)</option>
+				
+				<option value="file2">github.com/mrokoo/goERP/internal/inventory/app/handler.go (0.0%)</option>
+				
+				<option value="file3">github.com/mrokoo/goERP/internal/inventory/app/service.go (20.7%)</option>
+				
+				<option value="file4">github.com/mrokoo/goERP/internal/model/migrate.go (51.1%)</option>
+				
+				<option value="file5">github.com/mrokoo/goERP/internal/purchase/app/handler.go (0.0%)</option>
+				
+				<option value="file6">github.com/mrokoo/goERP/internal/purchase/app/service.go (23.7%)</option>
+				
+				<option value="file7">github.com/mrokoo/goERP/internal/system/role/infra/mongodb/role_repository.go (77.6%)</option>
+				
+				<option value="file8">github.com/mrokoo/goERP/internal/system/user/infra/adapter.go (0.0%)</option>
+				
+				<option value="file9">github.com/mrokoo/goERP/internal/system/user/infra/user_repository.go (4.5%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package repository
+
+import (
+        "github.com/mrokoo/goERP/internal/goods/product/domain"
+        "github.com/mrokoo/goERP/internal/goods/product/domain/valueobj/stock"
+        "github.com/mrokoo/goERP/internal/model"
+        "github.com/mrokoo/goERP/internal/share/valueobj/state"
+)
+
+func toModel(product *domain.Product) *model.Product <span class="cov8" title="1">{
+        var openingStock []model.OpeningStock
+        for i := range product.OpeningStock </span><span class="cov8" title="1">{
+                openingStock = append(openingStock, *toModelStock(&amp;product.OpeningStock[i]))
+        }</span>
+        <span class="cov8" title="1">return &amp;model.Product{
+                ID:           product.ID,
+                Name:         product.Name,
+                CategoryID:   product.CategoryID,
+                UnitID:       product.UnitID,
+                OpeningStock: openingStock,
+                State:        string(product.State),
+                Note:         product.Note,
+                Img:          product.Img,
+                Intro:        product.Intro,
+                Purchase:     product.Purchase,
+                Retail:       product.Retail,
+                Grade1:       product.Grade1,
+                Grade2:       product.Grade2,
+                Grade3:       product.Grade3,
+        }</span>
+}
+
+func toDomain(product *model.Product) *domain.Product <span class="cov8" title="1">{
+        var openingStock []stock.Stock
+        for i := range product.OpeningStock </span><span class="cov8" title="1">{
+                openingStock = append(openingStock, *toDomainStock(&amp;product.OpeningStock[i]))
+        }</span>
+        <span class="cov8" title="1">return &amp;domain.Product{
+                ID:           product.ID,
+                Name:         product.Name,
+                CategoryID:   product.CategoryID,
+                UnitID:       product.UnitID,
+                OpeningStock: openingStock,
+                State:        state.State(product.State),
+                Note:         product.Note,
+                Img:          product.Img,
+                Intro:        product.Intro,
+                Purchase:     product.Purchase,
+                Retail:       product.Retail,
+                Grade1:       product.Grade1,
+                Grade2:       product.Grade2,
+                Grade3:       product.Grade3,
+        }</span>
+}
+
+func toModelStock(stock *stock.Stock) *model.OpeningStock <span class="cov8" title="1">{
+        return &amp;model.OpeningStock{
+                WarehouseID: stock.WarehouseID,
+                Amount:      stock.Amount,
+        }
+}</span>
+
+func toDomainStock(s *model.OpeningStock) *stock.Stock <span class="cov8" title="1">{
+        return &amp;stock.Stock{
+                WarehouseID: s.WarehouseID,
+                Amount:      s.Amount,
+        }
+}</span>
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package repository
+
+import (
+        "github.com/mrokoo/goERP/internal/goods/product/domain"
+        "github.com/mrokoo/goERP/internal/model"
+        "gorm.io/gorm"
+)
+
+// 要将偶然复杂性消除掉，通过添加模型转换，或者适配器进行个隔离。
+var ErrNotFound = gorm.ErrRecordNotFound
+
+type ProductRepository struct {
+        db *gorm.DB
+}
+
+func NewProductRepository(db *gorm.DB) *ProductRepository <span class="cov8" title="1">{
+        return &amp;ProductRepository{
+                db: db,
+        }
+}</span>
+
+func (r *ProductRepository) GetAll() ([]*domain.Product, error) <span class="cov8" title="1">{
+        var list []*model.Product
+        result := r.db.Preload("OpeningStock").Find(&amp;list)
+        if err := result.Error; err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">var products []*domain.Product
+        for i := range list </span><span class="cov8" title="1">{
+                products = append(products, toDomain(list[i]))
+        }</span>
+        <span class="cov8" title="1">return products, nil</span>
+}
+
+func (r *ProductRepository) GetByID(productID string) (*domain.Product, error) <span class="cov0" title="0">{
+        product := model.Product{
+                ID: productID,
+        }
+        result := r.db.Preload("OpeningStock").First(&amp;product)
+        if err := result.Error; err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">return toDomain(&amp;product), nil</span>
+}
+
+func (r *ProductRepository) Save(product *domain.Product) error <span class="cov8" title="1">{
+        i := toModel(product)
+        result := r.db.Create(i)
+        return result.Error
+}</span>
+
+func (r *ProductRepository) Replace(product *domain.Product) error <span class="cov0" title="0">{
+        i := toModel(product)
+        result := r.db.Session(&amp;gorm.Session{FullSaveAssociations: true}).Updates(&amp;i)
+        return result.Error
+}</span>
+
+func (r *ProductRepository) Delete(productID string) error <span class="cov0" title="0">{
+        result := r.db.Delete(&amp;model.Product{
+                ID: productID,
+        })
+        return result.Error
+}</span>
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package app
+
+import (
+        "net/http"
+
+        "github.com/gin-gonic/gin"
+        "github.com/mrokoo/goERP/internal/inventory/domain/aggregate/allot"
+        "github.com/mrokoo/goERP/internal/inventory/domain/aggregate/record"
+        "github.com/mrokoo/goERP/internal/inventory/domain/aggregate/take"
+        "github.com/mrokoo/goERP/pkg/reponse"
+)
+
+type InventoryHandler struct {
+        inventoryService InventoryService
+}
+
+func NewInventoryHandler(inventoryService InventoryService) *InventoryHandler <span class="cov0" title="0">{
+        return &amp;InventoryHandler{
+                inventoryService: inventoryService,
+        }
+}</span>
+
+func (h *InventoryHandler) GetTaskList(ctx *gin.Context) <span class="cov0" title="0">{
+        inventorys, err := h.inventoryService.GetTaskList()
+        if err != nil </span><span class="cov0" title="0">{
+                ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
+                        Message: err.Error(),
+                        Data:    nil,
+                })
+                return
+        }</span>
+        <span class="cov0" title="0">ctx.JSON(http.StatusOK, reponse.Reponse{
+                Message: "",
+                Data:    inventorys,
+        })</span>
+}
+
+func (h *InventoryHandler) InvalidateTask(ctx *gin.Context) <span class="cov0" title="0">{
+        err := h.inventoryService.InvalidateTask(ctx.Param("id"))
+        if err != nil </span><span class="cov0" title="0">{
+                ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
+                        Message: err.Error(),
+                        Data:    nil,
+                })
+                return
+        }</span>
+        <span class="cov0" title="0">ctx.JSON(http.StatusOK, reponse.Reponse{
+                Message: "",
+                Data:    nil,
+        })</span>
+}
+
+func (h *InventoryHandler) AddRecord(ctx *gin.Context) <span class="cov0" title="0">{
+        type item struct {
+                ProductID string
+                Quantity  int
+        }
+        var req struct {
+                WarehouseID string `json:"warehouseID" binding:"required"`
+                UserID      string `json:"userID" binding:"required"`
+                Items       []item
+        }
+
+        if err := ctx.ShouldBindJSON(&amp;req); err != nil </span><span class="cov0" title="0">{
+                ctx.JSON(http.StatusBadRequest, reponse.Reponse{
+                        Message: err.Error(),
+                        Data:    nil,
+                })
+                return
+        }</span>
+
+        <span class="cov0" title="0">var items []record.RecordItem
+        for _, item := range req.Items </span><span class="cov0" title="0">{
+                c := h.inventoryService.CreateRecordItem(item.ProductID, item.Quantity)
+                items = append(items, c)
+        }</span>
+
+        <span class="cov0" title="0">record := record.NewRecord(req.WarehouseID, req.UserID, items)
+        err := h.inventoryService.AddRecord(ctx.Param("id"), record)
+        if err != nil </span><span class="cov0" title="0">{
+                ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
+                        Message: err.Error(),
+                        Data:    nil,
+                })
+                return
+        }</span>
+        <span class="cov0" title="0">ctx.JSON(http.StatusOK, reponse.Reponse{
+                Message: "",
+                Data:    nil,
+        })</span>
+}
+
+func (h *InventoryHandler) InvalidateRecord(ctx *gin.Context) <span class="cov0" title="0">{
+        err := h.inventoryService.InvalidateRecord(ctx.Param("id"), ctx.Param("rid"))
+        if err != nil </span><span class="cov0" title="0">{
+                ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
+                        Message: err.Error(),
+                        Data:    nil,
+                })
+                return
+        }</span>
+        <span class="cov0" title="0">ctx.JSON(http.StatusOK, reponse.Reponse{
+                Message: "",
+                Data:    nil,
+        })</span>
+}
+
+func (h *InventoryHandler) GetTakeList(ctx *gin.Context) <span class="cov0" title="0">{
+        takes, err := h.inventoryService.GetTakeList()
+        if err != nil </span><span class="cov0" title="0">{
+                ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
+                        Message: err.Error(),
+                        Data:    nil,
+                })
+                return
+        }</span>
+        <span class="cov0" title="0">ctx.JSON(http.StatusOK, reponse.Reponse{
+                Message: "",
+                Data:    takes,
+        })</span>
+}
+
+func (h *InventoryHandler) AddTake(ctx *gin.Context) <span class="cov0" title="0">{
+        type item struct {
+                ProductID string
+                Quantity  int
+        }
+        var req struct {
+                WarehouseID string `json:"warehouseID" binding:"required"`
+                UserID      string `json:"userID" binding:"required"`
+                Items       []item
+        }
+
+        if err := ctx.ShouldBindJSON(&amp;req); err != nil </span><span class="cov0" title="0">{
+                ctx.JSON(http.StatusBadRequest, reponse.Reponse{
+                        Message: err.Error(),
+                        Data:    nil,
+                })
+                return
+        }</span>
+
+        <span class="cov0" title="0">var takeItems []take.Item
+        for _, item := range req.Items </span><span class="cov0" title="0">{
+                takeItems = append(takeItems, take.Item{
+                        ProductID: item.ProductID,
+                        Quantity:  item.Quantity,
+                })
+        }</span>
+
+        <span class="cov0" title="0">err := h.inventoryService.CreateTake(req.WarehouseID, req.UserID, takeItems)
+        if err != nil </span><span class="cov0" title="0">{
+                ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
+                        Message: err.Error(),
+                        Data:    nil,
+                })
+                return
+        }</span>
+        <span class="cov0" title="0">ctx.JSON(http.StatusOK, reponse.Reponse{
+                Message: "",
+                Data:    nil,
+        })</span>
+}
+
+func (h *InventoryHandler) GetAllotList(ctx *gin.Context) <span class="cov0" title="0">{
+        allots, err := h.inventoryService.GetAllotList()
+        if err != nil </span><span class="cov0" title="0">{
+                ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
+                        Message: err.Error(),
+                        Data:    nil,
+                })
+                return
+        }</span>
+        <span class="cov0" title="0">ctx.JSON(http.StatusOK, reponse.Reponse{
+                Message: "",
+                Data:    allots,
+        })</span>
+}
+
+func (h *InventoryHandler) AddAllot(ctx *gin.Context) <span class="cov0" title="0">{
+        type Item struct {
+                ProductID string
+                Quantity  int
+        }
+
+        var req struct {
+                InWarehouseID  string `json:"inWarehouseID" binding:"required"`
+                OutWarehouseID string `json:"outWarehouseID" binding:"required"`
+                UserID         string `json:"userID" binding:"required"`
+                Items          []Item
+        }
+
+        if err := ctx.ShouldBindJSON(&amp;req); err != nil </span><span class="cov0" title="0">{
+                ctx.JSON(http.StatusBadRequest, reponse.Reponse{
+                        Message: err.Error(),
+                        Data:    nil,
+                })
+                return
+        }</span>
+
+        <span class="cov0" title="0">var allotItems []allot.Item
+        for _, item := range req.Items </span><span class="cov0" title="0">{
+                allotItems = append(allotItems, allot.Item{
+                        ProductID: item.ProductID,
+                        Quantity:  item.Quantity,
+                })
+        }</span>
+
+        <span class="cov0" title="0">err := h.inventoryService.CreateAllot(req.InWarehouseID, req.OutWarehouseID, req.UserID, allotItems)
+        if err != nil </span><span class="cov0" title="0">{
+                ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
+                        Message: err.Error(),
+                        Data:    nil,
+                })
+                return
+        }</span>
+        <span class="cov0" title="0">ctx.JSON(http.StatusOK, reponse.Reponse{
+                Message: "",
+                Data:    nil,
+        })</span>
+}
+
+func (h *InventoryHandler) GetInventoryFlowList(ctx *gin.Context) <span class="cov0" title="0">{
+        inventoryFlows, err := h.inventoryService.GetFlowList()
+        if err != nil </span><span class="cov0" title="0">{
+                ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
+                        Message: err.Error(),
+                        Data:    nil,
+                })
+                return
+        }</span>
+        <span class="cov0" title="0">ctx.JSON(http.StatusOK, reponse.Reponse{
+                Message: "",
+                Data:    inventoryFlows,
+        })</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package app
+
+import (
+        "github.com/mrokoo/goERP/internal/inventory/domain/aggregate/allot"
+        flowrecord "github.com/mrokoo/goERP/internal/inventory/domain/aggregate/flow"
+        "github.com/mrokoo/goERP/internal/inventory/domain/aggregate/record"
+        "github.com/mrokoo/goERP/internal/inventory/domain/aggregate/take"
+        "github.com/mrokoo/goERP/internal/inventory/domain/aggregate/task"
+        domain "github.com/mrokoo/goERP/internal/inventory/domain/repository"
+        "gorm.io/gorm"
+)
+
+type InventoryService interface {
+        // task api
+        GetTaskList() ([]*task.Task, error)
+        GetTaskByPurchaseID(purchaseID string, kind task.Kind) (*task.Task, error)
+        CreateTask(warehouseID string, kind task.Kind, basic string, items []task.TaskItem) error
+        CreateTaskItem(productID string, total int) task.TaskItem
+        InvalidateTask(taskID string) error
+        AddRecord(taskID string, record record.Record) error
+        CreateRecord(warehouseID string, userID string, items []record.RecordItem) (record.Record, error)
+        CreateRecordItem(productID string, total int) record.RecordItem
+        InvalidateRecord(taskID string, recordID string) error
+
+        // flow api
+        GetFlowList() ([]*flowrecord.InventoryFlow, error)
+        CreateFlow(basicID string, productID string, warehouseID string, flow flowrecord.FlowType, change int) error
+        GetPreviousProductQuantity(productID string, warehouseID string) (int, error)
+
+        // allot api
+        GetAllotList() ([]*allot.Allot, error)
+        CreateAllot(in string, out string, userID string, items []allot.Item) error
+
+        // take api
+        GetTakeList() ([]*take.Take, error)
+        CreateTake(warehouseID, userID string, items []take.Item) error
+}
+
+type InventoryServiceImpl struct {
+        InventoryFlowRepository domain.InventoryFlowRepository
+        TaskRepository          domain.TaskRepository
+        AllotRepository         domain.AllotRepository
+        TakeRepository          domain.TakeRepository
+}
+
+func NewInventoryServiceImpl(inventoryFlowRepository domain.InventoryFlowRepository, taskRepository domain.TaskRepository, allotRepository domain.AllotRepository, takeRepository domain.TakeRepository) InventoryServiceImpl <span class="cov8" title="1">{
+        return InventoryServiceImpl{
+                InventoryFlowRepository: inventoryFlowRepository,
+                TaskRepository:          taskRepository,
+                AllotRepository:         allotRepository,
+                TakeRepository:          takeRepository,
+        }
+}</span>
+
+// Taskapi
+func (i InventoryServiceImpl) GetTaskList() ([]*task.Task, error) <span class="cov8" title="1">{
+        list, err := i.TaskRepository.GetAll()
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">return list, nil</span>
+}
+
+func (i InventoryServiceImpl) GetTaskByPurchaseID(purchaseID string, kind task.Kind) (*task.Task, error) <span class="cov0" title="0">{
+        t, err := i.TaskRepository.GetTaskByPurchaseID(purchaseID, kind)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">return t, nil</span>
+}
+
+// CreateTask 不直接暴露，需要在其他包中调用
+func (i InventoryServiceImpl) CreateTask(warehouseID string, kind task.Kind, basic string, items []task.TaskItem) error <span class="cov0" title="0">{
+        t := task.NewTask(warehouseID, kind, basic, items)
+        err := i.TaskRepository.Save(&amp;t)
+        return err
+}</span>
+
+func (i InventoryServiceImpl) CreateTaskItem(productID string, total int) task.TaskItem <span class="cov0" title="0">{
+        item := task.NewTaskItem(productID, total)
+        return item
+}</span>
+
+// 不直接暴露，需要给其他包使用
+func (i InventoryServiceImpl) InvalidateTask(taskID string) error <span class="cov0" title="0">{
+        ID := taskID
+        t, err := i.TaskRepository.GetByID(ID)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov0" title="0">if err := t.InvalidateTask(); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov0" title="0">if err := i.TaskRepository.Save(t); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (i InventoryServiceImpl) AddRecord(taskID string, record record.Record) error <span class="cov8" title="1">{
+        t, err := i.TaskRepository.GetByID(taskID)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov8" title="1">if err := t.AddRecord(record); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov8" title="1">signal := 1
+        var kind flowrecord.FlowType
+        switch t.Kind </span>{
+        case task.IN_PURCHASE, task.IN_SALE:<span class="cov8" title="1">
+                kind = flowrecord.FLOWTYPE_RUKU
+                signal = 1</span>
+        case task.OUT_PURCHASE, task.OUT_SALE:<span class="cov0" title="0">
+                kind = flowrecord.FLOWTYPE_CHUKU
+                signal = -1</span>
+        case task.IN_ALLOCATION:<span class="cov0" title="0">
+                kind = flowrecord.FLOWTYPE_DIAOBO
+                signal = 1</span>
+        case task.OUT_ALLOCATION:<span class="cov0" title="0">
+                kind = flowrecord.FLOWTYPE_DIAOBO
+                signal = -1</span>
+        }
+        <span class="cov8" title="1">for _, ri := range record.Items </span><span class="cov8" title="1">{
+                if err := i.CreateFlow(taskID, ri.ProductID, t.WarehouseID, kind, signal*ri.Quantity); err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+        }
+
+        <span class="cov8" title="1">if err := i.TaskRepository.Save(t); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov8" title="1">return nil</span>
+}
+
+func (i InventoryServiceImpl) CreateRecord(warehouseID string, userID string, items []record.RecordItem) (record.Record, error) <span class="cov0" title="0">{
+        r := record.NewRecord(warehouseID, userID, items)
+        return r, nil
+}</span>
+
+func (i InventoryServiceImpl) CreateRecordItem(productID string, total int) record.RecordItem <span class="cov0" title="0">{
+        item := record.NewRecordItem(productID, total)
+        return item
+}</span>
+
+func (i InventoryServiceImpl) InvalidateRecord(taskID string, recordID string) error <span class="cov0" title="0">{
+        t, err := i.TaskRepository.GetByID(taskID)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov0" title="0">if err := t.InvalidateRecord(recordID); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov0" title="0">signal := 1
+        var kind flowrecord.FlowType
+        switch t.Kind </span>{
+        case task.IN_PURCHASE, task.IN_SALE:<span class="cov0" title="0">
+                kind = flowrecord.FLOWTYPE_ZUOFEIRUKU
+                signal = -1</span>
+        case task.OUT_PURCHASE, task.OUT_SALE:<span class="cov0" title="0">
+                kind = flowrecord.FLOWTYPE_ZUOFEICHUKU
+                signal = 1</span>
+        case task.IN_ALLOCATION:<span class="cov0" title="0">
+                kind = flowrecord.FLOWTYPE_ZUOFEIDIAOBO
+                signal = -1</span>
+        case task.OUT_ALLOCATION:<span class="cov0" title="0">
+                kind = flowrecord.FLOWTYPE_ZUOFEIDIAOBO
+                signal = 1</span>
+        }
+        <span class="cov0" title="0">for _, r := range t.Recrods </span><span class="cov0" title="0">{
+                if r.ID == recordID </span><span class="cov0" title="0">{
+                        for _, ri := range r.Items </span><span class="cov0" title="0">{
+                                if err := i.CreateFlow(taskID, ri.ProductID, t.WarehouseID, kind, signal*ri.Quantity); err != nil </span><span class="cov0" title="0">{
+                                        return err
+                                }</span>
+                        }
+                }
+        }
+
+        <span class="cov0" title="0">if err := i.TaskRepository.Save(t); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+
+// flow流水记录api
+func (i InventoryServiceImpl) GetFlowList() ([]*flowrecord.InventoryFlow, error) <span class="cov0" title="0">{
+        list, err := i.InventoryFlowRepository.GetAll()
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">return list, nil</span>
+}
+
+func (i InventoryServiceImpl) CreateFlow(basicID string, productID string, warehouseID string, flow flowrecord.FlowType, change int) error <span class="cov8" title="1">{
+        previous, err := i.GetPreviousProductQuantity(productID, warehouseID)
+        if err != nil </span><span class="cov0" title="0">{
+                if err == gorm.ErrRecordNotFound </span><span class="cov0" title="0">{
+                        previous = 0
+                }</span> else<span class="cov0" title="0"> {
+                        return err
+                }</span>
+        }
+        <span class="cov8" title="1">f := flowrecord.NewInventoryFlow(basicID, productID, warehouseID, flow, previous, change)
+        if err := i.InventoryFlowRepository.Save(&amp;f); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov8" title="1">return nil</span>
+}
+
+func (i InventoryServiceImpl) GetPreviousProductQuantity(productID string, warehouseID string) (int, error) <span class="cov8" title="1">{
+        f, err := i.InventoryFlowRepository.GetByProductIDAndWarehouseID(productID, warehouseID)
+        if err != nil </span><span class="cov0" title="0">{
+                return 0, err
+        }</span>
+        <span class="cov8" title="1">return f.Present, nil</span>
+}
+
+// allot api
+func (i InventoryServiceImpl) GetAllotList() ([]*allot.Allot, error) <span class="cov0" title="0">{
+        list, err := i.AllotRepository.GetAll()
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">return list, nil</span>
+}
+
+func (i InventoryServiceImpl) CreateAllot(in string, out string, userID string, items []allot.Item) error <span class="cov0" title="0">{
+        a := allot.NewAllot(in, out, userID, items)
+        var taskItems []task.TaskItem
+        for _, item := range items </span><span class="cov0" title="0">{
+                taskItems = append(taskItems, task.NewTaskItem(item.ProductID, item.Quantity))
+        }</span>
+        <span class="cov0" title="0">if err := i.CreateTask(a.InWarehouseID, task.IN_ALLOCATION, a.ID, taskItems); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov0" title="0">if err := i.CreateTask(a.OutWarehouseID, task.OUT_ALLOCATION, a.ID, taskItems); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov0" title="0">if err := i.AllotRepository.Save(a); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+
+// take api
+func (i InventoryServiceImpl) GetTakeList() ([]*take.Take, error) <span class="cov0" title="0">{
+        list, err := i.TakeRepository.GetAll()
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">return list, nil</span>
+}
+
+func (i InventoryServiceImpl) CreateTake(warehouseID, userID string, items []take.Item) error <span class="cov0" title="0">{
+        t := take.NewTake(warehouseID, userID, items)
+        for _, item := range t.Items </span><span class="cov0" title="0">{
+                if err := i.CreateFlow(t.ID, item.ProductID, t.WarehouseID, flowrecord.FLOWTYPE_PANDIAN, item.Quantity); err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+        }
+        <span class="cov0" title="0">if err := i.TakeRepository.Save(&amp;t); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package model
+
+import "gorm.io/gorm"
+
+func AutoMigrate(db *gorm.DB) error <span class="cov8" title="1">{
+
+        // goods
+        if err := db.AutoMigrate(&amp;Category{}); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov8" title="1">if err := db.AutoMigrate(&amp;Unit{}); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov8" title="1">if err := db.AutoMigrate(&amp;OpeningStock{}); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov8" title="1">if err := db.AutoMigrate(&amp;Product{}); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        // share
+        <span class="cov8" title="1">if err := db.AutoMigrate(&amp;Warehouse{}); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov8" title="1">if err := db.AutoMigrate(&amp;Supplier{}); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov8" title="1">if err := db.AutoMigrate(&amp;Customer{}); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov8" title="1">if err := db.AutoMigrate(&amp;Budget{}); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov8" title="1">if err := db.AutoMigrate(&amp;Account{}); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        // system
+        <span class="cov8" title="1">if err := db.AutoMigrate(&amp;User{}); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        // inventory
+        <span class="cov8" title="1">if err := db.AutoMigrate(&amp;InventoryFlow{}); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov8" title="1">if err := db.AutoMigrate(&amp;Task{}); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov8" title="1">if err := db.AutoMigrate(&amp;TaskItem{}); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov8" title="1">if err := db.AutoMigrate(&amp;TaskRecord{}); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov8" title="1">if err := db.AutoMigrate(&amp;TaskRecordItem{}); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov8" title="1">if err := db.AutoMigrate(&amp;Allot{}); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov8" title="1">if err := db.AutoMigrate(&amp;AllotItem{}); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov8" title="1">if err := db.AutoMigrate(&amp;Take{}); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov8" title="1">if err := db.AutoMigrate(&amp;TakeItem{}); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        // sale
+        <span class="cov8" title="1">if err := db.AutoMigrate(&amp;SaleOrder{}); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov8" title="1">if err := db.AutoMigrate(&amp;SaleOrderItem{}); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        // purchase
+        <span class="cov8" title="1">if err := db.AutoMigrate(&amp;PurchaseOrder{}); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov8" title="1">if err := db.AutoMigrate(&amp;PurchaseOrderItem{}); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        
+        <span class="cov8" title="1">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package app
+
+import (
+        "net/http"
+
+        "github.com/gin-gonic/gin"
+        "github.com/mrokoo/goERP/internal/purchase/domain"
+        "github.com/mrokoo/goERP/pkg/reponse"
+)
+
+type PurchaseHandler struct {
+        PurchaseService PurchaseService
+}
+
+func NewPurchaseHandler(purchaseService PurchaseService) *PurchaseHandler <span class="cov0" title="0">{
+        return &amp;PurchaseHandler{
+                PurchaseService: purchaseService,
+        }
+}</span>
+
+func (h *PurchaseHandler) GetPurchaseOrderList(ctx *gin.Context) <span class="cov0" title="0">{
+        purchaseOrders, err := h.PurchaseService.GetPurchaseOrderList()
+        if err != nil </span><span class="cov0" title="0">{
+                ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
+                        Message: err.Error(),
+                        Data:    nil,
+                })
+                return
+        }</span>
+        <span class="cov0" title="0">ctx.JSON(http.StatusOK, reponse.Reponse{
+                Message: "",
+                Data:    purchaseOrders,
+        })</span>
+}
+
+func (h *PurchaseHandler) AddPurchaseOrder(ctx *gin.Context) <span class="cov0" title="0">{
+        var req struct {
+                ID           string        `json:"id" binding:"required"`
+                SupplierID   string        `json:"supplier_id" binding:"required"`
+                WarehouseID  string        `json:"warehouse_id" binding:"required"`
+                UserID       string        `json:"user_id" binding:"required"`
+                Items        []domain.Item `json:"items" binding:"required"`
+                AccountID    string        `json:"account_id" binding:"required"`
+                OtherCost    float64       `json:"other_cost" binding:"gte=0"`
+                ActalPayment float64       `json:"actal_payment" binding:"gte=0"`
+                Basic        string        `json:"basic"`
+                Kind         string        `json:"kind" binding:"required,oneof=Order ReturnOrder"`
+        }
+
+        if err := ctx.ShouldBindJSON(&amp;req); err != nil </span><span class="cov0" title="0">{
+                ctx.JSON(http.StatusBadRequest, reponse.Reponse{
+                        Message: err.Error(),
+                        Data:    nil,
+                })
+                return
+        }</span>
+
+        <span class="cov0" title="0">order := domain.NewPurchaseOrder(req.ID, req.WarehouseID, req.SupplierID, req.UserID, req.AccountID, req.OtherCost, req.ActalPayment, req.Basic, req.Items, domain.Kind(req.Kind))
+        err := h.PurchaseService.AddPurchaseOrder(&amp;order)
+        if err != nil </span><span class="cov0" title="0">{
+                ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
+                        Message: err.Error(),
+                        Data:    nil,
+                })
+                return
+        }</span>
+        <span class="cov0" title="0">ctx.JSON(http.StatusOK, reponse.Reponse{
+                Message: "",
+                Data:    order,
+        })</span>
+}
+
+func (h *PurchaseHandler) InvalidatePurchaseOrder(ctx *gin.Context) <span class="cov0" title="0">{
+        id := ctx.Param("id")
+        err := h.PurchaseService.InvalidatePurchaseOrder(id)
+        if err != nil </span><span class="cov0" title="0">{
+                ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
+                        Message: err.Error(),
+                        Data:    nil,
+                })
+                return
+        }</span>
+        <span class="cov0" title="0">ctx.JSON(http.StatusOK, reponse.Reponse{
+                Message: "",
+                Data:    nil,
+        })</span>
+}
+
+func (h *PurchaseHandler) AddPurchaseReturnOrder(ctx *gin.Context) <span class="cov0" title="0">{
+        var req struct {
+                ID           string        `json:"id" binding:"required"`
+                SupplierID   string        `json:"supplier_id" binding:"required"`
+                WarehouseID  string        `json:"warehouse_id" binding:"required"`
+                UserID       string        `json:"user_id" binding:"required"`
+                Items        []domain.Item `json:"items" binding:"required"`
+                AccountID    string        `json:"account_id" binding:"required"`
+                OtherCost    float64       `json:"other_cost" binding:"gte=0"`
+                ActalPayment float64       `json:"actal_payment" binding:"gte=0"`
+                Basic        string        `json:"basic"`
+                Kind         string        `json:"kind" binding:"required,oneof=Order ReturnOrder"`
+        }
+
+        if err := ctx.ShouldBindJSON(&amp;req); err != nil </span><span class="cov0" title="0">{
+                ctx.JSON(http.StatusBadRequest, reponse.Reponse{
+                        Message: err.Error(),
+                        Data:    nil,
+                })
+                return
+        }</span>
+
+        <span class="cov0" title="0">order := domain.NewPurchaseOrder(req.ID, req.WarehouseID, req.SupplierID, req.UserID, req.AccountID, req.OtherCost, req.ActalPayment, req.Basic, req.Items, domain.Kind(req.Kind))
+        err := h.PurchaseService.AddPurchaseReturnOrder(&amp;order)
+        if err != nil </span><span class="cov0" title="0">{
+                ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
+                        Message: err.Error(),
+                        Data:    nil,
+                })
+                return
+        }</span>
+        <span class="cov0" title="0">ctx.JSON(http.StatusOK, reponse.Reponse{
+                Message: "",
+                Data:    order,
+        })</span>
+}
+
+func (h *PurchaseHandler) InvalidatePurchaseReturnOrder(ctx *gin.Context) <span class="cov0" title="0">{
+        id := ctx.Param("id")
+        err := h.PurchaseService.InvalidatePurchaseReturnOrder(id)
+        if err != nil </span><span class="cov0" title="0">{
+                ctx.JSON(http.StatusInternalServerError, reponse.Reponse{
+                        Message: err.Error(),
+                        Data:    nil,
+                })
+                return
+        }</span>
+        <span class="cov0" title="0">ctx.JSON(http.StatusOK, reponse.Reponse{
+                Message: "",
+                Data:    nil,
+        })</span>
+}
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">package app
+
+import (
+        inventory "github.com/mrokoo/goERP/internal/inventory/app"
+        "github.com/mrokoo/goERP/internal/inventory/domain/aggregate/task"
+        "github.com/mrokoo/goERP/internal/purchase/domain"
+)
+
+type PurchaseService interface {
+        GetPurchaseOrderList() ([]*domain.PurchaseOrder, error)
+        AddPurchaseOrder(purchaseOrder *domain.PurchaseOrder) error
+        AddPurchaseReturnOrder(purchaseOrder *domain.PurchaseOrder) error
+        InvalidatePurchaseOrder(purchaseOrderID string) error
+        InvalidatePurchaseReturnOrder(purchaseOrderID string) error
+}
+
+type PurchaseServiceImpl struct {
+        orderRepository  domain.PurchaseOrderRepository
+        inventoryService inventory.InventoryService
+}
+
+func NewPurchaseServiceImpl(orderRepository domain.PurchaseOrderRepository, inventoryService inventory.InventoryService) *PurchaseServiceImpl <span class="cov8" title="1">{
+        return &amp;PurchaseServiceImpl{
+                orderRepository:  orderRepository,
+                inventoryService: inventoryService,
+        }
+}</span>
+
+func (s *PurchaseServiceImpl) GetPurchaseOrderList() ([]*domain.PurchaseOrder, error) <span class="cov8" title="1">{
+        return s.orderRepository.GetAll()
+}</span>
+
+func (s *PurchaseServiceImpl) AddPurchaseOrder(purchaseOrder *domain.PurchaseOrder) error <span class="cov8" title="1">{
+        if err := s.orderRepository.Save(purchaseOrder); err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+        <span class="cov0" title="0">p := purchaseOrder
+        var taskItems []task.TaskItem
+        for _, item := range p.Items </span><span class="cov0" title="0">{
+                taskItem := task.NewTaskItem(item.ProductID, item.Quantity)
+                taskItems = append(taskItems, taskItem)
+        }</span>
+        <span class="cov0" title="0">if err := s.inventoryService.CreateTask(p.WarehouseID, task.IN_PURCHASE, p.ID, taskItems); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (s *PurchaseServiceImpl) AddPurchaseReturnOrder(returnOrder *domain.PurchaseOrder) error <span class="cov0" title="0">{
+        if err := s.orderRepository.Save(returnOrder); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov0" title="0">p := returnOrder
+        var taskItems []task.TaskItem
+        for _, item := range p.Items </span><span class="cov0" title="0">{
+                taskItem := task.NewTaskItem(item.ProductID, item.Quantity)
+                taskItems = append(taskItems, taskItem)
+        }</span>
+        <span class="cov0" title="0">if err := s.inventoryService.CreateTask(p.WarehouseID, task.OUT_PURCHASE, p.ID, taskItems); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (s *PurchaseServiceImpl) InvalidatePurchaseOrder(purchaseOrderID string) error <span class="cov8" title="1">{
+        task_, err := s.inventoryService.GetTaskByPurchaseID(purchaseOrderID, task.IN_PURCHASE)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov8" title="1">if err := s.inventoryService.InvalidateTask(task_.ID); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov8" title="1">if err := s.orderRepository.Invalidated(purchaseOrderID); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov8" title="1">return nil</span>
+}
+
+func (s *PurchaseServiceImpl) InvalidatePurchaseReturnOrder(purchaseOrderID string) error <span class="cov0" title="0">{
+        task_, err := s.inventoryService.GetTaskByPurchaseID(purchaseOrderID, task.OUT_PURCHASE)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov0" title="0">if err := s.inventoryService.InvalidateTask(task_.ID); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov0" title="0">if err := s.orderRepository.Invalidated(purchaseOrderID); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file7" style="display: none">package infra
+
+import (
+        "context"
+        "errors"
+
+        "github.com/casbin/casbin/v2"
+        mongodbadapter "github.com/casbin/mongodb-adapter/v3"
+        "github.com/mrokoo/goERP/internal/system/role/domain"
+        "go.mongodb.org/mongo-driver/mongo"
+)
+
+var ErrFailUpdate = errors.New("fail to update role")
+
+type MongoRepository struct {
+        e      *casbin.Enforcer
+        client *mongo.Client
+}
+
+func NewMongoRepository(client *mongo.Client) *MongoRepository <span class="cov8" title="1">{
+        a, err := mongodbadapter.NewAdapterByDB(client, &amp;mongodbadapter.AdapterConfig{
+                DatabaseName:   "goERP",
+                CollectionName: "roles",
+        })
+        if err != nil </span><span class="cov0" title="0">{
+                panic(err)</span>
+        }
+        <span class="cov8" title="1">e, err := casbin.NewEnforcer("../../../../../config/model.conf", a)
+        if err != nil </span><span class="cov0" title="0">{
+                panic(err)</span>
+        }
+        <span class="cov8" title="1">return &amp;MongoRepository{
+                e:      e,
+                client: client,
+        }</span>
+}
+
+func (r *MongoRepository) Save(role *domain.Role) error <span class="cov8" title="1">{
+        for _, v := range role.Permission </span><span class="cov8" title="1">{
+                rules := [][]string{
+                        {role.Name, v, "read"},
+                        {role.Name, v, "write"},
+                }
+                _, err := r.e.AddPolicies(rules)
+                if err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+        }
+        <span class="cov8" title="1">return nil</span>
+}
+
+func (r *MongoRepository) Update(role *domain.Role) error <span class="cov8" title="1">{
+        session, err := r.client.StartSession()
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov8" title="1">defer session.EndSession(context.TODO())
+        if err := r.Delete(role.Name); err != nil </span><span class="cov0" title="0">{
+                session.AbortTransaction(context.TODO())
+                return ErrFailUpdate
+        }</span>
+        <span class="cov8" title="1">if err := r.Save(role); err != nil </span><span class="cov0" title="0">{
+                session.AbortTransaction(context.TODO())
+                return ErrFailUpdate
+        }</span>
+        <span class="cov8" title="1">session.CommitTransaction(context.TODO())
+        return nil</span>
+}
+
+func (r *MongoRepository) Delete(name string) error <span class="cov8" title="1">{
+        _, err := r.e.DeleteRole(name)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov8" title="1">return nil</span>
+}
+
+func (r *MongoRepository) FindByName(name string) (*domain.Role, error) <span class="cov8" title="1">{
+        filteredPolicy := r.e.GetFilteredPolicy(0, name)
+        pp := toRole(filteredPolicy)
+        return &amp;domain.Role{
+                Name:       name,
+                Permission: pp,
+        }, nil
+}</span>
+
+func (r *MongoRepository) FindaAll() ([]*domain.Role, error) <span class="cov8" title="1">{
+        var allrole []*domain.Role
+        allSubjects := r.e.GetAllSubjects()
+        for _, v := range allSubjects </span><span class="cov8" title="1">{
+                role, err := r.FindByName(v)
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+                <span class="cov8" title="1">allrole = append(allrole, role)</span>
+        }
+
+        <span class="cov8" title="1">return allrole, nil</span>
+}
+
+func toRole(p [][]string) []domain.PermissionItem <span class="cov8" title="1">{
+        var pp []domain.PermissionItem
+        for _, v := range p </span><span class="cov8" title="1">{
+                pp = append(pp, v[1])
+        }</span>
+        <span class="cov8" title="1">return removeRepByMap(pp)</span>
+}
+
+func removeRepByMap(slc []string) []string <span class="cov8" title="1">{
+        result := []string{}
+        tempMap := map[string]byte{}
+        for _, e := range slc </span><span class="cov8" title="1">{
+                l := len(tempMap)
+                tempMap[e] = 0
+                if len(tempMap) != l </span><span class="cov8" title="1">{
+                        result = append(result, e)
+                }</span>
+        }
+        <span class="cov8" title="1">return result</span>
+}
+
+func (r *MongoRepository) AddRoleForUser(username string, role string) error <span class="cov8" title="1">{
+        roles, err := r.GetRolesForUser(username)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov8" title="1">if len(roles) != 0 </span><span class="cov0" title="0">{
+                return errors.New("the user already have role")
+        }</span>
+        <span class="cov8" title="1">if _, err := r.FindByName(role); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov8" title="1">_, err = r.e.AddRoleForUser(username, role)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov8" title="1">return nil</span>
+}
+
+func (r *MongoRepository) GetRolesForUser(name string) ([]string, error) <span class="cov8" title="1">{
+        roles, err := r.e.GetRolesForUser(name)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">return roles, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file8" style="display: none">package repository
+
+import (
+        "github.com/mrokoo/goERP/internal/model"
+        "github.com/mrokoo/goERP/internal/system/user/domain"
+)
+
+func toModel(user *domain.User) *model.User <span class="cov0" title="0">{
+        return &amp;model.User{
+                ID:       user.ID,
+                Name:     user.Name,
+                Phone:    user.Phone,
+                Email:    user.Email,
+                Gender:   user.Gender,
+                Password: user.Password,
+        }
+}</span>
+
+func toDomain(user *model.User) *domain.User <span class="cov0" title="0">{
+        return &amp;domain.User{
+                ID:       user.ID,
+                Name:     user.Name,
+                Phone:    user.Phone,
+                Email:    user.Email,
+                Gender:   user.Gender,
+                Password: user.Password,
+        }
+}</span>
+</pre>
+		
+		<pre class="file" id="file9" style="display: none">package repository
+
+import (
+        "github.com/mrokoo/goERP/internal/model"
+        "github.com/mrokoo/goERP/internal/system/user/domain"
+        "gorm.io/gorm"
+)
+
+var ErrNotFound = gorm.ErrRecordNotFound
+
+type UserRepository struct {
+        db *gorm.DB
+}
+
+func NewUserRepository(db *gorm.DB) *UserRepository <span class="cov8" title="1">{
+        return &amp;UserRepository{
+                db: db,
+        }
+}</span>
+
+func (r *UserRepository) GetAll() ([]*domain.User, error) <span class="cov0" title="0">{
+        var list []*model.User
+        result := r.db.Find(&amp;list)
+        if err := result.Error; err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">var users []*domain.User
+        for i := range list </span><span class="cov0" title="0">{
+                users = append(users, toDomain(list[i]))
+        }</span>
+        <span class="cov0" title="0">return users, nil</span>
+}
+
+func (r *UserRepository) GetByID(ID string) (*domain.User, error) <span class="cov0" title="0">{
+        user := model.User{
+                ID: ID,
+        }
+        result := r.db.First(&amp;user)
+        if err := result.Error; err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">return toDomain(&amp;user), nil</span>
+}
+
+func (r *UserRepository) Save(user *domain.User) error <span class="cov0" title="0">{
+        i := toModel(user)
+        result := r.db.Create(i)
+        return result.Error
+}</span>
+
+func (r *UserRepository) Replace(user *domain.User) error <span class="cov0" title="0">{
+        i := toModel(user)
+        result := r.db.Save(i)
+        return result.Error
+}</span>
+
+func (r *UserRepository) Delete(ID string) error <span class="cov0" title="0">{
+        result := r.db.Delete(&amp;model.User{
+                ID: ID,
+        })
+        return result.Error
+}</span>
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

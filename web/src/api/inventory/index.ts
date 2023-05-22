@@ -4,6 +4,7 @@ interface InventoryAPI {
   getTaskList: () => Promise<any>;
   addRecord: (id: string, data: any) => Promise<any>;
   invalidateRecord: (id: string, rid: string) => Promise<any>;
+  getInventoryFlowList: () => Promise<any>;
 }
 
 const inventoryAPI: InventoryAPI = {
@@ -13,6 +14,9 @@ const inventoryAPI: InventoryAPI = {
   },
   invalidateRecord: (id: string, rid: string) => {
     return axios.patch(`/tasks/${id}/records/${rid}`);
+  },
+  getInventoryFlowList: () => {
+    return axios.get("/inventoryflows");
   },
 };
 

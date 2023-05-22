@@ -29,8 +29,20 @@ type TaskRecord = {
   items: TaskRecordItem[];
 };
 
-
 type TaskRecordItem = {
   product_id: string;
   quantity: number;
-}
+};
+
+type InventoryFlow = {
+  id: string;
+  task_id?: string;
+  take_id?: string;
+  product_id: string;
+  warehouse_id: string;
+  flow: string;
+  previous: number;
+  change: number;
+  present: number;
+  created_at: string;
+};

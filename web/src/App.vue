@@ -48,6 +48,7 @@ onMounted(async () => {
   await system.getUser();
   await purchase.getPurchaseOrder();
   await inventory.getTaskList();
+  await inventory.getInventoryFlowList();
 });
 </script>
 

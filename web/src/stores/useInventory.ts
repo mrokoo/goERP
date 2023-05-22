@@ -6,6 +6,7 @@ const { message } = createDiscreteApi(["message"]);
 export const useInventory = defineStore("inventory", {
   state: () => ({
     task: [] as Task[],
+    flow: [] as InventoryFlow[],
   }),
   getters: {
     inTask(state) {
@@ -13,10 +14,18 @@ export const useInventory = defineStore("inventory", {
         return item.kind.includes("in");
       });
     },
-    taskRecord(state) {
+    intaskRecord(state) {
       const record = [] as TaskRecord[];
-      state.task.forEach((item) => {
-        record.push(...item.records);
+      const inTask = state.task.filter((item) => {
+        return item.kind.includes("in");
+      });
+
+      inTask.forEach((item) => {
+        if (item.records == null) {
+          return;
+        } else {
+          record.push(...item.records);
+        }
       });
       return record;
     },
@@ -27,6 +36,17 @@ export const useInventory = defineStore("inventory", {
         .getTaskList()
         .then((res: any) => {
           this.task.push(...res.data.data);
+        })
+        .catch((err: any) => {
+          throw err;
+        });
+    },
+
+    async getInventoryFlowList() {
+      api.inventory
+        .getInventoryFlowList()
+        .then((res: any) => {
+          this.flow.push(...res.data.data);
         })
         .catch((err: any) => {
           throw err;

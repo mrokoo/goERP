@@ -33,8 +33,8 @@ export default {
       component: () => import("@/views/finance/IncomeAndPay.vue"),
     },
     {
-      path: "flow",
-      name: "flow",
+      path: "f_flow",
+      name: "f_flow",
       component: () => import("@/views/finance/Flow.vue"),
     },
   ],

@@ -7,16 +7,16 @@ import (
 )
 
 type InventoryFlow struct {
-	ID          string
-	TaskID      *string
-	TakeID      *string
-	ProductID   string
-	WarehouseID string
-	Flow        FlowType
-	Previous    int // Previous Quantity
-	Change      int // Change Quantity
-	Present     int // Present Quantity
-	CreateAt    time.Time
+	ID          string    `json:"id"`
+	TaskID      *string   `json:"task_id"`
+	TakeID      *string   `json:"take_id"`
+	ProductID   string    `json:"product_id"`
+	WarehouseID string    `json:"warehouse_id"`
+	Flow        FlowType  `json:"flow"`
+	Previous    int       `json:"previous"` // Previous Quantity
+	Change      int       `json:"change"`   // Change Quantity
+	Present     int       `json:"present"`  // Present Quantity
+	CreateAt    time.Time `json:"created_at"`
 }
 
 func NewInventoryFlow(basicID string, productID string, warehouseID string, flow FlowType, previous int, change int) InventoryFlow {

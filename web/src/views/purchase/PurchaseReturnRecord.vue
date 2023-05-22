@@ -3,7 +3,10 @@ import { h, reactive, ref, Component, computed } from "vue";
 import Container from "@/components/Container.vue";
 import { NButton, NDataTable, type DataTableColumns } from "naive-ui";
 import { usePurchaseOrder } from "@/stores/usePurchaseOrder";
-
+import dayjs from "dayjs";
+import isLeapYear from "dayjs/plugin/isLeapYear"; // 导入插件
+dayjs.extend(isLeapYear); // 使用插件
+dayjs.locale("zh-cn"); // 使用本地化语言
 const order = usePurchaseOrder();
 
 type RowData = {
@@ -47,6 +50,9 @@ const tcolumns: DataTableColumns<RowData> = [
     title: "采购日期",
     key: "created_at",
     align: "center",
+    render(rowData, rowIndex) {
+      return dayjs(rowData.created_at).format("YYYY-MM-DD");
+    },
   },
   {
     title: "采购总额",
