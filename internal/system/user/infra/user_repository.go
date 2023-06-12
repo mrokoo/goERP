@@ -60,3 +60,4 @@ func (r *UserRepository) Delete(ID string) error {
 	})
 	return result.Error
 }
+
